@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>闭包及其在Java中的模拟实现 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="在上一篇博文 为什么Java匿名内部类中的方法参数必须定义为final 中提到在Stackoverflow上搜索答案时，有老外在答案中提到了Closure这个词，而这篇博文中就是关于闭包的。 我们先来看一下维基上给出的关于闭包的解释： In computer science, a closure &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/02/10/simulate-closure-in-java/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">闭包及其在Java中的模拟实现</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-02-10T14:04:00+08:00" pubdate data-updated="true">Feb 10<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在上一篇博文 <a href="http://liuxuan.info/blog/2011/01/28/java-anonymous-class/" title="为什么Java匿名内部类中的方法参数必须定义为final">为什么Java匿名内部类中的方法参数必须定义为final</a> 中提到在<code>Stackoverflow</code>上搜索答案时，有老外在答案中提到了<code>Closure</code>这个词，而这篇博文中就是关于闭包的。</p>
+
+<p>我们先来看一下维基上给出的关于闭包的解释：</p>
+
+<blockquote>
+  <p>In computer science, a <strong>closure</strong> is a first-class function with free variables that are bound in the lexical &gt; environment. Such a function is said to be “closed over” its free variables. A closure is defined within the scope of &gt; its free variables, and the extent of those variables is at least as long as the lifetime of the closure itself.</p>
+</blockquote>
+
+<p>第一次看这段英文的解释的时候很难搞懂他的意思，原因在于其中出现了较多第一次碰见的计算机编程领域的专业术语，如果不把这些专业术语搞明白的话整段话就自然而然搞不明白了（有朋友可能会说，你只要点击左侧边栏里的languages里的中文链接就能自动看中文版本的内容，而我想说的是中文版比英文版更看不明白XD）。</p>
+
+<!--more-->
+
+<p>好了，我们来逐个看一下这些专业名词。首先第一个是<code>first-class function</code>，这个名词已经做成了超链接，点击一下就可以看到关于<code>first-class function</code>的详细解释，所以这里就不贴了。有一个与<code>first-class function</code>对应的名词是<code>first-class object（第一类对象）</code>，维基上给出的解释是：第一类对象是个实体，它可以被当作函数的参数，可以从子程序中返回，可以赋值给变量。那么套用到<code>first-class function（第一类函数）</code>就是：如果某种函数可以作为参数传给其他函数，可以赋值给变量，可以被函数动态的创建和返回，那么这类函数被称为<code>first-class function</code>。</p>
+
+<p>看了这个定义后你可能会有这样一个疑问：在命令式编程语言中（例如Java），我们也可以把返回类型不是void的函数的调用作为另一个函数的参数传给他。其实在这个场景里，函数参数的类型还是基本类型或者引用类型，我们只是把原来的两行代码写在了一行里，真正传入的还是基本类型或者引用类型。而第一类函数可以作为参数传入另一个函数是指：可以在一段程序的执行过程中可以创建新的函数，可以在数据结构中保存新创建的函数，可以把这些新创建的函数作为参数传给其他函数，并且可以作为其他函数的返回值。也就是说其他函数可以把第一类函数（整个声明体或匿名）做为他的参数存在，这是和一般的命令式编程语言很大的区别（C#等混合语言除外）。</p>
+
+<p>好了，上面只是文字上的解释，我们来看一下第一类函数的例子：</p>
+
+<p>(1)第一类函数赋值给变量，这个函数的作用是对每个Int类型的值都加1：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Scala Example  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="k">var</span> <span class="n">increase</span> <span class="k">=</span> <span class="o">(</span><span class="n">x</span> <span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>(2)第一类函数作为参数传给另一个函数，这个函数的作用是打印集合中的每个元素：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Scala Example  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="nc">List</span><span class="o">.</span><span class="n">foreach</span><span class="o">((</span><span class="n">x</span> <span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>(3)第一类函数作为返回值，这个函数的作用是对x求导：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>C# Example  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class="csharp"><span class="line"><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Program</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="c1">// f: function that takes a double and returns a double</span>
+</span><span class="line">    <span class="c1">// deltaX: small positive number</span>
+</span><span class="line">    <span class="c1">// returns a function that is an approximate derivative of f</span>
+</span><span class="line">    <span class="k">static</span> <span class="n">Func</span><span class="err">＜</span><span class="kt">double</span> <span class="p">,</span> <span class="kt">double</span><span class="err">＞</span> <span class="n">MakeDerivative</span><span class="p">(</span><span class="n">Func</span><span class="err">＜</span><span class="kt">double</span> <span class="p">,</span> <span class="kt">double</span><span class="err">＞</span> <span class="n">f</span><span class="p">,</span> <span class="kt">double</span> <span class="n">deltaX</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">x</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span> <span class="p">+</span> <span class="n">deltaX</span><span class="p">)</span> <span class="p">-</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="p">/</span> <span class="n">deltaX</span><span class="p">;</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">()</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="kt">var</span> <span class="n">cos</span> <span class="p">=</span> <span class="n">MakeDerivative</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="n">Sin</span><span class="p">,</span> <span class="m">0.00000001</span><span class="p">);</span>
+</span><span class="line">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="m">0</span><span class="p">));</span>                    <span class="c1">// 1</span>
+</span><span class="line">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="n">PI</span> <span class="p">/</span> <span class="m">2</span><span class="p">));</span>          <span class="c1">// 0</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>好了，到现在为止只搞明白了<code>first-class function</code>是个什么东西，下面一个是<code>free variable（自由变量）</code>。点击词汇上的超链接，维基给出的解释是：自由变量是一个函数中的变量，并且既没有在上下文声明过，也不是函数的参数，并且会在函数的创建执行过程中被特定的值替换。<code>lexical environment</code>的意思可以理解为变量的作用域。</p>
+
+<p>现在我们可以来翻译这段关于闭包的解释了：
+&gt; 闭包是第一类函数和自由变量绑定在作用域中，这种函数被称为“关闭”他的自由变量。闭包是被定义在他的自由变量的作用域中，并且这些自由变量的生命周期至少跟&gt; 闭包本身的生命周期一样。
+因为闭包需要第一类函数和自由变量是函数式编程语言必须的要素，所以闭包更多的是在函数式编程语言中应用（JavaScript除外）。而Java不支持第一类函数，所以Java目前还不支持闭包（至少目前不支持，以后不好说）。但是我们在Java中可以模拟闭包（但是并不是真正的闭包，因为Java不支持上述所说的第一类函数），依靠内部类具有外部类引用的特性来模拟：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>UserController.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">final</span> <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">();</span>
+</span><span class="line"><span class="k">new</span> <span class="nf">AbstractExecutionThreadService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">    <span class="nd">@Override</span>
+</span><span class="line">    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">mailManager</span><span class="o">.</span><span class="na">sendActivateMail</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line"><span class="o">}.</span><span class="na">start</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>其实关于Java引入闭包的争论由来已久，几个月之前有消息说在JDK 7中将支持lamda表达式，并且我也在一些网站上看过语法的示例。但是看过后就感觉，即使把那些蛋疼的语法加入到Java中去，是不是也会有蛋疼的程序员去用？如果蛋疼的程序员写了蛋疼的代码，那读代码的人岂不是更蛋疼？</p>
+
+<p>现在已经有很多OO和FP混合的语言，比如Scala,Ruby,Python，C#现在更是把动态语言的特性也引入进去。我想说是不是真的有必要这么做？以C#为例，Linq可以把几行的循环代码等价转换成只有一行代码，这确实提高了编码效率。但是从我的感受来说，如果大段的命令式代码中突然夹杂了几行函数式的代码有一种非常强烈的跳跃感，除非你对命令式和函数式语言都非常的熟悉。</p>
+
+<p>语言之争（或者平台之争）一直是在激烈的持续着，这种情况下有点像冷战思维也不觉得奇怪，但是我觉得Java没必要跟C#学，C#想把自己变成一把瑞士军刀，但是，我们日常生活中有多少机会会用到这把功能虽多但很难用的刀呢？</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-02-10T14:04:00+08:00" pubdate data-updated="true">Feb 10<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>java</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/02/10/simulate-closure-in-java/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/02/10/simulate-closure-in-java/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

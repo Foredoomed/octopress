@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Java字节码invokeinterface,invokespecial,invokestatic和invokevirtual的含义和区别 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="在解释之前，首先需要理解JVM中的两个数据结构：Frames(栈帧)和Operand Stack(操作数栈)。 栈帧 在JVM中，栈帧是用来保存数据和部分结果，执行动态链接，返回方法调用的结果，分发异常。 每一次当一个方法被调用时就会创建一个新的栈帧，并且栈帧会在方法调用完毕后( &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/04/13/explain-java-bytecode-invokeinterface-invokespecial-invokestatic-invokevirtual/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Java字节码invokeinterface,invokespecial,invokestatic和invokevirtual的含义和区别</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-13T19:13:00+08:00" pubdate data-updated="true">Apr 13<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在解释之前，首先需要理解JVM中的两个数据结构：<strong>Frames(栈帧)</strong>和<strong>Operand Stack(操作数栈)</strong>。</p>
+
+<p><strong>栈帧</strong></p>
+
+<p>在JVM中，栈帧是用来保存数据和部分结果，执行动态链接，返回方法调用的结果，分发异常。</p>
+
+<p>每一次当一个方法被调用时就会创建一个新的栈帧，并且栈帧会在方法调用完毕后(无论方法是否正常执行结束或者因未捕获的异常而终止)消亡。</p>
+
+<p>栈帧是由JVM中创建栈帧的线程分配的。每个栈帧里含有：他自己的本地变量(基本数据类型或引用类型)的数组，他自己的操作数栈和一个当前方法所在类的常量池的引用。</p>
+
+<p>本地变量数组和操作数栈的大小在编译的时候就已经决定了，并且一直提供给和栈帧关联的方法使用。因此，栈帧的大小只跟JVM的实现以及方法被调用时这些数据结构同时在内存中被分配的大小决定。</p>
+
+<p>在一个线程执行过程中，任何时候只有一个栈帧(也就是正在执行的方法的栈帧)处于活动状态。这个栈帧就被认为是当前栈帧，并且他包含的方法就是当前正在执行的方法。当前方法所在的类称为当前类。在本地变量和操作数栈上的操作都含有当前栈帧的引用。</p>
+
+<p>当栈帧的方法调用另外的方法或者他的方法完成了，那么当前栈帧就会停止。当一个方法被调用的时候，会创建一个新的栈帧，并且当新的方法获得CPU控制权时这个新创建的栈帧会变成当前栈帧，当方法返回的时候，当前栈帧传回他的方法调用的结果，如果这个结果有的话将被传递给前一个栈帧。当之前的一个栈帧变成当前栈帧的时候，当前栈帧就会被丢弃。 <!--more--></p>
+
+<p><strong>操作数栈</strong></p>
+
+<p>每个栈帧都有一个last-in-first-out(LIFO)的栈，这个栈就被称为操作数栈。操作数栈的最大深度在编译时就已经确定，并且供与这个栈帧相关联的方法使用。</p>
+
+<p>当栈帧被创建时，操作数栈是空的。JVM发出指令装载本地变量中的常量和值到操作数栈中去。另外的指令是从操作数栈中取数，运算完成后把结果再放入操作数栈中。操作数栈还被用来保存方法的参数和方法的返回值。</p>
+
+<p>操作数栈中的值都是一个Java基本类型或者引用类型。操作数栈中的值必须在适合他们的类型的方式下操作。一小部分JVM指令(dup，swap)执行时不考虑值的类型，这些指令不能修改和分开单个的值，这些操作数栈的限制通过类文件检查时强制执行。</p>
+
+<p>long和double类型在操作数栈有2个单元长度，其他类型都是1个单元长度。</p>
+
+<p><strong>invokeinterface</strong></p>
+
+<p>当调用接口中的方法的时候，就会使用invokeinterface指令。</p>
+
+<p>Operand Stack
+    …, objectref, [arg1, [arg2 …]]  …</p>
+
+<p>实际被调用的方法将会遵循下面的查找步骤：</p>
+
+<p>(1)如果objectref这个类中含有和将要被调用的方法有相同的方法名和参数的方法，那么objectref这个类中的方法将会被调用，并且查找过程结束。</p>
+
+<p>(2)如果经过(1)后没有找到合适的方法，并且如果objectref有父类的话，那么就会在他的父类里迭代执行。</p>
+
+<p>(3)如果(1)，(2)后都没有找到，则会抛出AbstractMethodError。</p>
+
+<p><strong>invokespecial</strong></p>
+
+<p>当调用类的任何构造方法时，就会使用invokespecial指令。</p>
+
+<p>Operand Stack
+    …, objectref, [arg1, [arg2 …]]  …</p>
+
+<p>如果将要被调用的构造方法是“protected”的，并且要么是当前类的成员，要么是当前类父类的成员，那么objectref必须要么是当前类，要么是当前类的子类。</p>
+
+<p>当下面的条件都为“true”时，才会调用方法：</p>
+
+<p>(1)当前类已经设置好ACC_SUPER标志位。</p>
+
+<p>(2)要调用构造方法所在的类是当前类的父类。</p>
+
+<p>(3)要调用的构造方法所在的类还没有被实例化。</p>
+
+<p>当上面的条件都为“true”时，实际将要被调用的方法将会遵循下面的查找步骤。(假定C是当前类的直接父类):</p>
+
+<p>(1)如果C中有声明过相同的方法(包括方法签名和参数)，那么这个方法将会被调用，并且查找过程结束。</p>
+
+<p>(2)如果(1)不满足，并且C有父类，那么会在C的父类中迭代(1)，实际被调用的方法就是这个迭代查找过程的结果，并且查找过程结束。</p>
+
+<p>(3)如果(1),(2)都不满足，将会抛出AbstractMethodError。</p>
+
+<p><strong>invokestatic</strong></p>
+
+<p>当调用类的静态方法时，就会使用invokestatic指令。</p>
+
+<p>Operand Stack
+    …, [arg1, [arg2 …]]  …</p>
+
+<p>被调用的方法必须是静态方法，而且不能是抽象方法，并且如果要使用类的属性的话，那么类的属性也必须是静态的。</p>
+
+<p>如果这个静态方法是synchronized的，那么需要获得与这个类相关的monitor。</p>
+
+<p>如果这个被调用的方法不是native的话，操作数栈里保存的参数将会被弹出，并且为这个方法创建一个新的栈帧，弹出的参数按顺序赋值给新创建的栈帧的本地变量。如果弹出的参数是浮点类型的值的话，那么在保存为新栈帧的本地变量之前将会被类型转型(转换为最接近这个浮点类型值的类型)。</p>
+
+<p><strong>invokevirtual</strong></p>
+
+<p>当调用类的实例方法时，就会使用invokevirtual指令。</p>
+
+<p>值得注意的是，Java中的所有实例方法默认都是virtual的。</p>
+
+<p>Operand Stack
+    …, objectref, [arg1, [arg2 …]]  …</p>
+
+<p>如果被调用的方法是protected，并且他要么是当前类的成员，要么是当前类的父类里的成员，那么objectref必须要么是当前类，要么是当前类的子类。</p>
+
+<p>实际被调用的方法将会遵循以下查找过程：</p>
+
+<p>(1)如果objectref中有相同方法签名和参数的方法，并且这个方法可以从objectref中访问到，那么这个方法就会被调用，并且查找过程结束。</p>
+
+<p>(2)如果(1)不满足，并且objectref有一个父类，那么会在父类中迭代(1)，实际被调用的方法就是这个迭代查找过程的结果，并且查找过程结束。</p>
+
+<p>(3)如果(1),(2)都不满足，将会抛出AbstractMethodError 。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-13T19:13:00+08:00" pubdate data-updated="true">Apr 13<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>java</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/04/13/explain-java-bytecode-invokeinterface-invokespecial-invokestatic-invokevirtual/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/04/13/explain-java-bytecode-invokeinterface-invokespecial-invokestatic-invokevirtual/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

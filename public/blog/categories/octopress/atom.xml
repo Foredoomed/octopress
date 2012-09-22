@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: octopress | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/octopress/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[快速搭建Octopress博客环境]]></title>
+    <link href="http://liuxuan.info/blog/2012/06/14/setup-octopress-on-vps/"/>
+    <updated>2012-06-14T23:04:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/06/14/setup-octopress-on-vps</id>
+    <content type="html"><![CDATA[<p>这次为一个新买的VPS安装博客环境，特此记录如下。</p>
+
+<p><strong>1.删除和替换已有软件</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>servive sendmail stop
+</span><span class='line'>yum remove sendmail&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;service httpd stop
+</span><span class='line'>yum remove httpd&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;service rsyslog stop
+</span><span class='line'>yum remove rsyslog&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 添加EPEL软件库
+</span><span class='line'>rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装syslog-ng代替rsyslog
+</span><span class='line'>yum install syslog-ng
+</span><span class='line'>chkconfig syslog-ng on&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装dropbear代替openssh
+</span><span class='line'>yum install dropbear
+</span><span class='line'>chkconfig dropbear on
+</span><span class='line'>// 等dropbear配置好后
+</span><span class='line'>service sshd stop
+</span><span class='line'>yum remove openssh&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装vsftpd作为ftp服务器
+</span><span class='line'>yum install vsftpd
+</span><span class='line'>chkconfig vsftpd on&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 添加用户
+</span><span class='line'>groupadd www
+</span><span class='line'>useradd -g www username
+</span><span class='line'>passwd username&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 设定ftp登陆目录权限
+</span><span class='line'>chown -R usernmae /path/to/ftp/folder&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 更新软件
+</span><span class='line'>yum update
+</span><span class='line'>yum upgrade&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装ppp
+</span><span class='line'>rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装pptpd
+</span><span class='line'>rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<!-- more -->
+
+<p><strong>2.安装Octopress所需软件</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>// 安装git
+</span><span class='line'>yum install git&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装RVM
+</span><span class='line'>curl -L get.rvm.io | bash -s stable&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装ruby的依赖包
+</span><span class='line'>yum install -y gcc-c++ patch readline readline-devel zlib zlib-devel libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 添加nginx软件库
+</span><span class='line'>rpm -Uvh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装nginx
+</span><span class='line'>yum install nginx&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装ruby
+</span><span class='line'>rvm install 1.9.2&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装Octopress的依赖包
+</span><span class='line'>yum install python-devel&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 安装Octopress
+</span><span class='line'>mkdir /data
+</span><span class='line'><span class="nb">cd</span> /data
+</span><span class='line'>git clone git://github.com/imathis/octopress.git octopress&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;gem install bundler
+</span><span class='line'>rbenv rehash //If you use rbenv, rehash to be able to run the bundle <span class="nb">command</span>
+</span><span class='line'>bundle install
+</span><span class='line'>rake install&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;cd octopress
+</span><span class='line'>rake generate
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>3.VPS设置</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>// 配置vim
+</span><span class='line'>vim /etc/vimrc
+</span><span class='line'>// 加入下面几行
+</span><span class='line'>syntax on
+</span><span class='line'><span class="nb">set </span>nu
+</span><span class='line'><span class="nb">set </span><span class="nv">mouse</span><span class="o">=</span>a
+</span><span class='line'><span class="nb">set </span><span class="nv">tabstop</span><span class="o">=</span>4&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 禁用IPv6
+</span><span class='line'>vim /etc/sysconfig/network
+</span><span class='line'><span class="nv">NETWORKING_IPV6</span><span class="o">=</span>”no”&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 设置文件最大打开数
+</span><span class='line'>vim /etc/security/limits.conf
+</span><span class='line'>// 加入下面两行
+</span><span class='line'>* soft nofile 65535
+</span><span class='line'>* hard nofile 65535&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 把服务器时间改为上海时间
+</span><span class='line'>cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;// 关闭不需要的服务
+</span><span class='line'>ntsysv  //按空格选择和取消，按F12退出
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>4.其他设置</strong></p>
+
+<p>因为众所周知的原因在天朝twitter是无法访问的，所以最好去掉内置的twitter插件，这样就不会去请求twitter的js文件。方法是修改source/_includes文件夹下_twitter_sharing.html的文件名。</p>
+
+<p>关于dropbear/vsftp/pptp的配置可以参考<a href="http://liuxuan.info/blog/2011/08/21/install-dropbear-vsftp-pptpd-on-vps/">这里</a>，nginx的配置则可以参考<a href="http://liuxuan.info/blog/2011/11/08/switching-from-wordpress-to-octopress/">这里</a>。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[告别Wordpress,拥抱Octopress]]></title>
+    <link href="http://liuxuan.info/blog/2011/11/08/switching-from-wordpress-to-octopress/"/>
+    <updated>2011-11-08T22:49:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/11/08/switching-from-wordpress-to-octopress</id>
+    <content type="html"><![CDATA[<p>至今为止我开博有差不多1年多时间了，期间一直是用Wordpress搭建的博客系统。Wordpress虽然是目前最流行的博客系统，但是如果要在自己的VPS上搭建Wordpress环境还是有一定难度的(我当初搭建的时候就花了蛮长的时间，搭建完了还要优化)。当然最主要的还是用下来有许多的不方便的地方：</p>
+
+<ul>
+  <li>因为不懂PHP，所以修改功能起来比较麻烦</li>
+  <li>对“&lt;”等特殊符号需要手动转义</li>
+  <li>需要安装很多插件才能满足需要</li>
+  <li>Nginx+PHP+mySql的组合在小内存的VPS上内存占用率过高(在我256MB内存的VPS上达到了30%)</li>
+</ul>
+
+<p>直到上个星期在Google Reader上看到有人提到[Octopress]{http://octopress.org/ “Octopress”}这个用Ruby写的博客系统后，就一下子被它的简单轻量所吸引(只要一个Web服务器就行了，不需要mySql)，最终要的是我会Ruby，所以我毫不犹豫的决定从Wordpress转向Octopress。而且在Octopress的主页上还写着这样一句话：A blogging framework for hackers.恩，我就是个hacker，哈哈。</p>
+
+<p>整个安装过程还是比较简单的，不过在安装之前要先把之前的博客导出来(不管是从后台还是数据库导)，然后就可以按照<a href="http://octopress.org/docs/setup/" title="Octopress Setup">Octopress Setup</a>来安装了。注意，如果没有装过Ruby的话，那么在安装完<a href="http://beginrescueend.com/" title="RVM">RVM</a>后需要安装Ruby的依赖库：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum install -y gcc-c++ patch readline readline-devel zlib zlib-devel libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison iconv-devel
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>git的话只需要运行命令：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum install git-core
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>我的VPS的操作系统是CentOS 6，并且我把预装的Apache给卸载了，改用Nginx。顺便提一下，在编译Nginx的时候如果碰到编译错误，那就试试下面这句命令行吧：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum install pcre-devel
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>然后修改Nginx的配置文件nginx.conf
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>user  root;
+</span><span class='line'>worker_processes  1;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>error_log  logs/error.log crit;
+</span><span class='line'>#error_log  logs/error.log  notice;
+</span><span class='line'>#error_log  logs/error.log  info;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>pid        logs/nginx.pid;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>worker_rlimit_nofile 65535;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>events {
+</span><span class='line'>    use epoll;
+</span><span class='line'>    worker_connections  65535;
+</span><span class='line'>}&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>http {
+</span><span class='line'>    include       mime.types;
+</span><span class='line'>    default_type  application/octet-stream;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>server_names_hash_bucket_size 128;
+</span><span class='line'>large_client_header_buffers 4 32k;
+</span><span class='line'>client_header_buffer_size 32k; 
+</span><span class='line'>client_max_body_size 8m;
+</span><span class='line'>  
+</span><span class='line'>sendfile on;
+</span><span class='line'>keepalive_timeout 10 10;
+</span><span class='line'>tcp_nopush on;
+</span><span class='line'>tcp_nodelay on;
+</span><span class='line'>
+</span><span class='line'>fastcgi_connect_timeout 300;
+</span><span class='line'>fastcgi_send_timeout 300;
+</span><span class='line'>fastcgi_read_timeout 300;
+</span><span class='line'>fastcgi_buffer_size 32k;
+</span><span class='line'>fastcgi_buffers 4 32k;
+</span><span class='line'>fastcgi_busy_buffers_size 32k;
+</span><span class='line'>fastcgi_temp_file_write_size 32k;
+</span><span class='line'>fastcgi_intercept_errors on;
+</span><span class='line'>
+</span><span class='line'>gzip  on;
+</span><span class='line'>gzip_min_length  1k;
+</span><span class='line'>gzip_buffers     4 16k;
+</span><span class='line'>gzip_http_version 1.0;
+</span><span class='line'>gzip_comp_level 1;
+</span><span class='line'>gzip_types       text/plain application/x-javascript text/css application/xml;
+</span><span class='line'>gzip_vary on;
+</span><span class='line'>
+</span><span class='line'>server {
+</span><span class='line'>    listen       80;
+</span><span class='line'>    server_name  liuxuan.info www.liuxuan.info;
+</span><span class='line'>    
+</span><span class='line'>    log_format  access  '$remote_addr - $remote_user [$time_local] "$request" '
+</span><span class='line'>                        '$status $body_bytes_sent "$http_referer" '
+</span><span class='line'>                        '"$http_user_agent" $http_x_forwarded_for';
+</span><span class='line'>    
+</span><span class='line'>    access_log  logs/host.access.log  access;
+</span><span class='line'>
+</span><span class='line'>    location / {
+</span><span class='line'>        root   /path/to/octopress/public;
+</span><span class='line'>        index  index.html;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    #error_page  404              /404.html;
+</span><span class='line'>
+</span><span class='line'>    # redirect server error pages to the static page /50x.html
+</span><span class='line'>    #
+</span><span class='line'>    error_page   500 502 503 504  /50x.html;
+</span><span class='line'>    location = /50x.html {
+</span><span class='line'>        root   html;
+</span><span class='line'>    }
+</span><span class='line'>  
+</span><span class='line'>}
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>创建Nginx自动启动脚本
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>vim /etc/init.d/nginx
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>然后加入下面的内容
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># nginx - this script starts and stops the nginx daemin</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># chkconfig:   - 85 15 </span>
+</span><span class='line'><span class="c"># description:  Nginx is an HTTP(S) server, HTTP(S) reverse \</span>
+</span><span class='line'><span class="c">#               proxy and IMAP/POP3 proxy server</span>
+</span><span class='line'><span class="c"># processname: nginx</span>
+</span><span class='line'><span class="c"># config:      /usr/local/nginx/conf/nginx.conf</span>
+</span><span class='line'><span class="c"># pidfile:     /usr/local/nginx/logs/nginx.pid&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'>&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;source-function-library&quot;</span>&gt;Source <span class="k">function </span>library.&lt;/h1&gt;
+</span><span class='line'>&lt;p&gt;. /etc/rc.d/init.d/functions&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;source-networking-configuration&quot;</span>&gt;Source networking configuration.&lt;/h1&gt;
+</span><span class='line'>&lt;p&gt;. /etc/sysconfig/network&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;check-that-networking-is-up&quot;</span>&gt;Check that networking is up.&lt;/h1&gt;
+</span><span class='line'>&lt;p&gt;<span class="o">[</span> “<span class="nv">$NETWORKING</span>” <span class="o">=</span> “no” <span class="o">]</span> &amp;amp;&amp;amp; <span class="nb">exit </span>0&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;nginx<span class="o">=</span>”/usr/local/nginx/sbin/nginx”
+</span><span class='line'><span class="nv">prog</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$nginx</span><span class="k">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;NGINX_CONF_FILE<span class="o">=</span>”/usr/local/nginx/conf/nginx.conf”&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;lockfile<span class="o">=</span>/var/lock/subsys/nginx&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;start<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">[</span> -x <span class="nv">$nginx</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit </span>5
+</span><span class='line'>    <span class="o">[</span> -f <span class="nv">$NGINX_CONF_FILE</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit </span>6
+</span><span class='line'>    <span class="nb">echo</span> -n <span class="nv">$”</span>Starting <span class="nv">$prog</span>: “
+</span><span class='line'>    daemon <span class="nv">$nginx</span> -c <span class="nv">$NGINX_CONF_FILE</span>
+</span><span class='line'>    <span class="nv">retval</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>    <span class="nb">echo</span>
+</span><span class='line'>    <span class="o">[</span> <span class="nv">$retval</span> -eq 0 <span class="o">]</span> &amp;amp;&amp;amp; touch <span class="nv">$lockfile</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retval</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;stop<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nb">echo</span> -n <span class="nv">$”</span>Stopping <span class="nv">$prog</span>: “
+</span><span class='line'>    killproc <span class="nv">$prog</span> -QUIT
+</span><span class='line'>    <span class="nv">retval</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>    <span class="nb">echo</span>
+</span><span class='line'>    <span class="o">[</span> <span class="nv">$retval</span> -eq 0 <span class="o">]</span> &amp;amp;&amp;amp; rm -f <span class="nv">$lockfile</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retval</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;restart<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    configtest <span class="o">||</span> <span class="k">return</span> <span class="nv">$?</span>
+</span><span class='line'>    stop
+</span><span class='line'>    start
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;reload<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    configtest <span class="o">||</span> <span class="k">return</span> <span class="nv">$?</span>
+</span><span class='line'>    <span class="nb">echo</span> -n <span class="nv">$”</span>Reloading <span class="nv">$prog</span>: “
+</span><span class='line'>    killproc <span class="nv">$nginx</span> -HUP
+</span><span class='line'>    <span class="nv">RETVAL</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>    <span class="nb">echo</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;force_reload<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    restart
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;configtest<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nv">$nginx</span> -t -c <span class="nv">$NGINX_CONF_FILE</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;rh_status<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    status <span class="nv">$prog</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;rh_status_q<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    rh_status &amp;gt;/dev/null 2&amp;gt;&amp;amp;1
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;case “<span class="nv">$1</span>” in
+</span><span class='line'>    start<span class="o">)</span>
+</span><span class='line'>        rh_status_q &amp;amp;&amp;amp; <span class="nb">exit </span>0
+</span><span class='line'>        <span class="nv">$1</span>
+</span><span class='line'>        ;;
+</span><span class='line'>    stop<span class="o">)</span>
+</span><span class='line'>        rh_status_q <span class="o">||</span> <span class="nb">exit </span>0
+</span><span class='line'>        <span class="nv">$1</span>
+</span><span class='line'>        ;;
+</span><span class='line'>    restart|configtest<span class="o">)</span>
+</span><span class='line'>        <span class="nv">$1</span>
+</span><span class='line'>        ;;
+</span><span class='line'>    reload<span class="o">)</span>
+</span><span class='line'>        rh_status_q <span class="o">||</span> <span class="nb">exit </span>7
+</span><span class='line'>        <span class="nv">$1</span>
+</span><span class='line'>        ;;
+</span><span class='line'>    force-reload<span class="o">)</span>
+</span><span class='line'>        force_reload
+</span><span class='line'>        ;;
+</span><span class='line'>    status<span class="o">)</span>
+</span><span class='line'>        rh_status
+</span><span class='line'>        ;;
+</span><span class='line'>    condrestart|try-restart<span class="o">)</span>
+</span><span class='line'>        rh_status_q <span class="o">||</span> <span class="nb">exit </span>0
+</span><span class='line'>            ;;
+</span><span class='line'>    *<span class="o">)</span>
+</span><span class='line'>        <span class="nb">echo</span> <span class="nv">$”</span>Usage: <span class="nv">$0</span> <span class="o">{</span>start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest<span class="o">}</span>”
+</span><span class='line'>        <span class="nb">exit </span>2
+</span><span class='line'><span class="k">esac</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>添加可执行权限
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chmod +x /etc/init.d/nginx
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>配置开机自启动
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chkconfig nginx on
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>安装完成后顺便对CentOS做一下优化，用<a href="http://www.balabit.com/network-security/syslog-ng/opensource-logging-system" title="syslog-ng">syslog-ng</a>替换rsyslog，删除不需要的进程。然后调整Linux的最大文件打开数：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>vim /etc/security/limits.conf
+</span><span class='line'>在最后一行添加
+</span><span class='line'>* soft nofile 65535
+</span><span class='line'>* hard nofile 65535
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>整个搭建过程在30分钟之内就可以搞定，大大低于搭建Wordpress环境所需要的时间。而且通过top命令可以看到由于只有一个Nginx进程，所以整个内存占用率在4%左右，大大低于Wordpress的30%，这点对于小内存的VPS是非常有优势的。</p>
+
+]]></content>
+  </entry>
+  
+</feed>

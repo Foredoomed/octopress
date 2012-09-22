@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>浏览器是如何工作的(十) - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="6 绘制 在绘制阶段会遍历渲染树和调用renderer的paint方法来把他们的内容显示在屏幕上。绘制使用的是UI基础组件。 6.1 全局和增量 像布局一样，可以全局绘(绘制整个渲染树)，也可以是增量绘制。在增量绘制中，一部分renderer的变化不会影响这棵渲染树。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/12/14/how-browsers-work-ten/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">浏览器是如何工作的(十)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-14T00:26:00+08:00" pubdate data-updated="true">Dec 14<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>6 绘制</strong></p>
+
+<p>在绘制阶段会遍历渲染树和调用renderer的<code>paint</code>方法来把他们的内容显示在屏幕上。绘制使用的是UI基础组件。</p>
+
+<p><strong>6.1 全局和增量</strong></p>
+
+<p>像布局一样，可以全局绘(绘制整个渲染树)，也可以是增量绘制。在增量绘制中，一部分renderer的变化不会影响这棵渲染树。变化过的renderer会使它在屏幕上的矩形区域无效，这就会造成OS把它当作“脏区域”(dirty region)并且生成<code>paint</code>事件。OS会聪明地把多个脏区域合并成一个。在Chrome中则更复杂一点，因为renderer不是在主进程中，而是在其他进程中。Chrome模拟OS行为并且扩展它们，表现层监听这些事件而且把消息代理给渲染树的根元素。遍历渲染树直到遇见相关的renderer，渲染树重新绘制自己(经常连同它的孩子节点)。</p>
+
+<p><strong>6.2 绘制顺序</strong></p>
+
+<p>CSS2的规范中规定了绘制的顺序。这个顺序实际上就是元素在上下文中堆积的顺序。因为是从后往前绘制的，所以这个顺序会影响绘制。renderer的堆积顺序是：</p>
+
+<ol>
+  <li>background color</li>
+  <li>background image</li>
+  <li>border</li>
+  <li>children</li>
+  <li>outline</li>
+</ol>
+
+<p><strong>6.3 Firefox的显示列表</strong></p>
+
+<p>Firefox会再次遍历渲染树，然后构造一个已经绘制的矩形区域的显示列表。其中包含矩形区域相关的renderer，从右往左的绘制顺序(背景，边框等)。这种方式只需要遍历一次渲染树就可以重新绘制(所有背景，再所有图片，再所有边框等)。</p>
+
+<p>Firefox通过不把hidden的元素加入到列表中来优化这个过程。</p>
+
+<p><strong>6.4 Webkit的矩形存储</strong></p>
+
+<p>在重新绘制之前，webkit把旧的矩形保存为一个<code>bitmap</code>，然后只重新绘制新旧矩形的不同之处。</p>
+
+<!-- more -->
+
+<p><strong>7 动态变化</strong></p>
+
+<p>对应一个修改，浏览器会做尽可能少的动作，所以改变元素的颜色只会重新绘制这个元素。元素位置的改变会使元素重新布局和绘制，包括它的孩子和同辈元素。添加一个DOM节点会导致重新布局和绘制这个节点，主要的变化，比如改变<code>html</code>元素的字体大小，会导致缓存失效，重新布局和绘制整棵渲染树。</p>
+
+<p><strong>8 渲染引擎的线程</strong></p>
+
+<p>渲染引擎是单线程的，除了网络操作，大多数情况下是单线程的。在Firefox和Safari里，渲染线程是浏览器的主线程，但是在Chrome里它则是标签页进程的主线程。</p>
+
+<p>网络操作可以被多个线程并行执行，并行连接的数量是限定的(一般是2到6个连接，例如Firefox 3采用的是6个连接)。</p>
+
+<p><strong>8.1 事件循环</strong></p>
+
+<p>浏览器的主线程是一个事件循环，而且这个循环是无限的来保持进程能一直存活下去。它等待事件(比如布局和绘制事件)的到来，然后处理他们。下面是Firefox的主事件循环代码：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">mExiting</span><span class="p">)</span>
+</span><span class="line">    <span class="n">NS_ProcessNextEvent</span><span class="p">(</span><span class="kr">thread</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>9 CSS2的视觉模型</strong></p>
+
+<p><strong>9.1 画布(canvas)</strong></p>
+
+<p>根据CSS2的规范，画布是指：格式化结构被渲染的空间，也就是浏览器绘制内容的地方。画布在空间的任意维度上都是无限的，但是浏览器会在<code>viewport</code>的维度上选择一个初始宽度。</p>
+
+<p>根据<a href="www.w3.org/TR/CSS2/zindex.html" title="z-index">z-index</a>上所说，如果一个画布内包含了另一个画布的话，那么它内部的画布就会边透明；而如果没有包含其他画布的话，浏览器会给它一个浏览器定义的颜色。</p>
+
+<p><strong>9.2 CSS的盒子模型(box model)</strong></p>
+
+<p>CSS的盒子模型描述的是在文档树中为元素生成的矩形盒子，并且根据视觉格式模型被展现出来。</p>
+
+<p>每个盒子有一个内容区域(比如：文字，图片等)和可选的<code>padding</code>，<code>border</code>以及<code>margin</code>区域。</p>
+
+<p><img src="http://farm8.staticflickr.com/7005/6505395185_30710fe726.jpg&quot; width=&quot;500&quot; height=&quot;342&quot;" alt="box model" /></p>
+
+<p>每个节点都会生成0到n个这样的盒子。所有的元素都有一个<code>display</code>属性，这个属性决定了要生成盒子的类型。例如：</p>
+
+<p>block  - generates a block box.
+inline - generates one or more inline boxes.
+none - no box is generated.</p>
+
+<p>默认的盒子是<code>inline</code>类型的，但是浏览器自带的样式标会设置成其他默认值。例如：<code>div</code>元素的<code>display</code>默认值是<code>block</code>。你可以在<a href="www.w3.org/TR/CSS2/sample.html">这里</a>找到默认样式表的例子。</p>
+
+<p><strong>9.3 确定scheme的位置</strong></p>
+
+<p>有三种类型的scheme：</p>
+
+<ol>
+  <li>普通： 对象是根据它在文档中的位置来确定位置的，也就是说它在渲染树中的位置就好像它在DOM树中的位置，然后根据它的盒子类型和维度展现出来。</li>
+  <li>浮动： 对象一开始是普通类型，然后尽可能地往左边或右边移动。</li>
+  <li>绝对： 对象在渲染树中的位置和它在DOM树中的位置不同。</li>
+</ol>
+
+<p>scheme的位置是通过设置<code>position</code>属性和<code>float</code>属性来确定的。</p>
+
+<ul>
+  <li>静态和相对的值生成普通流</li>
+  <li>绝对和固定的值生成绝对的位置</li>
+</ul>
+
+<p>在静态位置确定过程中，<code>position</code>没有被定义，而且使用默认值，在其他scheme里，开发者指定了<code>position</code>(top,bottom,left,right)。</p>
+
+<p>盒子展现的方式是由以下条件决定的：</p>
+
+<ul>
+  <li>盒子的类型</li>
+  <li>盒子的维度</li>
+  <li>scheme的位置</li>
+  <li>外部信息(比如：图片大小和屏幕尺寸)</li>
+</ul>
+
+<p><strong>9.4 盒子的类型</strong></p>
+
+<p>Block：在浏览器窗口中有自己的矩形区域</p>
+
+<p><img src="http://farm8.staticflickr.com/7018/6505506095_ba7907c252_m.jpg&quot; width=&quot;150&quot; height=&quot;127&quot;" alt="block box" /></p>
+
+<p>Inline：没有自己的block，但是被其他block包含</p>
+
+<p><img src="http://farm8.staticflickr.com/7029/6505521245_8a3aee3173_m.jpg&quot; width=&quot;240&quot; height=&quot;186&quot;" alt="inline box" /></p>
+
+<p>Block垂直方向上一个排列，Inline在水平方向上排列</p>
+
+<p><img src="http://farm8.staticflickr.com/7003/6505539833_92df259ca6_m.jpg&quot; width=&quot;240&quot; height=&quot;222&quot;" alt="block and inline formatting" /></p>
+
+<p>Inline盒子被放在一行行中，所以又叫”line boxes”。行的高度至少要和最高的盒子一样，但是可以更高。当盒子和基准行(baseline)对齐时，意味着元素的底部和其他盒子不是底部的某个点对齐。为了防止容器的宽度不够，inline的盒子会被放在多行中，这一般发生在有段落的情况下。</p>
+
+<p><img src="http://farm8.staticflickr.com/7160/6505571567_7834c0cae3_m.jpg&quot; width=&quot;240&quot; height=&quot;166&quot;" alt="lines" /></p>
+
+<p><strong>9.5 确定位置</strong></p>
+
+<p><strong>9.5.1 相对盒子</strong></p>
+
+<p>相对位置是：先像通常一样放置，然后根据差异移动。</p>
+
+<p><img src="http://farm8.staticflickr.com/7010/6505597613_10dab9cd61_m.jpg&quot; width=&quot;240&quot; height=&quot;125&quot;" alt="relative positioning" /></p>
+
+<p><strong>9.5.2 漂浮盒子</strong></p>
+
+<p>漂浮盒子是偏移到一行左边或右边，有趣的特性是其他盒子环绕在它的旁边。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;p&gt;</span>
+</span><span class="line">  <span class="nt">&lt;img</span> <span class="na">style=</span><span class="s">&quot;float:right&quot;</span> <span class="na">src=</span><span class="s">&quot;images/image.gif&quot;</span> <span class="na">width=</span><span class="s">&quot;100&quot;</span> <span class="na">height=</span><span class="s">&quot;100&quot;</span><span class="nt">&gt;</span>
+</span><span class="line">  Lorem ipsum dolor sit amet, consectetuer...
+</span><span class="line"><span class="nt">&lt;/p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>的结果会是下面这个样子：</p>
+
+<p><img src="http://farm8.staticflickr.com/7160/6505635961_734095bce0_m.jpg&quot; width=&quot;240&quot; height=&quot;110&quot;" alt="float" /></p>
+
+<p><strong>9.5.3 绝对和固定盒子</strong></p>
+
+<p>绝对和固定盒子的定义独立于普通流，元素也不参与普通流，它的维度是相对于容器的。固定盒子的容器是viewport。</p>
+
+<p><img src="http://farm8.staticflickr.com/7164/6505656271_8a14ca32f2_m.jpg&quot; width=&quot;240&quot; height=&quot;165&quot;" alt="fixed positioning" /></p>
+
+<p>注意：固定盒子不会移动，即使下拉窗口！</p>
+
+<p><strong>9.6 基于层次的表现形式</strong></p>
+
+<p>它是用CSS中的<code>z-index</code>来指定的，它代表了盒子的第三维度，它的位置是沿着Z轴的。盒子被分成很多堆(称为堆积上下文)，在每个堆里最后一个元素首先被绘制，然后是前面的元素，所以前面的元素更靠近用户。为了防止重叠，先绘制的元素将被隐藏。</p>
+
+<p>堆是根据<code>z-index</code>属性来排序的，盒子是和<code>z-index</code>属性一起存放在本地堆中，viewport则有外部堆。</p>
+
+<p>例如：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;style </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
+</span><span class="line">      <span class="nt">div</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class="line">        <span class="k">left</span><span class="o">:</span> <span class="m">2in</span><span class="p">;</span>
+</span><span class="line">        <span class="k">top</span><span class="o">:</span> <span class="m">2in</span><span class="p">;</span>
+</span><span class="line">      <span class="p">}</span>
+</span><span class="line"><span class="nt">&lt;/style&gt;</span>
+</span><span class="line">
+</span><span class="line"><span class="nt">&lt;p&gt;</span>
+</span><span class="line">    <span class="nt">&lt;div</span>
+</span><span class="line">         <span class="na">style=</span><span class="s">&quot;z-index: 3;background-color:red; width: 1in; height: 1in; &quot;</span><span class="nt">&gt;</span>
+</span><span class="line">    <span class="nt">&lt;/div&gt;</span>
+</span><span class="line">    <span class="nt">&lt;div</span>
+</span><span class="line">         <span class="na">style=</span><span class="s">&quot;z-index: 1;background-color:green;width: 2in; height: 2in;&quot;</span><span class="nt">&gt;</span>
+</span><span class="line">    <span class="nt">&lt;/div&gt;</span>
+</span><span class="line"> <span class="nt">&lt;/p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>结果会是下面这个样子：</p>
+
+<p><img src="http://farm8.staticflickr.com/7021/6505743937_a87c962997_m.jpg&quot; width=&quot;240&quot; height=&quot;214&quot;" alt="fixed positioning" /></p>
+
+<p>尽管红色div声明在绿色之前而且会被首先绘制，但是它<code>z-index</code>属性值更大，所以它在根盒子持有的堆中位置更靠前。</p>
+
+<p>==========全文完==========</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-14T00:26:00+08:00" pubdate data-updated="true">Dec 14<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/browsers/'>browsers</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/12/14/how-browsers-work-ten/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/12/14/how-browsers-work-ten/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

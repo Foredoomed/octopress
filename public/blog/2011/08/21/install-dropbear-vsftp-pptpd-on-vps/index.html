@@ -1,0 +1,511 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>在VPS上安装dropbear,vsftp和pptpd - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="编译安装Dropbear 首先修改OpenSSH的端口,编辑/etc/ssh/sshd_config文件，找到Port 22这一行，并修改为Port 2222。 然后重启OpenSSH： 1
+service sshd restart 编译安装Dropbear: 1
+2
+3
+4
+5
+6
+cd / &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/08/21/install-dropbear-vsftp-pptpd-on-vps/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">在VPS上安装dropbear,vsftp和pptpd</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-21T17:31:00+08:00" pubdate data-updated="true">Aug 21<span>st</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>编译安装Dropbear</strong></p>
+
+<p>首先修改OpenSSH的端口,编辑<code>/etc/ssh/sshd_config</code>文件，找到<code>Port 22</code>这一行，并修改为<code>Port 2222</code>。</p>
+
+<p>然后重启OpenSSH：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">service sshd restart
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>编译安装Dropbear:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nb">cd</span> /data/software
+</span><span class="line">wget http://matt.ucc.asn.au/dropbear/dropbear-0.53.1.tar.gz
+</span><span class="line">tar -zxvf dropbear-0.53.1.tar.gz
+</span><span class="line"><span class="nb">cd </span>dropbear-0.53.1
+</span><span class="line">./configure
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>生成公钥：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">mkdir /etc/dropbear
+</span><span class="line">/usr/local/bin/dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
+</span><span class="line">/usr/local/bin/dropbearkey -t rsa -s 4096 -f /etc/dropbear/dropbear_rsa_host_key
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>启动Dropbear：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/local/sbin/dropbear start
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>配置开机自动启动：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">chkconfig --add dropbear
+</span><span class="line">chkconfig dropbear on
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Dropbear正确安装完成后，如果能够用ssh登录，那么就可以删除OpenSSH了:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">yum remove openssh
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<!--more-->
+
+<p><strong>编译安装vsftp</strong></p>
+
+<p>如果编译安装的话会报错，要自己手动复制文件，所以我就从软件库自动安装了：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">yum install vsftpd
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>创建FTP用户：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/sbin/groupadd ftp
+</span><span class="line">/usr/sbin/useradd -g ftp ftp
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>建立FTP默认目录:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">mkdir /var/ftp
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>设定FTP的home目录为/var/ftp：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">useradd -d /var/ftp -s /sbin/nologin ftp
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>设定home目录所有者和权限:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">chown ftp:ftp /var/ftp
+</span><span class="line">chmod 755 /var/ftp
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>编辑vsftp配置文件<code>/etc/vsftpd/vsftpd.conf</code>,修改为：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nv">anonymous_enable</span><span class="o">=</span>no
+</span><span class="line"><span class="nv">listen</span><span class="o">=</span>yes
+</span><span class="line">
+</span><span class="line">//并在文件末尾添加：
+</span><span class="line"><span class="nv">local_root</span><span class="o">=</span>/var/ftp/pub
+</span><span class="line"><span class="nv">use_localtime</span><span class="o">=</span>yes
+</span><span class="line"><span class="nv">connect_timeout</span><span class="o">=</span>60
+</span><span class="line"><span class="nv">accept_timeout</span><span class="o">=</span>60
+</span><span class="line"><span class="nv">max_clients</span><span class="o">=</span>10
+</span><span class="line"><span class="nv">max_per_ip</span><span class="o">=</span>10
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>配置开机自动启动</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">chkconfig --add vsftpd
+</span><span class="line">chkconfig vsftpd on
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>安装pptpd</strong></p>
+
+<p>1.首先用ssh登录VPS，检查VPS是否有必要的支持，否则将导致无法安装(如果是buyvm的VPS可以跳过这步)</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">modprobe ppp-compress-18 <span class="o">&amp;&amp;</span> <span class="nb">echo </span>ok
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>用模块方式支持MPPE加密模式浏览，如果内核支持则检测不到。如果显示“ok”表明通过，不过还需要做另一个检查：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">cat /dev/net/tun
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>如果显示结果为下面的文本就表明通过：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">cat: /dev/net/tun: File descriptor in bad state
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>上述两条检测只需一条通过，即可安装pptpd。如果还有其他问题，就提Ticket给服务商替你解决。</p>
+
+<p>2.安装ppp：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>3.安装pptpd:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>4.配置pptpd:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /etc/pptpd.conf
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>把下面字段前面的#去掉即可：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">localip 192.168.0.1
+</span><span class="line">remoteip 192.168.0.234-238,192.168.0.245
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>接下来再编辑<code>/etc/ppp/options.pptpd</code>文件：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /etc/ppp/options.pptpd
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>去掉<code>ms-dns</code>前面的#，并修改成如下字段：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">ms-dns 8.8.8.8
+</span><span class="line">ms-dns 8.8.4.4
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>5.设置pptpd账号和密码：</p>
+
+<p>编辑<code>/etc/ppp/chap-secrets</code>文件：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /etc/ppp/chap-secrets
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>直接输入如下字段,username和password就是你要登录VPN的用户名和密码：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">username pptpd password *
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>6.修改内核设置，使其支持转发:</p>
+
+<p>编辑<code>/etc/sysctl.conf</code>文件：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /etc/sysctl.conf
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>做下面的修改：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">net.ipv4.ip_forward<span class="o">=</span>1
+</span><span class="line"><span class="c"># net.ipv4.tcp_syncookies = 1  //注释这行</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>保存退出，并执行下面的命令来使它生效：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">sysctl -p
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>7.添加iptables转发规则：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -j SNAT --to-source xxx.xxx.xxx.xxx  //xxx.xxx.xxx.xxx为你的VPS的公网IP地址
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>保存iptables转发规则：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/etc/init.d/iptables save
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>重启iptables：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/etc/init.d/iptables restart
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>8.重启pptpd服务：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/etc/init.d/pptpd restart
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>9.设置开机自动启动</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">chkconfig --add pptpd
+</span><span class="line">chkconfig pptpd on
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-21T17:31:00+08:00" pubdate data-updated="true">Aug 21<span>st</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/vps/'>vps</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/08/21/install-dropbear-vsftp-pptpd-on-vps/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/08/21/install-dropbear-vsftp-pptpd-on-vps/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

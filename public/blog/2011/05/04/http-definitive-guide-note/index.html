@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>《HTTP: The Definitive Guide》读书笔记 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="1.MIME(Multipurpose Internet Mail Extensions):是一个数据格式标签，用来解决不同的电子邮件系统中传输消息时遇到的问题。 MIME是一个文本类型的标签，用一个主要对象类型和一个特指的子类型，中间加上斜杠表示
+例如： An HTML-formatted &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/05/04/http-definitive-guide-note/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">《HTTP: The Definitive Guide》读书笔记</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-04T19:20:00+08:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>1.MIME(Multipurpose Internet Mail Extensions):是一个数据格式标签，用来解决不同的电子邮件系统中传输消息时遇到的问题。 </p>
+
+<p>MIME是一个文本类型的标签，用一个主要对象类型和一个特指的子类型，中间加上斜杠表示<br />
+例如：</p>
+
+<ul>
+  <li>An HTML-formatted text document would be labeled with type text/html.  </li>
+  <li>A plain ASCII text document would be labeled with type text/plain.  </li>
+  <li>A JPEG version of an image would be image/jpeg.  </li>
+</ul>
+
+<p>2.URI（Uniform resource identifier）：每个服务器资源都有个名字，这个名字就叫做URI。它是唯一制定的。</p>
+
+<p>3.URL（Uniform resource locator）：是URI的最常用的表示形式。URL表示的是一个资源在特定服务器上的指定位置。它是URI的一个子集。 <!--more--></p>
+
+<p>URI与URL的区别：</p>
+
+<p>URI例子:<br />
+  ftp://ftp.is.co.za/rfc/rfc1808.txt<br />
+  http://www.ietf.org/rfc/rfc2396.txt<br />
+  ldap://[2001:db8::7]/c=GB?objectClass?one<br />
+  mailto:John.Doe@example.com<br />
+  news:comp.infosystems.www.servers.unix<br />
+  tel:+1-816-555-1212<br />
+  telnet://192.0.2.16:80/<br />
+  urn:oasis:names:specification:docbook:dtd:xml:4.1.2  </p>
+
+<p>URL：指定协议，网络地址和服务器上的资源名。协议多为http。</p>
+
+<p>URN（Uniform Resource Name）：特定内容唯一的名字，与资源目前的位置无关。也是URI的一个子集。</p>
+
+<p>4.http支持几个不同的请求命令，称为http方法。每个http请求消息都有一个方法。这个方法告诉服务器去执行什么动作。</p>
+
+<p>GET：Send named resource from the server to the client.</p>
+
+<p>PUT：Store data from client into a named server resource.</p>
+
+<p>DELETE：Delete the named resource from a server.</p>
+
+<p>POST：Send client data into a server gateway application.</p>
+
+<p>HEAD：Send just the HTTP headers from the response for the named resource.</p>
+
+<p>5.状态码</p>
+
+<p>200：OK. Document returned correctly.</p>
+
+<p>302：Redirect. Go someplace else to get the resource.</p>
+
+<p>404：Not Found. Can’t find this resource.</p>
+
+<p>HTTP会和数字状态码一起发送一段解释性的文本，例如：200 OK</p>
+
+<p>6.http消息有三部分组成：</p>
+
+<ol>
+  <li>start line：消息的第一行，表示请求要去做什么或者应答要发生什么。</li>
+  <li>header fields：0个或多个头部信息在start line之后，每个头部信息有一个名字和对应的值组成，用“：”隔开,头部消息用一行空行结束。</li>
+  <li>在一行空行之后是一个可选的正文消息，不同于上面2种是有组织的并且是文本类型的，这个消息可以是任何类型的数据。</li>
+</ol>
+
+<p>7.TCP/IP</p>
+
+<p>TCP提供：（1）无错的数据传输  （2）有组织的分发  （3）不分段的数据流</p>
+
+<p>8.OSI七层从下到上：物理层，数据链路层，网络层，传输层，会话层，表示层，应用层</p>
+
+<p>9.浏览器访问http页面的步骤：</p>
+
+<ol>
+  <li>The browser extracts the server’s hostname from the URL.</li>
+  <li>The browser converts the server’s hostname into the server’s IP address.</li>
+  <li>The browser extracts the port number (if any) from the URL.</li>
+  <li>The browser establishes a TCP connection with the web server.</li>
+  <li>The browser sends an HTTP request message to the server.</li>
+  <li>The server sends an HTTP response back to the browser.</li>
+  <li>The connection is closed, and the browser displays the document.</li>
+</ol>
+
+<p>10.Status code classes </p>
+
+<p>Overall range  Defined range  Category</p>
+
+<p>100-199        100-101        Informational</p>
+
+<p>200-299        200-206        Successful</p>
+
+<p>300-399        300-305        Redirection</p>
+
+<p>400-499        400-415        Client error</p>
+
+<p>500-599        500-505        Server error</p>
+
+<p>11.Header example                    Description</p>
+
+<p>Date: Tue, 3 Oct 1997 02:16:03 GMT  The date the server generated the response</p>
+
+<p>Content-length: 15040               The entity body contains 15,040 bytes of data</p>
+
+<p>Content-type: image/gif             The entity body is a GIF image</p>
+
+<p>Accept: image/gif, image/jpeg, text/html   The client accepts GIF and JPEG images and HTML</p>
+
+<p>Cache-Control: max-age: The max-age value defines the maximum age of the document—the maximum legal elapsed time(in seconds) from when a document is first generated to when it can no longer be                          considered fresh enough to serve.(Cache-Control: max-age=484200)</p>
+
+<p>Expires: Specifies an absolute expiration date. If the expiration date is in the past, the document is no longer fresh.(Expires: Fri, 05 Jul 2002, 05:00:00 GMT)</p>
+
+<p>If-Modified-Since: </p>
+
+<p>Perform the requested method if the document has been modified since the specified date. This is used in conjunction with the Last-Modified server response header, to fetch content only if the content has been modified from the cached version.</p>
+
+<p>If-None-Match: </p>
+
+<p>Instead of matching on last-modified date, the server may provide special tags (see ETag) on the document that act like serial numbers. The If-None-Match header performs the requested method if the cached tags differ from the tags in the server’s document.</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-04T19:20:00+08:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/notes/'>notes</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/05/04/http-definitive-guide-note/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/05/04/http-definitive-guide-note/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

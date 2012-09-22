@@ -1,0 +1,24 @@
+.datalist{
+    border:1px solid #ccc;
+    border-collapse:collapse;
+	margin: 20px auto 20px auto;		
+}
+
+.datalist caption{
+	font-weight:bold;
+	text-align:center;
+}
+
+.datalist th{
+	border:1px solid #ccc;
+	background-color: #F0F0F0;
+    font-weight:bold;
+    padding:5px 10px;
+    text-align:center;
+}
+
+.datalist td{
+	border:1px solid #ccc;
+    padding:5px 10px;
+}
+

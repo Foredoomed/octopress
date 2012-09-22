@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>浏览器是如何工作的(九) - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="5 布局 当renderer被创建和加入到树中时，它是没有位置和大小的，计算这两个值称为布局或回流(reflow)。 HTML使用的是基于布局模型的流，这意味着大多数时间内，单一路径下计算几何值是可能的。后进入流的元素不会影响比它先进入流的元素的几何属性值，所以布局文档可以被从左到右，从上到下处理 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/12/12/how-browsers-work-nine/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">浏览器是如何工作的(九)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-12T22:19:00+08:00" pubdate data-updated="true">Dec 12<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>5 布局</strong></p>
+
+<p>当renderer被创建和加入到树中时，它是没有位置和大小的，计算这两个值称为布局或回流(reflow)。</p>
+
+<p>HTML使用的是基于布局模型的流，这意味着大多数时间内，单一路径下计算几何值是可能的。后进入流的元素不会影响比它先进入流的元素的几何属性值，所以布局文档可以被从左到右，从上到下处理。但是也有例外：比如，HTML的table元素可能需要多条路径。</p>
+
+<p>坐标系统是和根框架相关的，而且使用的是上坐标和左坐标。</p>
+
+<p>布局是一个迭代的过程，它从根renderer(对应于HTML文档的<code>&lt;html&gt;</code>元素)开始。布局迭代部分或整个框架，计算每个renderer的几何信息。</p>
+
+<p>根renderer的位置是<code>0,0</code>，它的范围是viewport(浏览器窗口的可视区域)。所有的renderer都有<code>layout</code>或<code>reflow</code>方法，每个renderer调用需要生成布局的孩子的<code>layout</code>方法。</p>
+
+<!-- more -->
+
+<p><strong>5.1 脏位系统</strong></p>
+
+<p>为了在细小的改动是不重新生成整个布局，浏览器使用一个叫脏位(dirty bit)的系统。一个被修改或添加的renderer，它和它的孩子都会被标记为”dirty”，意思是说需要重新布局。</p>
+
+<p>浏览器有2个标志位：“dirty”和”children are dirty”。后者的意思是也许这个renderer本身不需要重新布局，但是它的孩子中至少有一个需要重新布局。</p>
+
+<p><strong>5.2 全局和增量布局</strong></p>
+
+<p>布局可以在整个渲染树上被触发，这就叫做全局(global)布局。全局布局的触发条件为：</p>
+
+<ol>
+  <li>全局样式的改变影响了所有的renderer，例如修改字体大小。</li>
+  <li>窗口大小的改变。</li>
+</ol>
+
+<p>布局可以是增量式的，只有脏renderer会被设置布局(这样会造成需要做额外布局的危害)。</p>
+
+<p>当renderer被标记为脏时，增量布局被异步触发。例如在从网络上获取内容后，新renderer被附加到渲染树，并且被加入到DOM树中。</p>
+
+<p><img src="http://farm8.staticflickr.com/7167/6498973627_ca37c1cac5.jpg&quot; width=&quot;326&quot; height=&quot;341&quot;" alt="reflow" /></p>
+
+<p><strong>5.3 异步和同步布局</strong></p>
+
+<p>增量布局的过程是异步的，Firefox把reflow命令放入队列，然后用一个调度器批量的执行这些命令。Webkit也有一个计时器来实现增量布局，遍历渲染树把脏renderer重新布局。</p>
+
+<p>脚本请求样式信息，比如<code>offsetHeight</code>，会触发同步的增量布局。全部布局一般都是同步触发的，有些时候因为一些属性的原因，布局在初始后被作为回调函数触发，比如下拉位置的改变。</p>
+
+<p><strong>5.4 优化</strong></p>
+
+<p>当布局是因为大小改变或者renderer的位置改变而触发，那么renderer的大小将从cache从读取，不会重新计算。</p>
+
+<p>在一些情况下，比如只有子树被修改和布局不是从根开始，这是由于修改是在本地而且没有影响到周围元素，比如文本插入到文本区域。</p>
+
+<p><strong>5.5 布局过程</strong></p>
+
+<p>布局总是有下面的模式：</p>
+
+<ol>
+  <li>双亲renderer决定自己的宽度。</li>
+  <li>双亲转为孩子并且：
+    <ol>
+      <li>设置孩子renderer的<code>x</code>和<code>y</code></li>
+      <li>如果被标记为脏或者在全局布局中等原因，则调用孩子的<code>layout</code>方法，这会导致计算孩子的高度。</li>
+    </ol>
+  </li>
+  <li>双亲使用孩子累积的<code>height</code>，<code>margin</code>和<code>padding</code>来设置自己的对应值。</li>
+  <li>设置脏位为false。</li>
+</ol>
+
+<p>Firefox使用一个状态对象(nsHTMLReflowState)作为布局的一个参数，在其他状态中包括了双亲的宽度。Firefox布局的输出是一个<code>metrics</code>对象(nsHTMLReflowMetrics)，它包含了renderer的高度。</p>
+
+<p><strong>5.6 宽度计算</strong></p>
+
+<p>renderer的宽度是用容器宽度来计算的，renderer的<code>width</code>样式属性，<code>margin</code>和<code>border</code>属性。</p>
+
+<p>例如计算下面<code>div</code>的宽度：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">&quot;width:30%&quot;</span><span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Webkit是这样计算的(RenderBox类的calcWidth方法)</p>
+
+<ul>
+  <li>容器的宽度取容器可以达到的最大宽度与0两者之间较大的那个，可以达到的最大宽度就是内容宽度，它的计算方式是：<code>clientWidth() - paddingLeft() - paddingRight()</code>，clientWidth和clientHeight表示的是除了border和scrollbar之外的内部对象。</li>
+  <li>元素的宽度是有样式属性<code>width</code>决定的，它是计算容器宽度的百分比得出的一个绝对数值。</li>
+  <li>然后加入水平边框和缩进</li>
+</ul>
+
+<p>到目前为止是偏好宽度(preferred width)的计算，然后最小和最大宽度值会被计算。如果偏好宽度比最大宽度大，那么就会使用最大宽度，同样如果小于最小宽度，那么就会使用最小宽度。</p>
+
+<p>以防万一宽度没有改变的情况下需要重新布局，所以宽度的值都会被缓存。</p>
+
+<p><strong>5.7 换行</strong></p>
+
+<p>当一个renderer在布局的中间时就需要被分开，这时它会停止布局并告诉双亲它需要被分开，然后双亲就会创建额外的renderer和在他们身上调用<code>layout</code>方法。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-12T22:19:00+08:00" pubdate data-updated="true">Dec 12<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/browsers/'>browsers</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/12/12/how-browsers-work-nine/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/12/12/how-browsers-work-nine/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

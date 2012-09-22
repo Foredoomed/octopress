@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>JIT到底做了些什么事 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="最近在网上看到一篇关JIT(Just in Time)的文章Just in Time Compiler (JIT) in Hotspot,这篇文章很短，但是对JIT的作用基本上说的比较清楚的，可以作为JIT的学习参考，所以我就决定把这篇文章翻译成中文，供以后复习参考用 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">JIT到底做了些什么事</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-03T15:15:00+08:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>最近在网上看到一篇关JIT(Just in Time)的文章<a href="http://java.dzone.com/articles/just-time-compiler-jit-hotspot?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+javalobby%2Ffrontpage+%28Javalobby+%2F+Java+Zone%29&amp;utm_content=Google+Reader" title="Just in Time Compiler (JIT) in Hotspot">Just in Time Compiler (JIT) in Hotspot</a>,这篇文章很短，但是对JIT的作用基本上说的比较清楚的，可以作为JIT的学习参考，所以我就决定把这篇文章翻译成中文，供以后复习参考用。</p>
+
+<!--more-->
+
+<p>================正文开始==================</p>
+
+<p>什么是JIT编译器</p>
+
+<p>JIT和更普便的自适应优化概念是在包括Java在内的许多编程语言，例如.Net, Lua, JRuby中所为人熟知的概念。</p>
+
+<p>为了解释什么是JIT编译器，我想从编译器的定义开始。根据维基百科上对于编译器的定义：
+&gt; 一个计算机程序是把源程序语言转换成目标语言。</p>
+
+<p>我们对静态Java编译器(javac)都很熟悉，它的作用是将人类能够阅读的.java文件编译成为能够被JVM解释的.class文件。现在问题来了，那么JIT用来编译什么东西呢？答案将在解释完什么是Just in Time后给出。</p>
+
+<p>根据许多研究得出的结果，20%的代码的执行时间要占到全部时间的80%。如果这时候有一种方法决定那些20%的代码并且优化他们，那将是令人兴奋的事。这就是JIT做的事：在运行时收集统计数据，找出那些经常执行的代码，把他们从字节码转换成操作系统能够直接执行的本地代码，并且重度优化他们。最小的编译单元是单个方法。编译和统计数据收集是靠特殊线程并行处理的。在统计数据收集期间，编译器会推测代码功能，并且通过时间的推移来验证这个推测。如果这个推测是错误的话，优化过的代码会被还原并且重新编译。</p>
+
+<p>Hotspot JVM这个名字的由来就是因为这个JVM的作用就是找到代码中的“hot spot(热点)”。</p>
+
+<p>JIT会做哪些优化？</p>
+
+<ul>
+  <li>内敛方法 - 方法不是直接在对象的实例上调用，而是拷贝到调用代码里去。为了防止产生任何开销，热门方法应该尽可能靠近调用着</li>
+  <li>如果监视器从别的线程是不可到达的，那就消除锁</li>
+  <li>用直接的方法调用代替接口以消除调用虚函数的开销</li>
+  <li>合并临近的在同一对象上的锁</li>
+  <li>消除不会被执行的代码(dead code)</li>
+  <li>对非volatile变量，忽略内存写</li>
+  <li>删除预先检查的NullPointerException和IndexOutOfBoundsException</li>
+  <li>等等</li>
+</ul>
+
+<p>当JVM调用一个Java方法，它会使用在已经加载类的方法块中的定义的调用方法。虚拟机有好几个调用方法，比如，如果方法是同步的，或者是本地方法的话，不同的调用者会被使用。JIT编译器使用的是它自己的调用者。虚拟机会检查ACC_MACHINE_COMPILED这个值，来通知解释器这个值对应的方法已经编译并且保持在已加载的类中。JIT编译器把方法块编译成本地代码，并且把它保存在那个方法的代码块中。一旦ACC_MACHINE_COMPILED位被设置，那么这个代码就被编译完成了。那我们怎么知道JIT在我们的程序中正在做什么，怎么样才能控制它？</p>
+
+<p>首先就是取消JIT的功能：Djava.compiler=NONE</p>
+
+<p>Hotspot中有2种JI编译器，一种是为客户端程序使用，另一种是服务器端程序。运行在服务器上的程序通常来说需要更多的资源，并且程序的吞吐量是非常重要的。因此，服务器版的JIT会消耗更多的资源，并且为了统计数据的准确，要花更多的时间来收集统计数据。而客户端版的JIT为一个方法收集统计数据会持续1500次方法调用，服务器版JIT则是15000次。这些默认值可以通过JVM参数:-XX:CompileThreshold=XXX来修改。</p>
+
+<p>JIT的不足</p>
+
+<p>JIT增加了Java程序的不可预测性和复杂性。它增加了一层程序员不是正真理解的另外一层。</p>
+
+<p>一个可能bug的例子：并发中的”happens before relations”。JIT会简单的记录在单线程中代码的改变是否安全。解决这个问题的方法是加上<strong>synchronized</strong>或着显式的加锁。</p>
+
+<p>JIT的优势</p>
+
+<ul>
+  <li>对于GC来说，程序必须到达安全点。为了这个目的，JIT通过在本地代码的相同间隔内注入<strong>yieldpoints</strong>。</li>
+  <li>除了扫描堆栈来找出根引用，寄存器也必须被扫描，因为他们可能会持有JIT创建的对象。</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-03T15:15:00+08:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>java</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

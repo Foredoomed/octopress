@@ -1,0 +1,898 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: browsers | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/browsers/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(十)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/14/how-browsers-work-ten/"/>
+    <updated>2011-12-14T00:26:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/14/how-browsers-work-ten</id>
+    <content type="html"><![CDATA[<p><strong>6 绘制</strong></p>
+
+<p>在绘制阶段会遍历渲染树和调用renderer的<code>paint</code>方法来把他们的内容显示在屏幕上。绘制使用的是UI基础组件。</p>
+
+<p><strong>6.1 全局和增量</strong></p>
+
+<p>像布局一样，可以全局绘(绘制整个渲染树)，也可以是增量绘制。在增量绘制中，一部分renderer的变化不会影响这棵渲染树。变化过的renderer会使它在屏幕上的矩形区域无效，这就会造成OS把它当作“脏区域”(dirty region)并且生成<code>paint</code>事件。OS会聪明地把多个脏区域合并成一个。在Chrome中则更复杂一点，因为renderer不是在主进程中，而是在其他进程中。Chrome模拟OS行为并且扩展它们，表现层监听这些事件而且把消息代理给渲染树的根元素。遍历渲染树直到遇见相关的renderer，渲染树重新绘制自己(经常连同它的孩子节点)。</p>
+
+<p><strong>6.2 绘制顺序</strong></p>
+
+<p>CSS2的规范中规定了绘制的顺序。这个顺序实际上就是元素在上下文中堆积的顺序。因为是从后往前绘制的，所以这个顺序会影响绘制。renderer的堆积顺序是：</p>
+
+<ol>
+  <li>background color</li>
+  <li>background image</li>
+  <li>border</li>
+  <li>children</li>
+  <li>outline</li>
+</ol>
+
+<p><strong>6.3 Firefox的显示列表</strong></p>
+
+<p>Firefox会再次遍历渲染树，然后构造一个已经绘制的矩形区域的显示列表。其中包含矩形区域相关的renderer，从右往左的绘制顺序(背景，边框等)。这种方式只需要遍历一次渲染树就可以重新绘制(所有背景，再所有图片，再所有边框等)。</p>
+
+<p>Firefox通过不把hidden的元素加入到列表中来优化这个过程。</p>
+
+<p><strong>6.4 Webkit的矩形存储</strong></p>
+
+<p>在重新绘制之前，webkit把旧的矩形保存为一个<code>bitmap</code>，然后只重新绘制新旧矩形的不同之处。</p>
+
+<!-- more -->
+
+<p><strong>7 动态变化</strong></p>
+
+<p>对应一个修改，浏览器会做尽可能少的动作，所以改变元素的颜色只会重新绘制这个元素。元素位置的改变会使元素重新布局和绘制，包括它的孩子和同辈元素。添加一个DOM节点会导致重新布局和绘制这个节点，主要的变化，比如改变<code>html</code>元素的字体大小，会导致缓存失效，重新布局和绘制整棵渲染树。</p>
+
+<p><strong>8 渲染引擎的线程</strong></p>
+
+<p>渲染引擎是单线程的，除了网络操作，大多数情况下是单线程的。在Firefox和Safari里，渲染线程是浏览器的主线程，但是在Chrome里它则是标签页进程的主线程。</p>
+
+<p>网络操作可以被多个线程并行执行，并行连接的数量是限定的(一般是2到6个连接，例如Firefox 3采用的是6个连接)。</p>
+
+<p><strong>8.1 事件循环</strong></p>
+
+<p>浏览器的主线程是一个事件循环，而且这个循环是无限的来保持进程能一直存活下去。它等待事件(比如布局和绘制事件)的到来，然后处理他们。下面是Firefox的主事件循环代码：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">mExiting</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">NS_ProcessNextEvent</span><span class="p">(</span><span class="kr">thread</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>9 CSS2的视觉模型</strong></p>
+
+<p><strong>9.1 画布(canvas)</strong></p>
+
+<p>根据CSS2的规范，画布是指：格式化结构被渲染的空间，也就是浏览器绘制内容的地方。画布在空间的任意维度上都是无限的，但是浏览器会在<code>viewport</code>的维度上选择一个初始宽度。</p>
+
+<p>根据<a href="www.w3.org/TR/CSS2/zindex.html" title="z-index">z-index</a>上所说，如果一个画布内包含了另一个画布的话，那么它内部的画布就会边透明；而如果没有包含其他画布的话，浏览器会给它一个浏览器定义的颜色。</p>
+
+<p><strong>9.2 CSS的盒子模型(box model)</strong></p>
+
+<p>CSS的盒子模型描述的是在文档树中为元素生成的矩形盒子，并且根据视觉格式模型被展现出来。</p>
+
+<p>每个盒子有一个内容区域(比如：文字，图片等)和可选的<code>padding</code>，<code>border</code>以及<code>margin</code>区域。</p>
+
+<p><img src="http://farm8.staticflickr.com/7005/6505395185_30710fe726.jpg&quot; width=&quot;500&quot; height=&quot;342&quot;" alt="box model" /></p>
+
+<p>每个节点都会生成0到n个这样的盒子。所有的元素都有一个<code>display</code>属性，这个属性决定了要生成盒子的类型。例如：</p>
+
+<p>block  - generates a block box.
+inline - generates one or more inline boxes.
+none - no box is generated.</p>
+
+<p>默认的盒子是<code>inline</code>类型的，但是浏览器自带的样式标会设置成其他默认值。例如：<code>div</code>元素的<code>display</code>默认值是<code>block</code>。你可以在<a href="www.w3.org/TR/CSS2/sample.html">这里</a>找到默认样式表的例子。</p>
+
+<p><strong>9.3 确定scheme的位置</strong></p>
+
+<p>有三种类型的scheme：</p>
+
+<ol>
+  <li>普通： 对象是根据它在文档中的位置来确定位置的，也就是说它在渲染树中的位置就好像它在DOM树中的位置，然后根据它的盒子类型和维度展现出来。</li>
+  <li>浮动： 对象一开始是普通类型，然后尽可能地往左边或右边移动。</li>
+  <li>绝对： 对象在渲染树中的位置和它在DOM树中的位置不同。</li>
+</ol>
+
+<p>scheme的位置是通过设置<code>position</code>属性和<code>float</code>属性来确定的。</p>
+
+<ul>
+  <li>静态和相对的值生成普通流</li>
+  <li>绝对和固定的值生成绝对的位置</li>
+</ul>
+
+<p>在静态位置确定过程中，<code>position</code>没有被定义，而且使用默认值，在其他scheme里，开发者指定了<code>position</code>(top,bottom,left,right)。</p>
+
+<p>盒子展现的方式是由以下条件决定的：</p>
+
+<ul>
+  <li>盒子的类型</li>
+  <li>盒子的维度</li>
+  <li>scheme的位置</li>
+  <li>外部信息(比如：图片大小和屏幕尺寸)</li>
+</ul>
+
+<p><strong>9.4 盒子的类型</strong></p>
+
+<p>Block：在浏览器窗口中有自己的矩形区域</p>
+
+<p><img src="http://farm8.staticflickr.com/7018/6505506095_ba7907c252_m.jpg&quot; width=&quot;150&quot; height=&quot;127&quot;" alt="block box" /></p>
+
+<p>Inline：没有自己的block，但是被其他block包含</p>
+
+<p><img src="http://farm8.staticflickr.com/7029/6505521245_8a3aee3173_m.jpg&quot; width=&quot;240&quot; height=&quot;186&quot;" alt="inline box" /></p>
+
+<p>Block垂直方向上一个排列，Inline在水平方向上排列</p>
+
+<p><img src="http://farm8.staticflickr.com/7003/6505539833_92df259ca6_m.jpg&quot; width=&quot;240&quot; height=&quot;222&quot;" alt="block and inline formatting" /></p>
+
+<p>Inline盒子被放在一行行中，所以又叫”line boxes”。行的高度至少要和最高的盒子一样，但是可以更高。当盒子和基准行(baseline)对齐时，意味着元素的底部和其他盒子不是底部的某个点对齐。为了防止容器的宽度不够，inline的盒子会被放在多行中，这一般发生在有段落的情况下。</p>
+
+<p><img src="http://farm8.staticflickr.com/7160/6505571567_7834c0cae3_m.jpg&quot; width=&quot;240&quot; height=&quot;166&quot;" alt="lines" /></p>
+
+<p><strong>9.5 确定位置</strong></p>
+
+<p><strong>9.5.1 相对盒子</strong></p>
+
+<p>相对位置是：先像通常一样放置，然后根据差异移动。</p>
+
+<p><img src="http://farm8.staticflickr.com/7010/6505597613_10dab9cd61_m.jpg&quot; width=&quot;240&quot; height=&quot;125&quot;" alt="relative positioning" /></p>
+
+<p><strong>9.5.2 漂浮盒子</strong></p>
+
+<p>漂浮盒子是偏移到一行左边或右边，有趣的特性是其他盒子环绕在它的旁边。</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;img</span> <span class="na">style=</span><span class="s">&quot;float:right&quot;</span> <span class="na">src=</span><span class="s">&quot;images/image.gif&quot;</span> <span class="na">width=</span><span class="s">&quot;100&quot;</span> <span class="na">height=</span><span class="s">&quot;100&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>  Lorem ipsum dolor sit amet, consectetuer...
+</span><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>的结果会是下面这个样子：</p>
+
+<p><img src="http://farm8.staticflickr.com/7160/6505635961_734095bce0_m.jpg&quot; width=&quot;240&quot; height=&quot;110&quot;" alt="float" /></p>
+
+<p><strong>9.5.3 绝对和固定盒子</strong></p>
+
+<p>绝对和固定盒子的定义独立于普通流，元素也不参与普通流，它的维度是相对于容器的。固定盒子的容器是viewport。</p>
+
+<p><img src="http://farm8.staticflickr.com/7164/6505656271_8a14ca32f2_m.jpg&quot; width=&quot;240&quot; height=&quot;165&quot;" alt="fixed positioning" /></p>
+
+<p>注意：固定盒子不会移动，即使下拉窗口！</p>
+
+<p><strong>9.6 基于层次的表现形式</strong></p>
+
+<p>它是用CSS中的<code>z-index</code>来指定的，它代表了盒子的第三维度，它的位置是沿着Z轴的。盒子被分成很多堆(称为堆积上下文)，在每个堆里最后一个元素首先被绘制，然后是前面的元素，所以前面的元素更靠近用户。为了防止重叠，先绘制的元素将被隐藏。</p>
+
+<p>堆是根据<code>z-index</code>属性来排序的，盒子是和<code>z-index</code>属性一起存放在本地堆中，viewport则有外部堆。</p>
+
+<p>例如：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;style </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">div</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">left</span><span class="o">:</span> <span class="m">2in</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">top</span><span class="o">:</span> <span class="m">2in</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'><span class="nt">&lt;/style&gt;&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">&quot;z-index: 3;background-color:red; width: 1in; height: 1in; &quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">&quot;z-index: 1;background-color:green;width: 2in; height: 2in;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'> <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>结果会是下面这个样子：</p>
+
+<p><img src="http://farm8.staticflickr.com/7021/6505743937_a87c962997_m.jpg&quot; width=&quot;240&quot; height=&quot;214&quot;" alt="fixed positioning" /></p>
+
+<p>尽管红色div声明在绿色之前而且会被首先绘制，但是它<code>z-index</code>属性值更大，所以它在根盒子持有的堆中位置更靠前。</p>
+
+<p>==========全文完==========</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(九)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/12/how-browsers-work-nine/"/>
+    <updated>2011-12-12T22:19:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/12/how-browsers-work-nine</id>
+    <content type="html"><![CDATA[<p><strong>5 布局</strong></p>
+
+<p>当renderer被创建和加入到树中时，它是没有位置和大小的，计算这两个值称为布局或回流(reflow)。</p>
+
+<p>HTML使用的是基于布局模型的流，这意味着大多数时间内，单一路径下计算几何值是可能的。后进入流的元素不会影响比它先进入流的元素的几何属性值，所以布局文档可以被从左到右，从上到下处理。但是也有例外：比如，HTML的table元素可能需要多条路径。</p>
+
+<p>坐标系统是和根框架相关的，而且使用的是上坐标和左坐标。</p>
+
+<p>布局是一个迭代的过程，它从根renderer(对应于HTML文档的<code>&lt;html&gt;</code>元素)开始。布局迭代部分或整个框架，计算每个renderer的几何信息。</p>
+
+<p>根renderer的位置是<code>0,0</code>，它的范围是viewport(浏览器窗口的可视区域)。所有的renderer都有<code>layout</code>或<code>reflow</code>方法，每个renderer调用需要生成布局的孩子的<code>layout</code>方法。</p>
+
+<!-- more -->
+
+<p><strong>5.1 脏位系统</strong></p>
+
+<p>为了在细小的改动是不重新生成整个布局，浏览器使用一个叫脏位(dirty bit)的系统。一个被修改或添加的renderer，它和它的孩子都会被标记为”dirty”，意思是说需要重新布局。</p>
+
+<p>浏览器有2个标志位：“dirty”和”children are dirty”。后者的意思是也许这个renderer本身不需要重新布局，但是它的孩子中至少有一个需要重新布局。</p>
+
+<p><strong>5.2 全局和增量布局</strong></p>
+
+<p>布局可以在整个渲染树上被触发，这就叫做全局(global)布局。全局布局的触发条件为：</p>
+
+<ol>
+  <li>全局样式的改变影响了所有的renderer，例如修改字体大小。</li>
+  <li>窗口大小的改变。</li>
+</ol>
+
+<p>布局可以是增量式的，只有脏renderer会被设置布局(这样会造成需要做额外布局的危害)。</p>
+
+<p>当renderer被标记为脏时，增量布局被异步触发。例如在从网络上获取内容后，新renderer被附加到渲染树，并且被加入到DOM树中。</p>
+
+<p><img src="http://farm8.staticflickr.com/7167/6498973627_ca37c1cac5.jpg&quot; width=&quot;326&quot; height=&quot;341&quot;" alt="reflow" /></p>
+
+<p><strong>5.3 异步和同步布局</strong></p>
+
+<p>增量布局的过程是异步的，Firefox把reflow命令放入队列，然后用一个调度器批量的执行这些命令。Webkit也有一个计时器来实现增量布局，遍历渲染树把脏renderer重新布局。</p>
+
+<p>脚本请求样式信息，比如<code>offsetHeight</code>，会触发同步的增量布局。全部布局一般都是同步触发的，有些时候因为一些属性的原因，布局在初始后被作为回调函数触发，比如下拉位置的改变。</p>
+
+<p><strong>5.4 优化</strong></p>
+
+<p>当布局是因为大小改变或者renderer的位置改变而触发，那么renderer的大小将从cache从读取，不会重新计算。</p>
+
+<p>在一些情况下，比如只有子树被修改和布局不是从根开始，这是由于修改是在本地而且没有影响到周围元素，比如文本插入到文本区域。</p>
+
+<p><strong>5.5 布局过程</strong></p>
+
+<p>布局总是有下面的模式：</p>
+
+<ol>
+  <li>双亲renderer决定自己的宽度。</li>
+  <li>双亲转为孩子并且：
+    <ol>
+      <li>设置孩子renderer的<code>x</code>和<code>y</code></li>
+      <li>如果被标记为脏或者在全局布局中等原因，则调用孩子的<code>layout</code>方法，这会导致计算孩子的高度。</li>
+    </ol>
+  </li>
+  <li>双亲使用孩子累积的<code>height</code>，<code>margin</code>和<code>padding</code>来设置自己的对应值。</li>
+  <li>设置脏位为false。</li>
+</ol>
+
+<p>Firefox使用一个状态对象(nsHTMLReflowState)作为布局的一个参数，在其他状态中包括了双亲的宽度。Firefox布局的输出是一个<code>metrics</code>对象(nsHTMLReflowMetrics)，它包含了renderer的高度。</p>
+
+<p><strong>5.6 宽度计算</strong></p>
+
+<p>renderer的宽度是用容器宽度来计算的，renderer的<code>width</code>样式属性，<code>margin</code>和<code>border</code>属性。</p>
+
+<p>例如计算下面<code>div</code>的宽度：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="ni">&amp;lt;</span>div style=&quot;width:30%&quot;/<span class="ni">&amp;gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Webkit是这样计算的(RenderBox类的calcWidth方法)</p>
+
+<ul>
+  <li>容器的宽度取容器可以达到的最大宽度与0两者之间较大的那个，可以达到的最大宽度就是内容宽度，它的计算方式是：<code>clientWidth() - paddingLeft() - paddingRight()</code>，clientWidth和clientHeight表示的是除了border和scrollbar之外的内部对象。</li>
+  <li>元素的宽度是有样式属性<code>width</code>决定的，它是计算容器宽度的百分比得出的一个绝对数值。</li>
+  <li>然后加入水平边框和缩进</li>
+</ul>
+
+<p>到目前为止是偏好宽度(preferred width)的计算，然后最小和最大宽度值会被计算。如果偏好宽度比最大宽度大，那么就会使用最大宽度，同样如果小于最小宽度，那么就会使用最小宽度。</p>
+
+<p>以防万一宽度没有改变的情况下需要重新布局，所以宽度的值都会被缓存。</p>
+
+<p><strong>5.7 换行</strong></p>
+
+<p>当一个renderer在布局的中间时就需要被分开，这时它会停止布局并告诉双亲它需要被分开，然后双亲就会创建额外的renderer和在他们身上调用<code>layout</code>方法。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(八)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/11/how-browsers-work-eight/"/>
+    <updated>2011-12-11T21:32:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/11/how-browsers-work-eight</id>
+    <content type="html"><![CDATA[<p>4.3.3 简单规则匹配的例子</p>
+
+<p>样式规则有下面几种：</p>
+
+<ul>
+  <li>
+    <p>CSS规则，外部表单或style元素</p>
+
+    <p>p {color:blue}</p>
+  </li>
+  <li>
+    <p>内联style属性</p>
+
+    <p style="color:blue" />
+  </li>
+  <li>
+    <p>HTML的视觉属性(会被映射到相关的样式规则)</p>
+
+    <p bgcolor="blue" />
+  </li>
+</ul>
+
+<!-- more -->
+
+<p>后两种很容易和元素匹配，因为元素有style属性和HTML属性，他们可以用元素作为key来映射。</p>
+
+<p>前面提到过的问题#2，CSS规则匹配可以是很复杂的。为了解决这个难题，所以对规则做一些处理，让获取规则更容易。</p>
+
+<p>在解析样式表后，根据选择器规则会被加入到一个或多个hashmap中。这些map有以id为key的，有以class名key的，有以tag名为key的，还有一个通用map，它的key可以是任何类型。如果选择器是id选择器，那么规则会被加入到以id为key的map中，以此类推。</p>
+
+<p>这个处理会使匹配规则变得更加容易。现在就没有必要查看每个定义，我们可以从map中得到相关的规则。这个优化消除了超过95%的规则，所以他们甚至在匹配过程中都不需要被考虑。</p>
+
+<p>让我们看下面一个样式规则的例子：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>p.error {color:red}
+</span><span class='line'>#messageDiv {height:50px}
+</span><span class='line'>div {margin:5px}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>上面第一个规则会被插入到以class为key的map中，第二个规则会被插入到以id为key的map中，第三个规则会被插入到以tag名为key的map中。</p>
+
+<p>对于下面的HTML片段：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="ni">&amp;lt;</span>p class=&quot;error&quot;<span class="ni">&amp;gt;</span>an error occurred <span class="ni">&amp;lt;</span>/p<span class="ni">&amp;gt;</span>
+</span><span class='line'><span class="ni">&amp;lt;</span>div id=&quot; messageDiv&quot;<span class="ni">&amp;gt;</span>this is a message<span class="ni">&amp;lt;</span>/div<span class="ni">&amp;gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>首先尝试寻找对应<code>p</code>元素的规则，在以class为key的map里找到一个以<code>error</code>为key的规则<code>p.error</code>。div元素在id的map和tag名的map中都有相关规则，所以剩下要做的只是找到哪个规则是真正匹配的规则。</p>
+
+<p>例如下面的div样式规则：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>table div {margin:5px}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>更好匹配的是tag名的map，因为tag名是最右端的选择器，但是如果div元素没有table锚点的话就不会匹配。</p>
+
+<p>Webkit和Firefox都会做这个处理。</p>
+
+<p>4.3.4 在正确的层级顺序中应用规则</p>
+
+<p>style对象有对应于视觉属性的属性，如果属性没有对应的规则，那么一些属性可以继承双亲元素的style对象，其他的属性有默认值。</p>
+
+<p>当有多个定义的时候问题就来了，解决这个问题靠的是层级顺序。</p>
+
+<p>样式表的层级顺序</p>
+
+<p>style属性的声明可以在多个样式表中被声明，有时在一个样式表中，这意味着应用规则的顺序变得非常重要。这被称为层级顺序，根据CSS2的规范说明，层级顺序是(从低到高)：</p>
+
+<ol>
+  <li>浏览器定义</li>
+  <li>用户普通定义</li>
+  <li>开发者普通定义</li>
+  <li>开发者重要定义</li>
+  <li>用户重要定义</li>
+</ol>
+
+<p>浏览器定义是最不重要的，用户定义的样式如果被标记为重要的就可以覆盖开发者定义的样式。如果是相同顺序的定义会被<a href="http://www.html5rocks.com/en/tutorials/internals/howbrowserswork/#Specificity" title="specificity">特征(specificity)</a>排序，经过排序后的顺序是特征化的。HTML视觉属性被翻译成匹配的CSS声明，他们是以低优先级的开发者规则被对待的。</p>
+
+<p>特征(Specificity)</p>
+
+<p>选择器的特征在<a href="http://www.w3.org/TR/CSS2/cascade.html#specificity" title="CSS2">CSS2规范</a>中被定义为：</p>
+
+<ul>
+  <li>如果样式声明是从style属性中来，而不是一个选择器的规则，那么特征就为1，否则就为0(= a)</li>
+  <li>计算选择器的ID属性的数量(= b)</li>
+  <li>计算选择器中其他属性和pseudo-class的数量(= c)</li>
+  <li>计算选择器中元素名和pseudo-element的数量(= d)</li>
+</ul>
+
+<p>最后特征值就是把上面四个数字连起来：a-b-c-d</p>
+
+<p>数的进制是上面四个数的最大值决定的。例如，如果<code>a = 14</code>，那么就可以使用16进制；而如果<code>a = 17</code>的话，就需要使用18或更高进制。后一种情况在选择器类似于<code>html body div div p ... </code>的情况下会发生。</p>
+
+<p>一些例子：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>*             {}  /* a=0 b=0 c=0 d=0 -&gt; specificity = 0,0,0,0 &lt;em>/
+</span><span class='line'> li            {}  /&lt;/em> a=0 b=0 c=0 d=1 -&gt; specificity = 0,0,0,1 &lt;em>/
+</span><span class='line'> li:first-line {}  /&lt;/em> a=0 b=0 c=0 d=2 -&gt; specificity = 0,0,0,2 &lt;em>/
+</span><span class='line'> ul li         {}  /&lt;/em> a=0 b=0 c=0 d=2 -&gt; specificity = 0,0,0,2 &lt;em>/
+</span><span class='line'> ul ol+li      {}  /&lt;/em> a=0 b=0 c=0 d=3 -&gt; specificity = 0,0,0,3 &lt;em>/
+</span><span class='line'> h1 + *[rel=up]{}  /&lt;/em> a=0 b=0 c=1 d=1 -&gt; specificity = 0,0,1,1 &lt;em>/
+</span><span class='line'> ul ol li.red  {}  /&lt;/em> a=0 b=0 c=1 d=3 -&gt; specificity = 0,0,1,3 &lt;em>/
+</span><span class='line'> li.red.level  {}  /&lt;/em> a=0 b=0 c=2 d=1 -&gt; specificity = 0,0,2,1 &lt;em>/
+</span><span class='line'> #x34y         {}  /&lt;/em> a=0 b=1 c=0 d=0 -&gt; specificity = 0,1,0,0 &lt;em>/
+</span><span class='line'> style=””          /&lt;/em> a=1 b=0 c=0 d=0 -&gt; specificity = 1,0,0,0 */</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>规则排序</p>
+
+<p>在所有的规则匹配之后，他们会根据层级规则被排序。Webkit使用冒泡排序法对小的集合排序，用归并排序法对大的集合排序。Webkit依靠重写<code>&gt;</code>操作符来实现排序：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">static</span> <span class="n">bool</span> <span class="n">operator</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;(</span><span class="n">CSSRuleData</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">r1</span><span class="p">,</span> <span class="n">CSSRuleData</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span> <span class="n">r2</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">spec1</span> <span class="o">=</span> <span class="n">r1</span><span class="p">.</span><span class="n">selector</span><span class="p">()</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">specificity</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">spec2</span> <span class="o">=</span> <span class="n">r2</span><span class="p">.</span><span class="n">selector</span><span class="p">()</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">specificity</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="n">spec1</span> <span class="o">==</span> <span class="n">spec2</span><span class="p">)</span> <span class="o">:</span> <span class="n">r1</span><span class="p">.</span><span class="n">position</span><span class="p">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">r2</span><span class="p">.</span><span class="n">position</span><span class="p">()</span> <span class="o">:</span> <span class="n">spec1</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">spec2</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>4.4 渐进的过程</p>
+
+<p>Webkit使用一个标志来标记所有顶层样式表(包括<code>@imports</code>)被加载完成。如果在样式没有完全被加载时就去访问它，那么站位符就会被使并且在文档中被标记，在样式表被加载完成后重新计算。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(七)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/11/how-browsers-work-seven/"/>
+    <updated>2011-12-11T15:13:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/11/how-browsers-work-seven</id>
+    <content type="html"><![CDATA[<p>4.1 渲染树和DOM树的关系</p>
+
+<p>renderer对应于DOM的元素，但并不是一对一的关系。非视觉DOM元素不会被插入渲染树，比如”head”元素。元素的视觉属性是”none”的元素不会出现在树中(视觉属性是”hidden”话会出现在树中)。</p>
+
+<p>DOM元素对应多个视觉对象。一般情况下，复杂结构的元素不能在单个矩形中被描述清楚。比如，<code>select</code>元素有3个renderer：一个是显示区域；一个是下拉框；还有一个是按钮。当文字被分成多行的时候(在一行里显示的宽度不够)，新的行会被作为附加renderer加入到树中。</p>
+
+<p>另一个有许多renderer的例子例子是不完整的HTML。根据CSS规范，内联元素必须包含块元素或着只包含内联元素。为了防止混合的内容，匿名块renderer会被创建来包裹内敛元素。</p>
+
+<p>有些渲染对象对应于DOM节点，但不是在树中的相同位置。浮动元素和绝对固定位置的元素会被放置在树中的不同的位置，而且映射到实际的frame中去，所以它应该是有站位符的frame。</p>
+
+<!-- more -->
+
+<p><img src="http://farm8.staticflickr.com/7156/6486727487_c447bed064.jpg&quot; width=&quot;500&quot; height=&quot;271&quot;" alt="render tree corresponding dom tree" /></p>
+
+<p>4.2 构造树的流程</p>
+
+<p>在Firefox中，展示层为了DOM更新而注册成了一个监听器。展示层把frame的创建代理给了<code>FrameConstructor</code>，而且构造器处理样式和创建frame。</p>
+
+<p>在Webkit中，处理样式和创建renderer被称为“attachment”。每个DOM节点都有一个”attach”方法。“attachment”是同步的，节点被添加到DOM树中被称为新节点”attach”方法。</p>
+
+<p>处理html和body标签会造成渲染树根节点的构造。根渲染对象对应于在CSS规范中的containing block(最上端包含其他所有block的block)。跟节点的大小就是viewport(浏览器窗口显示的区域大小)，Firefox把它称作<code>ViewPortFrame</code>，而Webkit把它称为<code>RenderView</code>。这就是文档指向的渲染对象，树的其余部分是通过插入DOM节点来构造的。</p>
+
+<p>4.3 样式的计算</p>
+
+<p>构建渲染树的时候需要计算渲染对象的视觉属性，这是通过计算每个元素的style属性完成的。</p>
+
+<p>样式包括各种样式表源，内联样式元素和HTML里的视觉属性(比如”bgcolor”属性)，然后再被转换匹配CSS里的属性。</p>
+
+<p>样式表源是浏览器的默认样式表，样式表由开发者和用户样式表提供。用户样式表是由浏览器使用者提供(浏览器允许自定义样式，比如在Firefox中，可以通过在”Firefox Profile”文件夹下放置样式表来实现)。</p>
+
+<p>样式的计算有一些难点：</p>
+
+<ol>
+  <li>样式数据结构非常庞大，持有大量的样式属性会有内存问题。</li>
+  <li>
+    <p>为每个元素找到对应的规则在没有优化的情况下会有性能问题。为每个元素遍历整个规则表是一个非常繁重的工作。选择器的结构有的非常负责，这会造成匹配过程从一个看上去有希望的路径开始，但最后证明是无效的，然后尝试另一个路径。</p>
+
+    <p>例如下面这个组合选择器：</p>
+
+    <pre><code>div div div div{
+...
+}
+</code></pre>
+
+    <p>上面例子的样式意味着要应用到一个被3个div包含的<code>&lt;div&gt;</code>上去。假如你想检查这个规则被应用到了一个给定的div元素上，你需要选择某个路径向上查找。你可能会向上遍历节点树，发现只有2个div元素，然后尝试另一条路径。</p>
+  </li>
+  <li>应用规则包括非常复杂的层级规则，它定义了规则的继承关系。</li>
+</ol>
+
+<p>让我们来看一下浏览器是怎么处理这些问题的：</p>
+
+<p>4.3.1 共享样式数据</p>
+
+<p>Webkit的节点引用样式对象(RenderStyle)，这些对象可以在某些条件下被节点共享。这些节点是兄弟或同辈节点，而且：</p>
+
+<ol>
+  <li>元素必须在相同的鼠标状态下(比如，一个有<code>:hover</code>而另一个没有)</li>
+  <li>两个元素都不应该有id</li>
+  <li>标签名要匹配</li>
+  <li><code>class</code>属性要匹配</li>
+  <li>映射过的属性要一致</li>
+  <li><code>link</code>要匹配</li>
+  <li><code>focus</code>要匹配</li>
+  <li>两个元素都不能被属性选择器影响，影响的是定义为拥有任何选择器匹配使用一个属性的选择器。</li>
+  <li>元素没有内联样式属性</li>
+  <li>必须有兄弟选择器，当遇到任何的兄弟选择器，WebCore简单的抛出一个全局switch，当他们出现时对整个文档禁用样式共享。这包括<code>+</code>选择器和<code>:first-child</code>，<code>:last-child</code>选择器。</li>
+</ol>
+
+<p>4.3.2 Firefox规则树</p>
+
+<p>为了更简单地计算样式，Firefox有两个额外的树：规则树和样式上下文树。Webkit也有样式对象，不过他们都不保存在树中，只有DOM节点指向与它相关的样式。</p>
+
+<p><img src="http://farm8.staticflickr.com/7031/6490768261_6bb541748b.jpg&quot; width=&quot;500&quot; height=&quot;318&quot;" alt="style context tree" /></p>
+
+<p>样式上下文树包含最终值。这个值是通过应用在正确顺序上的所有匹配的规则和把逻辑值转换成具体的值。比如，如果逻辑值是屏幕的百分比，那它会被计算和转换成绝对值。规则树的想法真的是非常聪明，它使得在节点间共享这些值，避免了再次的计算，也节省了空间。</p>
+
+<p>所有匹配的规则被保存在一个树中，叶子节点在路径上有更高的优先级。这棵树包含所有已经找到并且匹配的路径。规则是延迟保存的，这棵树不会在一开始为每个节点计算，只是当一个节点的样式需要被计算时，计算路径才会被加入到树中。</p>
+
+<p>这个查找路径的想法就像在字典中查单词一样，让我看一下已经计算好的规则树：</p>
+
+<p><img src="http://farm8.staticflickr.com/7152/6490816137_053bb01868.jpg&quot; width=&quot;400&quot; height=&quot;261&quot;" alt="rule tree" /></p>
+
+<p>假设我们需要为一个上下文树中的元素匹配规则，并且找到了匹配的规则是B - E - I。我们已经在树中有这个路径，因为我们已经计算了路径A - B - E - I - L，所以现在剩下的工作变得轻松很多。</p>
+
+<p>让我看一下这棵树是怎么减轻我们的工作量的。</p>
+
+<p>分配成为结构(Division into structs)</p>
+
+<p>样式上下文被分配成为结构。这些结构包含了某个种类的样式信息，比如<code>border</code>或<code>color</code>。所有的属性在结构中要么被继承，要么没有被继承。继承的属性除非是被元素定义，否则继承自他的父亲。没有继承的属性(被称为”reset”属性)在某有定义的情况下使用默认值。</p>
+
+<p>这棵树的作用是缓存树中的整个结构(包含计算完成的最终值)。这个想法就是，如果底端的节点不能满足一个结构的定义，那么就可以使用缓存结构中更上层的节点。</p>
+
+<p>用规则树计算样式上下文</p>
+
+<p>当为某个元素计算样式上下文时，我们首先计算规则树中的一个路径，或者使用现有的一个路径。然后开始应用路径上的规则来填充新样式上下文的结构。我们从路径的底部节点开始(最高的优先级，通常是最具体的选择器)向上遍历整棵树直到结构被填充满。如果在规则节点中没有结构的规范，我们就可以做巨大的优化(向上遍历树直到找到一个完全匹配的节点，然后简单地指向它，这是最优优化，因为整个结构被共享了，节省计算最终值的工作量和内存）。</p>
+
+<p>如果只找到部分定义就向上查找知道结构被填满。</p>
+
+<p>如果没有找到对结构的任何定义，为了防止结构是一个继承类型，就把它指向上下文树的双亲结构，在这种情况下我们也能共享结构，如果是一个reset结构，那么将会使用默认值。</p>
+
+<p>如果大多数特定的节点加入了值，我们需要做一些额外的计算把它转换成实际值，然后在缓存结果在树节点中，然后就可以被子节点使用。</p>
+
+<p>为了防止一个元素有兄弟，把它指向同一个节点，这样的话整个样式上下文可以被他们共享。</p>
+
+<p>让我看个例子，假设有下面的HTML</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;err&quot;</span> <span class="na">id=</span><span class="s">&quot;div1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;p&gt;</span>
+</span><span class='line'>        this is a <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;big&quot;</span><span class="nt">&gt;</span> big error <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'>        this is also a
+</span><span class='line'>        <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;big&quot;</span><span class="nt">&gt;</span> very  big  error<span class="nt">&lt;/span&gt;</span> error
+</span><span class='line'>      <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;err&quot;</span> <span class="na">id=</span><span class="s">&quot;div2&quot;</span><span class="nt">&gt;</span>another error<span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>和下面的规则：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1. div {margin:5px;color:black}
+</span><span class='line'>2. .err {color:red}
+</span><span class='line'>3. .big {margin-top:3px}
+</span><span class='line'>4. div span {margin-bottom:4px}
+</span><span class='line'>5. #div1 {color:blue}
+</span><span class='line'>6. #div2 {color:green}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>为了简便，我们之需要填充两个结构：<code>color</code>和<code>margin</code>结构。<code>color</code>结构只包含一个成员<code>color</code>；<code>margin</code>结构包含四个方面。</p>
+
+<p>规则树的结果大致是下面的样子(节点用节点名标记，#号后的数字是它指向的规则)：</p>
+
+<p><img src="http://farm8.staticflickr.com/7163/6490941481_7c897aeef6.jpg&quot; width=&quot;500&quot; height=&quot;294&quot;" alt="rule tree" /></p>
+
+<p>上下文树则是下面的的样子(冒号后的是它指向的规则节点)：</p>
+
+<p><img src="http://farm8.staticflickr.com/7172/6490949269_a4116c1fd5.jpg&quot; width=&quot;400&quot; height=&quot;305&quot;" alt="context tree" /></p>
+
+<p>假设解析HTML而且要得到第二个<code>div</code>标签，我们需要为这个节点创建一个样式上下文，然后填充它的样式结构。</p>
+
+<p>匹配规则后发现与这个<code>div</code>匹配的规则是1，2和6。这意味着在树中已经有一个存在的路径供我们的元素使用，只要加入另一个节点6到规则树中(规则树的节点F)。</p>
+
+<p>我们将会创建一个样式上下文，并把它加入到上下文树中，新的样式上下文将指向规则树的节点F。</p>
+
+<p>现在需要填充样式结构了。我们从填充<code>margin</code>结构开始，因为最后的规则节点F没有加入到<code>margin</code>结构，我们向上查找节点直到找到在上一次节点插入是已经缓存的计算完成的结构，然后使用这个结构。这个节点就是B，它是<code>margin</code>规则的最上层节点。</p>
+
+<p>我们有一个<code>color</code>结构的定义，所以我们不能使用缓存的结构。因为<code>color</code>有一个属性，所以不需要向上查找节点填充其他属性。我们只要计算最终值(把字符串转换成RGB等)，并且缓存这个节点的结构。</p>
+
+<p>第二个<code>span</code>元素的工作更容易。匹配规则的结果是像前一个<code>span</code>一样指向G。因为我们有兄弟节点指向相同节点，我们可以共享整个样式上下文，只需要指向上一个<code>span</code>的上下文。</p>
+
+<p>对于包含继承它双亲的规则的结构来说，缓存是在上下文树中完成的。(<code>coloor</code>属性是被继承的，但是Firefox把它当作reset，缓存在规则树上)。</p>
+
+<p>例如，如果我们在一个段落里加入字体规则：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>p {font-family:Verdana;font size:10px;font-weight:bold}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>段落元素是上下文树中<code>div</code>节点的孩子节点，所以如果段落没有定义字体规则的情况下，可以共享它双亲相同的字体结构。</p>
+
+<p>Webkit没有规则树，所以匹配的定义要遍历4次。首先是非重要高优先级属性先于高优先级重要属性(被其他的属性依赖的属性先要被生成节点，比如<code>display</code>)被生成节点。然后一般优先级非重要属性，再是一般优先级重要属性。这意味着出现多次的属性会被处理多次，但是结果由最后一次决定。</p>
+
+<p>所以总结来说：共享样式对象(全部或者部分结构)可以解决问题1和3。Firefox的规则树则会帮助在正确的顺序下应用属性。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(六)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/10/how-browsers-work-six/"/>
+    <updated>2011-12-10T20:57:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/10/how-browsers-work-six</id>
+    <content type="html"><![CDATA[<p>3.3 CSS解析</p>
+
+<p>和HTML不同，CSS是内容无关的语法，所以可以被一般解析器解析。CSS规范定义了词法和语法。</p>
+
+<p>让我们来看一些例子：</p>
+
+<p>CSS的文法(词汇)是用正则表达式定义的</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>comment   \/*[^&lt;em>]&lt;/em>*+([^/&lt;em>][^&lt;/em>]&lt;em>*+)&lt;/em>\/
+</span><span class='line'>num   [0-9]+|[0-9]&lt;em>”.”[0-9]+
+</span><span class='line'>nonascii  [\200-\377]
+</span><span class='line'>nmstart   [_a-z]|{nonascii}|{escape}
+</span><span class='line'>nmchar    [_a-z0-9-]|{nonascii}|{escape}
+</span><span class='line'>name    {nmchar}+
+</span><span class='line'>ident   {nmstart}{nmchar}&lt;/em></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>ident是identifier的缩写，比如class的名字；name是元素id(#号引用)。</p>
+
+<!-- more -->
+
+<p>而语法使用BNF描述的：</p>
+
+<dl>
+  <dt><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/dt>
+</span><span class='line'>  &lt;dt>ruleset&lt;/dt>
+</span><span class='line'>  &lt;dd>selector [ ‘,’ S* selector ]*
+</span><span class='line'>‘{‘ S* declaration [ ‘;’ S* declaration ]* ‘}’ S*
+</span><span class='line'>  ;
+</span><span class='line'>selector&lt;/dd>
+</span><span class='line'>  &lt;dd>simple_selector [ combinator selector | S+ [ combinator? selector ]? ]? 
+</span><span class='line'>  ;
+</span><span class='line'>simple_selector&lt;/dd>
+</span><span class='line'>  &lt;dd>element_name [ HASH | class | attrib | pseudo ]*
+</span><span class='line'>  | [ HASH | class | attrib | pseudo ]+
+</span><span class='line'>  ;
+</span><span class='line'>class&lt;/dd>
+</span><span class='line'>  &lt;dd>’.’ IDENT
+</span><span class='line'>  ;
+</span><span class='line'>element_name&lt;/dd>
+</span><span class='line'>  &lt;dd>IDENT | ‘*’
+</span><span class='line'>  ;
+</span><span class='line'>attrib&lt;/dd>
+</span><span class='line'>  &lt;dd>’[’ S* IDENT S* [ [ ‘=’ | INCLUDES | DASHMATCH ] S*
+</span><span class='line'>[ IDENT | STRING ] S* ] ‘]’
+</span><span class='line'>  ;
+</span><span class='line'>pseudo&lt;/dd>
+</span><span class='line'>  &lt;dd>’:’ [ IDENT | FUNCTION S* [IDENT S*] ‘)’ ]
+</span><span class='line'>  ;</span></code></pre></td></tr></table></div></figure></notextile></div></dd>
+</dl>
+
+<p>比如下面的CSS：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>div.error , a.error {
+</span><span class='line'>  color:red;
+</span><span class='line'>  font-weight:bold;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><code>div.error</code>和<code>a.error</code>是选择器，大括号里包含的就是ruleset里定义的规则，它适用于下面的定义：</p>
+
+<dl>
+  <dt><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/dt>
+</span><span class='line'>  &lt;dt>ruleset&lt;/dt>
+</span><span class='line'>  &lt;dd>selector [ ‘,’ S* selector ]*
+</span><span class='line'>‘{‘ S* declaration [ ‘;’ S* declaration ]* ‘}’ S*
+</span><span class='line'>  ;</span></code></pre></td></tr></table></div></figure></notextile></div></dd>
+</dl>
+
+<p>也就是说，ruleset是一个或多个选择器，他们由逗号隔开，S代表空格。ruleset包括大括号和其中的一个或多个，由分号隔开的声明。”声明”和”选择器“会在下面的BNF定义中介绍。</p>
+
+<p>3.3.1 Webkit的CSS解析器</p>
+
+<p>Webkit使用Flex和Bison解析器生成器，从CSS语法文件自动创建解析器，而Bison创建的是自下而上的shift-reduce解析器。Firefox使用手动写的自上而下的解析器。两种情况下，每个CSS文件都会被解析成为StyleSheet对象，每个对象都包含CSS规则。CSS规则对象包含选择器和声明对象，还有其他CSS语法中对应的对象。</p>
+
+<p><img src="http://farm8.staticflickr.com/7145/6486240717_22094df7b7.jpg&quot; width=&quot;500&quot; height=&quot;393&quot;" alt="parsing css" /></p>
+
+<p>3.4 处理scripts和style sheets的顺序</p>
+
+<p>3.4.1 Scripts</p>
+
+<p>web的模型是异步的。开发者希望当遇到<code>&lt;script&gt;</code>标签后，脚本能够立即被解析和执行。文档的解析会被挂起，知道脚本执行完毕。如果脚本是从外部引用的，那么必须先从网络上把拿到这个脚本，这个过程是同步的，直到脚本被抓取到本地后才会开始解析。这个模型已经存在了很多年，而且在HTML4和5规范中也有定义。开发者可以把脚本标记为”differ”，这样的话就不会挂起文档解析，脚本解析完后就会执行。HTML5加入了一个可以标记脚本为异步的选项，所以它会被另一个线程解析和执行。</p>
+
+<p>3.4.2 Speculative parsing</p>
+
+<p>Webkit和Firefox都会做这种优化。当脚本在执行时，另一个线程解析剩下的文档和找出其他需要从网络上加载的资源，并且加载他们。在这种方式下，资源可以在并行连接的情况下加载，而且总的速度会更好。注意，speculative parser不会修改DOM树，然后把它交给主解析器，它只解析外部资源的引用，比如外部脚本，样式表和图片。</p>
+
+<p>3.4.3 Style sheets</p>
+
+<p>没有理由等待DOM树和停止文档解析。有个脚本的问题就是在文档解析阶段脚本请求样式的信息。如果样式还没有被加载和解析，脚本会获得错误的结果，这样明显会产生许多问题。这看上去是一个边界条件，但又是非常普遍。Firefox在CSS加载和解析的时候会阻塞所有的脚本。Webkit只在尝试获取某个特定的CSS属性，而这个属性会被未加载的CSS影响到时阻塞脚本。</p>
+
+<p>4 渲染构造树</p>
+
+<p>当DOM树被构造完成后，浏览器会构造另一棵树，即渲染树。这棵树是按顺序的视觉元素构成的，而且他们会被显示。它是文档的视觉展现。渲染树的目的是使内容在正确的顺序上绘制。</p>
+
+<p>Firefox把渲染树里的元素称为”frames”，Webkt则是render或render object。
+Webkit的RenderObject类是renderer的基本类，它的定义如下：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">class</span> <span class="n">RenderObject</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">layout</span><span class="p">();</span>
+</span><span class='line'>  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">paint</span><span class="p">(</span><span class="n">PaintInfo</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">rect</span> <span class="n">repaintRect</span><span class="p">();</span>
+</span><span class='line'>  <span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">;</span>  <span class="c1">//the DOM node</span>
+</span><span class='line'>  <span class="n">RenderStyle</span><span class="o">*</span> <span class="n">style</span><span class="p">;</span>  <span class="c1">// the computed style</span>
+</span><span class='line'>  <span class="n">RenderLayer</span><span class="o">*</span> <span class="n">containgLayer</span><span class="p">;</span> <span class="c1">//the containing z-index layer</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>每个renderer代表了一个矩形区域，类似于节点的CSS盒子模型。它包括了几何信息，比如宽度，高度和位置。</p>
+
+<p>盒子的类型会被”display”样式的属性影响(参看style computation部分)。下面的Webkit代码是决定的是，根据显示属性，什么类型的renderer应该被创建为DOM节点。</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">RenderObject</span><span class="o">*</span> <span class="n">RenderObject</span><span class="o">::</span><span class="n">createObject</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="n">RenderStyle</span><span class="o">*</span> <span class="n">style</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">Document</span><span class="o">*</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">document</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">RenderArena</span><span class="o">*</span> <span class="n">arena</span> <span class="o">=</span> <span class="n">doc</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">renderArena</span><span class="p">();</span>
+</span><span class='line'>    <span class="err">…</span>
+</span><span class='line'>    <span class="n">RenderObject</span><span class="o">*</span> <span class="n">o</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">switch</span> <span class="p">(</span><span class="n">style</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">display</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">NONE</span>:
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">INLINE</span>:
+</span><span class='line'>        <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderInline</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">BLOCK</span>:
+</span><span class='line'>        <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderBlock</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">INLINE_BLOCK</span>:
+</span><span class='line'>        <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderBlock</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">LIST_ITEM</span>:
+</span><span class='line'>        <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderListItem</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>   <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">o</span><span class="p">;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</code></pre>
+
+<p>元素类型也是会被考虑的，例如，form控制和table有特殊的框架。在Webkit中，如果元素想要创建特殊的renderer，它会覆盖<code>createRenderer</code>方法。renderer指向包含非几何信息的style object。</p>
+
+]]></content>
+  </entry>
+  
+</feed>

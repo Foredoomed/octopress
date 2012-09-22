@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>浏览器是如何工作的(六) - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="3.3 CSS解析 和HTML不同，CSS是内容无关的语法，所以可以被一般解析器解析。CSS规范定义了词法和语法。 让我们来看一些例子： CSS的文法(词汇)是用正则表达式定义的 1
+2
+3
+4
+5
+6
+7
+comment \/\*[^*]*\*+([^/*][^*]*\*+)*\/
+num [0 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/12/10/how-browsers-work-six/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">浏览器是如何工作的(六)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-10T20:57:00+08:00" pubdate data-updated="true">Dec 10<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>3.3 CSS解析</p>
+
+<p>和HTML不同，CSS是内容无关的语法，所以可以被一般解析器解析。CSS规范定义了词法和语法。</p>
+
+<p>让我们来看一些例子：</p>
+
+<p>CSS的文法(词汇)是用正则表达式定义的</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">comment   \/\*[^*]*\*+([^/*][^*]*\*+)*\/
+</span><span class="line">num   [0-9]+|[0-9]*"."[0-9]+
+</span><span class="line">nonascii  [\200-\377]
+</span><span class="line">nmstart   [_a-z]|{nonascii}|{escape}
+</span><span class="line">nmchar    [_a-z0-9-]|{nonascii}|{escape}
+</span><span class="line">name    {nmchar}+
+</span><span class="line">ident   {nmstart}{nmchar}*</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>ident是identifier的缩写，比如class的名字；name是元素id(#号引用)。</p>
+
+<!-- more -->
+
+<p>而语法使用BNF描述的：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">ruleset
+</span><span class="line">  : selector [ ',' S* selector ]*
+</span><span class="line">    '{' S* declaration [ ';' S* declaration ]* '}' S*
+</span><span class="line">  ;
+</span><span class="line">selector
+</span><span class="line">  : simple_selector [ combinator selector | S+ [ combinator? selector ]? ]? 
+</span><span class="line">  ;
+</span><span class="line">simple_selector
+</span><span class="line">  : element_name [ HASH | class | attrib | pseudo ]*
+</span><span class="line">  | [ HASH | class | attrib | pseudo ]+
+</span><span class="line">  ;
+</span><span class="line">class
+</span><span class="line">  : '.' IDENT
+</span><span class="line">  ;
+</span><span class="line">element_name
+</span><span class="line">  : IDENT | '*'
+</span><span class="line">  ;
+</span><span class="line">attrib
+</span><span class="line">  : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S*
+</span><span class="line">    [ IDENT | STRING ] S* ] ']'
+</span><span class="line">  ;
+</span><span class="line">pseudo
+</span><span class="line">  : ':' [ IDENT | FUNCTION S* [IDENT S*] ')' ]
+</span><span class="line">  ;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>比如下面的CSS：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">div.error , a.error {
+</span><span class="line">  color:red;
+</span><span class="line">  font-weight:bold;
+</span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>div.error</code>和<code>a.error</code>是选择器，大括号里包含的就是ruleset里定义的规则，它适用于下面的定义：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">ruleset
+</span><span class="line">  : selector [ ',' S* selector ]*
+</span><span class="line">    '{' S* declaration [ ';' S* declaration ]* '}' S*
+</span><span class="line">  ;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>也就是说，ruleset是一个或多个选择器，他们由逗号隔开，S代表空格。ruleset包括大括号和其中的一个或多个，由分号隔开的声明。”声明”和”选择器“会在下面的BNF定义中介绍。</p>
+
+<p>3.3.1 Webkit的CSS解析器</p>
+
+<p>Webkit使用Flex和Bison解析器生成器，从CSS语法文件自动创建解析器，而Bison创建的是自下而上的shift-reduce解析器。Firefox使用手动写的自上而下的解析器。两种情况下，每个CSS文件都会被解析成为StyleSheet对象，每个对象都包含CSS规则。CSS规则对象包含选择器和声明对象，还有其他CSS语法中对应的对象。</p>
+
+<p><img src="http://farm8.staticflickr.com/7145/6486240717_22094df7b7.jpg&quot; width=&quot;500&quot; height=&quot;393&quot;" alt="parsing css" /></p>
+
+<p>3.4 处理scripts和style sheets的顺序</p>
+
+<p>3.4.1 Scripts</p>
+
+<p>web的模型是异步的。开发者希望当遇到<code>&lt;script&gt;</code>标签后，脚本能够立即被解析和执行。文档的解析会被挂起，知道脚本执行完毕。如果脚本是从外部引用的，那么必须先从网络上把拿到这个脚本，这个过程是同步的，直到脚本被抓取到本地后才会开始解析。这个模型已经存在了很多年，而且在HTML4和5规范中也有定义。开发者可以把脚本标记为”differ”，这样的话就不会挂起文档解析，脚本解析完后就会执行。HTML5加入了一个可以标记脚本为异步的选项，所以它会被另一个线程解析和执行。</p>
+
+<p>3.4.2 Speculative parsing</p>
+
+<p>Webkit和Firefox都会做这种优化。当脚本在执行时，另一个线程解析剩下的文档和找出其他需要从网络上加载的资源，并且加载他们。在这种方式下，资源可以在并行连接的情况下加载，而且总的速度会更好。注意，speculative parser不会修改DOM树，然后把它交给主解析器，它只解析外部资源的引用，比如外部脚本，样式表和图片。</p>
+
+<p>3.4.3 Style sheets</p>
+
+<p>没有理由等待DOM树和停止文档解析。有个脚本的问题就是在文档解析阶段脚本请求样式的信息。如果样式还没有被加载和解析，脚本会获得错误的结果，这样明显会产生许多问题。这看上去是一个边界条件，但又是非常普遍。Firefox在CSS加载和解析的时候会阻塞所有的脚本。Webkit只在尝试获取某个特定的CSS属性，而这个属性会被未加载的CSS影响到时阻塞脚本。</p>
+
+<p>4 渲染构造树</p>
+
+<p>当DOM树被构造完成后，浏览器会构造另一棵树，即渲染树。这棵树是按顺序的视觉元素构成的，而且他们会被显示。它是文档的视觉展现。渲染树的目的是使内容在正确的顺序上绘制。</p>
+
+<p>Firefox把渲染树里的元素称为”frames”，Webkt则是render或render object。
+Webkit的RenderObject类是renderer的基本类，它的定义如下：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="n">class</span> <span class="n">RenderObject</span><span class="p">{</span>
+</span><span class="line">  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">layout</span><span class="p">();</span>
+</span><span class="line">  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">paint</span><span class="p">(</span><span class="n">PaintInfo</span><span class="p">);</span>
+</span><span class="line">  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">rect</span> <span class="n">repaintRect</span><span class="p">();</span>
+</span><span class="line">  <span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">;</span>  <span class="c1">//the DOM node</span>
+</span><span class="line">  <span class="n">RenderStyle</span><span class="o">*</span> <span class="n">style</span><span class="p">;</span>  <span class="c1">// the computed style</span>
+</span><span class="line">  <span class="n">RenderLayer</span><span class="o">*</span> <span class="n">containgLayer</span><span class="p">;</span> <span class="c1">//the containing z-index layer</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>每个renderer代表了一个矩形区域，类似于节点的CSS盒子模型。它包括了几何信息，比如宽度，高度和位置。</p>
+
+<p>盒子的类型会被”display”样式的属性影响(参看style computation部分)。下面的Webkit代码是决定的是，根据显示属性，什么类型的renderer应该被创建为DOM节点。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="n">RenderObject</span><span class="o">*</span> <span class="n">RenderObject</span><span class="o">::</span><span class="n">createObject</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="n">RenderStyle</span><span class="o">*</span> <span class="n">style</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="n">Document</span><span class="o">*</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">document</span><span class="p">();</span>
+</span><span class="line">    <span class="n">RenderArena</span><span class="o">*</span> <span class="n">arena</span> <span class="o">=</span> <span class="n">doc</span><span class="o">-&gt;</span><span class="n">renderArena</span><span class="p">();</span>
+</span><span class="line">    <span class="p">...</span>
+</span><span class="line">    <span class="n">RenderObject</span><span class="o">*</span> <span class="n">o</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">switch</span> <span class="p">(</span><span class="n">style</span><span class="o">-&gt;</span><span class="n">display</span><span class="p">())</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">NONE</span>:
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">INLINE</span>:
+</span><span class="line">            <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderInline</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">BLOCK</span>:
+</span><span class="line">            <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderBlock</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">INLINE_BLOCK</span>:
+</span><span class="line">            <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderBlock</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">LIST_ITEM</span>:
+</span><span class="line">            <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderListItem</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">       <span class="p">...</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">o</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>元素类型也是会被考虑的，例如，form控制和table有特殊的框架。在Webkit中，如果元素想要创建特殊的renderer，它会覆盖<code>createRenderer</code>方法。renderer指向包含非几何信息的style object。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-10T20:57:00+08:00" pubdate data-updated="true">Dec 10<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/browsers/'>browsers</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/12/10/how-browsers-work-six/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/12/10/how-browsers-work-six/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

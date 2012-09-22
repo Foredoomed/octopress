@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>NoSQL数据库比较 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="随着Web2.0时代的来临以及宽带技术的迅猛发展，许多Web应用都感受到了来自高并发以及高数据量的挑战。而大多数情况下这种挑战来自于数据库，即二维关系型数据库的缺陷导致了RDBMS成为了高并发和高数据量下的瓶颈。正是为了消除这种瓶颈，才诞生了NoSQL。NoSQL是当下最热的技术话题， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/06/03/comparison-of-nosql-databases/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">NoSQL数据库比较</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-03T13:59:00+08:00" pubdate data-updated="true">Jun 3<span>rd</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>随着Web2.0时代的来临以及宽带技术的迅猛发展，许多Web应用都感受到了来自高并发以及高数据量的挑战。而大多数情况下这种挑战来自于数据库，即二维关系型数据库的缺陷导致了RDBMS成为了高并发和高数据量下的瓶颈。正是为了消除这种瓶颈，才诞生了NoSQL。NoSQL是当下最热的技术话题，而且越来越多的公司开始选择NoSQL产品来提高Web应用的性能及伸缩性，我们完全可以想象在不远的将来NoSQL取代现在的关系型数据库，成为数据存储的第一选择。 <!--more--></p>
+
+<p><strong>一.NoSQL数据库的分类</strong></p>
+
+<p>NoSQL按存储方式主要分为四类：</p>
+
+<p>1.Key-values Stores</p>
+
+<p>主要的想法是用hash表，里面包括一个unique key和指向特定数据的指针。Key-value 模型是最简单和最容易实现的. 但是它对查询和更新部分数据时效率不高。</p>
+
+<table>
+<tr>
+<td>Examples</td>
+<td>Tokyo Cabinet/Tyrant, Redis, Voldemort, Oracle BDB</td>
+</tr>
+<tr>
+<td>典型应用场景</td>
+<td>内容缓存，主要用于处理大量数据的高访问负载，也用于一些日志系统等等。</td>
+</tr>
+<tr>
+<td>数据模型</td>
+<td>Key 指向 Value 的键值对，通常用hash table来实现</td>
+</tr>
+<tr>
+<td>强项</td>
+<td>查找速度快</td>
+</tr>
+<tr>
+<td>弱项</td>
+<td>数据无结构化，通常只被当作字符串或者二进制数据</td>
+</tr>
+</table>
+
+<p><br />
+2.Document Databases</p>
+
+<p>这个模型是包含key-value集合的文档，并且这个文档被标记过版本的。这些半结构文档是以类似于JSON的形式存储。Document databases基本上是更高级的Key-value形式，允许每个key的value可以多级嵌套。Document databases 支持更有效的查询。</p>
+
+<table>
+<tr>
+<td>Examples</td>
+<td>CouchDB, MongoDB</td>
+</tr>
+<tr>
+<td>典型应用场景</td>
+<td>Web应用（与Key-Value类似，Value是结构化的，不同的是数据库能够了解Value的内容）</td>
+</tr>
+<tr>
+<td>数据模型</td>
+<td>Key-Value对应的键值对，Value为结构化数据</td>
+</tr>
+<tr>
+<td>强项</td>
+<td>数据结构要求不严格，表结构可变，不需要像关系型数据库一样需要预先定义表结构</td>
+</tr>
+<tr>
+<td>弱项</td>
+<td>查询性能不高，而且缺乏统一的查询语法。</td>
+</tr>
+</table>
+
+<p><br />
+3.Column Family Stores</p>
+
+<p>这类NoSQL主要是用来存储和处理大容量分布式数据。仍然有key，但指向的是多列，并且列是由column family来组织。</p>
+
+<table>
+<tr>
+<td>Examples</td>
+<td>Cassandra, HBase</td>
+</tr>
+<tr>
+<td>典型应用场景</td>
+<td>分布式的文件系统</td>
+</tr>
+<tr>
+<td>数据模型</td>
+<td>以列簇式存储，将同一列数据存在一起</td>
+</tr>
+<tr>
+<td>强项</td>
+<td>查找速度快，可扩展性强，更容易进行分布式扩展</td>
+</tr>
+<tr>
+<td>弱项</td>
+<td>功能相对局限</td>
+</tr>
+</table>
+
+<p><br />
+4.Graph Databases</p>
+
+<p>这类NoSQL的结构不是一般的二维表结构，而是更有弹性的图形模型。并且需要指定数据模型来查询这类数据库。</p>
+
+<table>
+<tr>
+<td>Examples</td>
+<td>Neo4J, InfoGrid, Infinite Graph</td>
+</tr>
+<tr>
+<td>典型应用场景</td>
+<td>社交网络，推荐系统等。专注于构建关系图谱</td>
+</tr>
+<tr>
+<td>数据模型</td>
+<td>图结构</td>
+</tr>
+<tr>
+<td>强项</td>
+<td>利用图结构相关算法。比如最短路径寻址，N度关系查找等</td>
+</tr>
+<tr>
+<td>弱项</td>
+<td>很多时候需要对整个图做计算才能得出需要的信息，而且这种结构不太好做分布式的集群方案。</td>
+</tr>
+</table>
+
+<p><br />
+<strong>二.RDBMS和NoSQL的选择:</strong></p>
+
+<p>NoSQL: </p>
+
+<ul>
+  <li>实时状态或分析</li>
+  <li>日志或归档</li>
+  <li>社交计算</li>
+  <li>外部数据Feed集成</li>
+  <li>前端顺序处理系统</li>
+  <li>企业内容管理服务</li>
+  <li>处理非常高负载的存储能力</li>
+  <li>对于持久化数据有非常多的写操作</li>
+  <li>希望具有水平扩展的能力</li>
+  <li>如果你需要动态查询</li>
+  <li>简单的查询语句(没有“join”)</li>
+</ul>
+
+<p>RDBMS:</p>
+
+<ul>
+  <li>希望有高负责情况下的存储能力，但是主要的是读操作</li>
+  <li>比起优雅的数据结构，你更看重性能</li>
+  <li>你需要强大的SQL查询语言</li>
+</ul>
+
+<p><strong>三.MongoDB和Redis的比较:</strong></p>
+
+<p>1.MongoDB</p>
+
+<p>MongoDB的特性：  </p>
+
+<ul>
+  <li>用C++实现的</li>
+  <li>保留了一些SQL的友好的特性（查询，索引）</li>
+  <li>在AGPL许可下发布</li>
+  <li>自定义的二进制协议（BSON）</li>
+  <li>Master/slave形式的数据同步</li>
+  <li>查询语句是javascript表达式</li>
+  <li>在服务器端执行任意的javascript函数</li>
+  <li>比起CouchDB，有更好的即时更新（update-in-place）性能</li>
+  <li>内建分片</li>
+  <li>用内存映射存储数据</li>
+  <li>追求性能而不是特性</li>
+  <li>一旦崩溃，它需要去修复表</li>
+  <li>在1.8版本中将有更好的持久性</li>
+</ul>
+
+<p>MongoDB的主要事项:</p>
+
+<ul>
+  <li>对于分开的读和写，MongoDB会用一个该死的全局锁。</li>
+  <li>MongoDB没有一个统计计划优化程序。</li>
+  <li>在分片的时候才需要Mongos进程。</li>
+  <li>MongoDB支持Master-Slave和Replica-Sets的数据同步模式。</li>
+  <li>在第二次复制时，MongoDB支持“slave-delay”</li>
+  <li>MongoDB不应该在32位环境下运行。</li>
+  <li>MongoDB会自动记录任何超过100ms的查询语句。</li>
+  <li>如果一个查询语句要消耗较长的一段时间，MongoDB可以用来做性能提高工具。</li>
+  <li>MongoDB不支持multi-master数据同步。他们认为这样保持逻辑简单很好。而且，系统因为不用担心在多master的情况下发生写冲突而简单很多。</li>
+  <li>在复制安装情况下，MongoDB支持一个叫做Arbiter，它的工作就是把结打开。</li>
+</ul>
+
+<p>2.Redis</p>
+
+<p>Redis的特性：</p>
+
+<ul>
+  <li>用C++实现的</li>
+  <li>主要特点：Blazing fast</li>
+  <li>在BSD许可下发布</li>
+  <li>协议：Telnet-like</li>
+  <li>以硬盘为后备的内存数据库</li>
+  <li>从2.0后,可以交换到磁盘上</li>
+  <li>Master/slave形式的数据同步</li>
+  <li>简单的keys和values</li>
+  <li>复杂的操作，像ZREVRANGEBYSCORE</li>
+  <li>增长和压缩（对比率和统计有好处）</li>
+  <li>Sets(also union/diff/inter)</li>
+  <li>lists(also a queue; blocking pop)</li>
+  <li>hashes(多属性的对象)</li>
+  <li>在所有这些数据之中，只有Redis支持事务</li>
+  <li>数据可以设置为过期（因为在cache中）</li>
+  <li>Sorted sets（高分数表，对处理查询有好处）</li>
+  <li>发布/订阅和看管数据变化</li>
+</ul>
+
+<p>最佳应用: 对于在可预见的数据库容量下快速改变的数据（绝大部分在内存）。例如：股价，分析，实时数据收集，实时交流。 </p>
+
+<p>参考文章：</p>
+
+<p>[1]<a href="http://blog.monitis.com/index.php/2011/05/22/picking-the-right-nosql-database-tool" title="picking-the-right-nosql-database-tool">picking-the-right-nosql-database-tool</a><br />
+[2]<a href="http://kkovacs.eu/cassandra-vs-mongodb-vs-couchdb-vs-redis" title="cassandra-vs-mongodb-vs-couchdb-vs-redis">cassandra-vs-mongodb-vs-couchdb-vs-redis</a><br />
+[3]<a href="http://blog.nosqlfan.com/html/1727.html" title="如何选择最适合你的NoSQL数据库">如何选择最适合你的NoSQL数据库</a></p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-03T13:59:00+08:00" pubdate data-updated="true">Jun 3<span>rd</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/nosql/'>nosql</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/06/03/comparison-of-nosql-databases/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/06/03/comparison-of-nosql-databases/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

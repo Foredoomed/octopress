@@ -1,0 +1,10 @@
+---
+layout: post
+title: "Code Rush"
+date: 2011-12-06 22:38
+comments: true
+categories: life
+---
+在[阮一峰的博客](http://www.ruanyifeng.com/blog/2009/09/code_rush.html "纪录片《Code Rush》")看到了这个纪录片，不过年代有些久远了，记录了Netscape公司从1998年到1999年这一年之间的事，在其中还看到了Jamie Zawinski这位牛人，果真是那样特立独行啊。总之强力推荐，看完后也许你会像我一样找到一些共鸣。
+
+<embed src="http://player.youku.com/player.php/sid/XMTc5OTc5Njcy/v.swf" allowFullScreen="true" quality="high" width="480" height="400" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>

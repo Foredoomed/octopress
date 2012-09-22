@@ -1,0 +1,1010 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>iBatis源码分析之映射 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="1.包结构分析 Packages com.ibatis.sqlmap.engine.builder.xml
+&nbsp; com.ibatis.common.xml
+&nbsp; com.ibatis.sqlmap.engine.mapping.parameter
+&nbsp; com. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/10/23/ibatis-source-code-analysis-mapping/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">iBatis源码分析之映射</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-10-23T19:14:00+08:00" pubdate data-updated="true">Oct 23<span>rd</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>1.包结构分析</strong></p>
+
+<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+<tbody><tr>
+<th align="left" colspan="2" style="background-color:#CCCCFF">
+<b>Packages</b></th></tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.builder.xml</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.common.xml</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.parameter</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.result</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.result.loader</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.sql</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.sql.dynamic</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.sql.dynamic.elements</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.sql.raw</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.sql.simple</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.sql.stat</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.sqlmap.engine.mapping.statement</b></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+
+<p>iBatis处理映射的包结构应该说还是比较清晰的，基本上看到包名就可以知道包下面的类是做什么用的。但是我们看到关于映射的包一共有10个，但是像dynamic，raw，simple，stat这些包下都只有一个类，显然这种分法是有问题的，我们应当尽可能地减少包，包越少结构就越清晰，但并不是说把类都放一个包下，要在这两者之间寻求平衡。 <!--more--></p>
+
+<p><strong>2.源码分析</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>SqlMapClientBuilder.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">static</span> <span class="n">SqlMapClient</span> <span class="nf">buildSqlMapClient</span><span class="o">(</span><span class="n">Reader</span> <span class="n">reader</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">return</span> <span class="k">new</span> <span class="nf">SqlMapConfigParser</span><span class="o">().</span><span class="na">parse</span><span class="o">(</span><span class="n">reader</span><span class="o">);</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>我们要对数据库操作，首先要创建SqlMapClient接口，而SqlMapClientBuilder类就是用来创建SqlMapClient接口的。在buildSqlMapClient方法里创建了SqlMapConfigParser类，然后再调用该类的parse方法来解析XML配置文件。其实代码读到这里就可以看出SqlMapClient接口是线程安全的。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>SqlMapConfigParser.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="nf">SqlMapConfigParser</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">parser</span><span class="o">.</span><span class="na">setValidation</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class="line">    <span class="n">parser</span><span class="o">.</span><span class="na">setEntityResolver</span><span class="o">(</span><span class="k">new</span> <span class="n">SqlMapClasspathEntityResolver</span><span class="o">());</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">addSqlMapConfigNodelets</span><span class="o">();</span>
+</span><span class="line">    <span class="n">addGlobalPropNodelets</span><span class="o">();</span>
+</span><span class="line">    <span class="n">addSettingsNodelets</span><span class="o">();</span>
+</span><span class="line">    <span class="n">addTypeAliasNodelets</span><span class="o">();</span>
+</span><span class="line">    <span class="n">addTypeHandlerNodelets</span><span class="o">();</span>
+</span><span class="line">    <span class="n">addTransactionManagerNodelets</span><span class="o">();</span>
+</span><span class="line">    <span class="n">addSqlMapNodelets</span><span class="o">();</span>
+</span><span class="line">    <span class="n">addResultObjectFactoryNodelets</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>首先在创建SqlMapConfigParser类的时候就会为NodeletParser类预先定义好XML文件里各种DOM类型的解析方法，这个是通过实现Nodelet接口的process方法来实现的(Nodelet实际上就是回调接口)。我们可以看到iBatis对各种DOM类型自定义了一套表示方法，他们的定义在NodeletParser类里。在SqlMapConfigParser类的parse方法里再调用NodeletParser的parse方法解析XML文件。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>NodeletParser.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line">
+</span><span class="line">  <span class="cm">/**</span>
+</span><span class="line"><span class="cm">   * Registers a nodelet for the specified XPath.  Current XPaths supported</span>
+</span><span class="line"><span class="cm">   * are:</span>
+</span><span class="line"><span class="cm">   * &lt;ul&gt;</span>
+</span><span class="line"><span class="cm">   * &lt;li&gt; Text Path - /rootElement/childElement/text()</span>
+</span><span class="line"><span class="cm">   * &lt;li&gt; Attribute Path  - /rootElement/childElement/@theAttribute</span>
+</span><span class="line"><span class="cm">   * &lt;li&gt; Element Path - /rootElement/childElement/theElement</span>
+</span><span class="line"><span class="cm">   * &lt;li&gt; All Elements Named - //theElement</span>
+</span><span class="line"><span class="cm">   * &lt;/ul&gt;</span>
+</span><span class="line"><span class="cm">   */</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addNodelet</span><span class="o">(</span><span class="n">String</span> <span class="n">xpath</span><span class="o">,</span> <span class="n">Nodelet</span> <span class="n">nodelet</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">letMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">xpath</span><span class="o">,</span> <span class="n">nodelet</span><span class="o">);</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/**</span>
+</span><span class="line"><span class="cm">   * A recursive method that walkes the DOM tree, registers XPaths and</span>
+</span><span class="line"><span class="cm">   * calls Nodelets registered under those XPaths.</span>
+</span><span class="line"><span class="cm">   */</span>
+</span><span class="line">  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">process</span><span class="o">(</span><span class="n">Node</span> <span class="n">node</span><span class="o">,</span> <span class="n">Path</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="k">instanceof</span> <span class="n">Element</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="c1">// Element</span>
+</span><span class="line">      <span class="n">String</span> <span class="n">elementName</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">getNodeName</span><span class="o">();</span>
+</span><span class="line">      <span class="n">path</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">elementName</span><span class="o">);</span>
+</span><span class="line">      <span class="n">processNodelet</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">path</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+</span><span class="line">      <span class="n">processNodelet</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">(</span><span class="s">&quot;//&quot;</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">elementName</span><span class="o">).</span><span class="na">toString</span><span class="o">());</span>
+</span><span class="line">
+</span><span class="line">      <span class="c1">// Attribute</span>
+</span><span class="line">      <span class="n">NamedNodeMap</span> <span class="n">attributes</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">getAttributes</span><span class="o">();</span>
+</span><span class="line">      <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getLength</span><span class="o">();</span>
+</span><span class="line">      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">Node</span> <span class="n">att</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">item</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+</span><span class="line">        <span class="n">String</span> <span class="n">attrName</span> <span class="o">=</span> <span class="n">att</span><span class="o">.</span><span class="na">getNodeName</span><span class="o">();</span>
+</span><span class="line">        <span class="n">path</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;@&quot;</span> <span class="o">+</span> <span class="n">attrName</span><span class="o">);</span>
+</span><span class="line">        <span class="n">processNodelet</span><span class="o">(</span><span class="n">att</span><span class="o">,</span> <span class="n">path</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+</span><span class="line">        <span class="n">processNodelet</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">(</span><span class="s">&quot;//@&quot;</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">attrName</span><span class="o">).</span><span class="na">toString</span><span class="o">());</span>
+</span><span class="line">        <span class="n">path</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">      <span class="c1">// Children</span>
+</span><span class="line">      <span class="n">NodeList</span> <span class="n">children</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">getChildNodes</span><span class="o">();</span>
+</span><span class="line">      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">children</span><span class="o">.</span><span class="na">getLength</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">process</span><span class="o">(</span><span class="n">children</span><span class="o">.</span><span class="na">item</span><span class="o">(</span><span class="n">i</span><span class="o">),</span> <span class="n">path</span><span class="o">);</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">      <span class="n">path</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;end()&quot;</span><span class="o">);</span>
+</span><span class="line">      <span class="n">processNodelet</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">path</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+</span><span class="line">      <span class="n">path</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+</span><span class="line">      <span class="n">path</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="k">instanceof</span> <span class="n">Text</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="c1">// Text</span>
+</span><span class="line">      <span class="n">path</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;text()&quot;</span><span class="o">);</span>
+</span><span class="line">      <span class="n">processNodelet</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">path</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+</span><span class="line">      <span class="n">processNodelet</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="s">&quot;//text()&quot;</span><span class="o">);</span>
+</span><span class="line">      <span class="n">path</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>解析XML采用的是SAX方式，为了区分XML中的元素类型自定义了一套XPath，然后根据XPath进行相应的处理。processNodelet方法里调用Nodelet接口的process方法，而这个process方法已经在创建SqlMapConfigParser类的时候实现了。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>SqlStatementParser.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SqlStatementParser</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">parseGeneralStatement</span><span class="o">(</span><span class="n">Node</span> <span class="n">node</span><span class="o">,</span> <span class="n">MappedStatement</span> <span class="n">statement</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="c1">// get attributes</span>
+</span><span class="line">    <span class="n">Properties</span> <span class="n">attributes</span> <span class="o">=</span> <span class="n">NodeletUtils</span><span class="o">.</span><span class="na">parseAttributes</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">state</span><span class="o">.</span><span class="na">getGlobalProps</span><span class="o">());</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">id</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">parameterMapName</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">applyNamespace</span><span class="o">(</span><span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;parameterMap&quot;</span><span class="o">));</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">parameterClassName</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;parameterClass&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">resultMapName</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;resultMap&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">resultClassName</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;resultClass&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">cacheModelName</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">applyNamespace</span><span class="o">(</span><span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;cacheModel&quot;</span><span class="o">));</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">xmlResultName</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;xmlResultName&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">resultSetType</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;resultSetType&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">fetchSize</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;fetchSize&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">allowRemapping</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;remapResults&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">timeout</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;timeout&quot;</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="na">isUseStatementNamespaces</span><span class="o">())</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">id</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">applyNamespace</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">    <span class="n">String</span><span class="o">[]</span> <span class="n">additionalResultMapNames</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">resultMapName</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">additionalResultMapNames</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">getAllButFirstToken</span><span class="o">(</span><span class="n">resultMapName</span><span class="o">);</span>
+</span><span class="line">      <span class="n">resultMapName</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">getFirstToken</span><span class="o">(</span><span class="n">resultMapName</span><span class="o">);</span>
+</span><span class="line">      <span class="n">resultMapName</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">applyNamespace</span><span class="o">(</span><span class="n">resultMapName</span><span class="o">);</span>
+</span><span class="line">      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">additionalResultMapNames</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">additionalResultMapNames</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">applyNamespace</span><span class="o">(</span><span class="n">additionalResultMapNames</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">String</span><span class="o">[]</span> <span class="n">additionalResultClassNames</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">resultClassName</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">additionalResultClassNames</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">getAllButFirstToken</span><span class="o">(</span><span class="n">resultClassName</span><span class="o">);</span>
+</span><span class="line">      <span class="n">resultClassName</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">getFirstToken</span><span class="o">(</span><span class="n">resultClassName</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">    <span class="n">Class</span><span class="o">[]</span> <span class="n">additionalResultClasses</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">additionalResultClassNames</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">additionalResultClasses</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Class</span><span class="o">[</span><span class="n">additionalResultClassNames</span><span class="o">.</span><span class="na">length</span><span class="o">];</span>
+</span><span class="line">      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">additionalResultClassNames</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">additionalResultClasses</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">resolveClass</span><span class="o">(</span><span class="n">additionalResultClassNames</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">state</span><span class="o">.</span><span class="na">getConfig</span><span class="o">().</span><span class="na">getErrorContext</span><span class="o">().</span><span class="na">setMoreInfo</span><span class="o">(</span><span class="s">&quot;Check the parameter class.&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">Class</span> <span class="n">parameterClass</span> <span class="o">=</span> <span class="n">resolveClass</span><span class="o">(</span><span class="n">parameterClassName</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">state</span><span class="o">.</span><span class="na">getConfig</span><span class="o">().</span><span class="na">getErrorContext</span><span class="o">().</span><span class="na">setMoreInfo</span><span class="o">(</span><span class="s">&quot;Check the result class.&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">Class</span> <span class="n">resultClass</span> <span class="o">=</span> <span class="n">resolveClass</span><span class="o">(</span><span class="n">resultClassName</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">Integer</span> <span class="n">timeoutInt</span> <span class="o">=</span> <span class="n">timeout</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="kc">null</span> <span class="o">:</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="n">timeout</span><span class="o">);</span>
+</span><span class="line">    <span class="n">Integer</span> <span class="n">fetchSizeInt</span> <span class="o">=</span> <span class="n">fetchSize</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="kc">null</span> <span class="o">:</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="n">fetchSize</span><span class="o">);</span>
+</span><span class="line">    <span class="kt">boolean</span> <span class="n">allowRemappingBool</span> <span class="o">=</span> <span class="s">&quot;true&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">allowRemapping</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">MappedStatementConfig</span> <span class="n">statementConf</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="na">getConfig</span><span class="o">().</span><span class="na">newMappedStatementConfig</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">statement</span><span class="o">,</span>
+</span><span class="line">        <span class="k">new</span> <span class="nf">XMLSqlSource</span><span class="o">(</span><span class="n">state</span><span class="o">,</span> <span class="n">node</span><span class="o">),</span> <span class="n">parameterMapName</span><span class="o">,</span> <span class="n">parameterClass</span><span class="o">,</span> <span class="n">resultMapName</span><span class="o">,</span> <span class="n">additionalResultMapNames</span><span class="o">,</span>
+</span><span class="line">        <span class="n">resultClass</span><span class="o">,</span> <span class="n">additionalResultClasses</span><span class="o">,</span> <span class="n">resultSetType</span><span class="o">,</span> <span class="n">fetchSizeInt</span><span class="o">,</span> <span class="n">allowRemappingBool</span><span class="o">,</span> <span class="n">timeoutInt</span><span class="o">,</span> <span class="n">cacheModelName</span><span class="o">,</span>
+</span><span class="line">        <span class="n">xmlResultName</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">findAndParseSelectKey</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">statementConf</span><span class="o">);</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>在SqlStatementParser类的parseGeneralStatement方法中创建MappedStatementConfig对象。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>MappedStatementConfig.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="n">MappedStatementConfig</span><span class="o">(</span><span class="n">SqlMapConfiguration</span> <span class="n">config</span><span class="o">,</span> <span class="n">String</span> <span class="n">id</span><span class="o">,</span> <span class="n">MappedStatement</span> <span class="n">statement</span><span class="o">,</span> <span class="n">SqlSource</span> <span class="n">processor</span><span class="o">,</span>
+</span><span class="line">                        <span class="n">String</span> <span class="n">parameterMapName</span><span class="o">,</span> <span class="n">Class</span> <span class="n">parameterClass</span><span class="o">,</span> <span class="n">String</span> <span class="n">resultMapName</span><span class="o">,</span>
+</span><span class="line">                        <span class="n">String</span><span class="o">[]</span> <span class="n">additionalResultMapNames</span><span class="o">,</span> <span class="n">Class</span> <span class="n">resultClass</span><span class="o">,</span> <span class="n">Class</span><span class="o">[]</span> <span class="n">additionalResultClasses</span><span class="o">,</span>
+</span><span class="line">                        <span class="n">String</span> <span class="n">cacheModelName</span><span class="o">,</span> <span class="n">String</span> <span class="n">resultSetType</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">fetchSize</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">allowRemapping</span><span class="o">,</span>
+</span><span class="line">                        <span class="n">Integer</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">defaultStatementTimeout</span><span class="o">,</span> <span class="n">String</span> <span class="n">xmlResultName</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">this</span><span class="o">.</span><span class="na">errorContext</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="na">getErrorContext</span><span class="o">();</span>
+</span><span class="line">    <span class="k">this</span><span class="o">.</span><span class="na">client</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="na">getClient</span><span class="o">();</span>
+</span><span class="line">    <span class="n">SqlMapExecutorDelegate</span> <span class="n">delegate</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">getDelegate</span><span class="o">();</span>
+</span><span class="line">    <span class="k">this</span><span class="o">.</span><span class="na">typeHandlerFactory</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="na">getTypeHandlerFactory</span><span class="o">();</span>
+</span><span class="line">    <span class="n">errorContext</span><span class="o">.</span><span class="na">setActivity</span><span class="o">(</span><span class="s">&quot;parsing a mapped statement&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">errorContext</span><span class="o">.</span><span class="na">setObjectId</span><span class="o">(</span><span class="n">id</span> <span class="o">+</span> <span class="s">&quot; statement&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">errorContext</span><span class="o">.</span><span class="na">setMoreInfo</span><span class="o">(</span><span class="s">&quot;Check the result map name.&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">resultMapName</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">statement</span><span class="o">.</span><span class="na">setResultMap</span><span class="o">(</span><span class="n">client</span><span class="o">.</span><span class="na">getDelegate</span><span class="o">().</span><span class="na">getResultMap</span><span class="o">(</span><span class="n">resultMapName</span><span class="o">));</span>
+</span><span class="line">      <span class="k">if</span> <span class="o">(</span><span class="n">additionalResultMapNames</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">additionalResultMapNames</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">          <span class="n">statement</span><span class="o">.</span><span class="na">addResultMap</span><span class="o">(</span><span class="n">client</span><span class="o">.</span><span class="na">getDelegate</span><span class="o">().</span><span class="na">getResultMap</span><span class="o">(</span><span class="n">additionalResultMapNames</span><span class="o">[</span><span class="n">i</span><span class="o">]));</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">    <span class="n">errorContext</span><span class="o">.</span><span class="na">setMoreInfo</span><span class="o">(</span><span class="s">&quot;Check the parameter map name.&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">parameterMapName</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">statement</span><span class="o">.</span><span class="na">setParameterMap</span><span class="o">(</span><span class="n">client</span><span class="o">.</span><span class="na">getDelegate</span><span class="o">().</span><span class="na">getParameterMap</span><span class="o">(</span><span class="n">parameterMapName</span><span class="o">));</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">    <span class="n">statement</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+</span><span class="line">    <span class="n">statement</span><span class="o">.</span><span class="na">setResource</span><span class="o">(</span><span class="n">errorContext</span><span class="o">.</span><span class="na">getResource</span><span class="o">());</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">resultSetType</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">if</span> <span class="o">(</span><span class="s">&quot;FORWARD_ONLY&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">resultSetType</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">statement</span><span class="o">.</span><span class="na">setResultSetType</span><span class="o">(</span><span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="n">ResultSet</span><span class="o">.</span><span class="na">TYPE_FORWARD_ONLY</span><span class="o">));</span>
+</span><span class="line">      <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="s">&quot;SCROLL_INSENSITIVE&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">resultSetType</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">statement</span><span class="o">.</span><span class="na">setResultSetType</span><span class="o">(</span><span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="n">ResultSet</span><span class="o">.</span><span class="na">TYPE_SCROLL_INSENSITIVE</span><span class="o">));</span>
+</span><span class="line">      <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="s">&quot;SCROLL_SENSITIVE&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">resultSetType</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">statement</span><span class="o">.</span><span class="na">setResultSetType</span><span class="o">(</span><span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="n">ResultSet</span><span class="o">.</span><span class="na">TYPE_SCROLL_SENSITIVE</span><span class="o">));</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">fetchSize</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">statement</span><span class="o">.</span><span class="na">setFetchSize</span><span class="o">(</span><span class="n">fetchSize</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="c1">// set parameter class either from attribute or from map (make sure to match)</span>
+</span><span class="line">    <span class="n">ParameterMap</span> <span class="n">parameterMap</span> <span class="o">=</span> <span class="n">statement</span><span class="o">.</span><span class="na">getParameterMap</span><span class="o">();</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">parameterMap</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">statement</span><span class="o">.</span><span class="na">setParameterClass</span><span class="o">(</span><span class="n">parameterClass</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">statement</span><span class="o">.</span><span class="na">setParameterClass</span><span class="o">(</span><span class="n">parameterMap</span><span class="o">.</span><span class="na">getParameterClass</span><span class="o">());</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="c1">// process SQL statement, including inline parameter maps</span>
+</span><span class="line">    <span class="n">errorContext</span><span class="o">.</span><span class="na">setMoreInfo</span><span class="o">(</span><span class="s">&quot;Check the SQL statement.&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="n">Sql</span> <span class="n">sql</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="na">getSql</span><span class="o">();</span>
+</span><span class="line">    <span class="n">setSqlForStatement</span><span class="o">(</span><span class="n">statement</span><span class="o">,</span> <span class="n">sql</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="c1">// set up either null result map or automatic result mapping</span>
+</span><span class="line">    <span class="n">ResultMap</span> <span class="n">resultMap</span> <span class="o">=</span> <span class="o">(</span><span class="n">ResultMap</span><span class="o">)</span> <span class="n">statement</span><span class="o">.</span><span class="na">getResultMap</span><span class="o">();</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">resultMap</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">resultClass</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">statement</span><span class="o">.</span><span class="na">setResultMap</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">resultMap</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">resultMap</span> <span class="o">=</span> <span class="n">buildAutoResultMap</span><span class="o">(</span><span class="n">allowRemapping</span><span class="o">,</span> <span class="n">statement</span><span class="o">,</span> <span class="n">resultClass</span><span class="o">,</span> <span class="n">xmlResultName</span><span class="o">);</span>
+</span><span class="line">      <span class="n">statement</span><span class="o">.</span><span class="na">setResultMap</span><span class="o">(</span><span class="n">resultMap</span><span class="o">);</span>
+</span><span class="line">      <span class="k">if</span> <span class="o">(</span><span class="n">additionalResultClasses</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">additionalResultClasses</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">          <span class="n">statement</span><span class="o">.</span><span class="na">addResultMap</span><span class="o">(</span><span class="n">buildAutoResultMap</span><span class="o">(</span><span class="n">allowRemapping</span><span class="o">,</span> <span class="n">statement</span><span class="o">,</span> <span class="n">additionalResultClasses</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">xmlResultName</span><span class="o">));</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="o">...</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>在MappedStatementConfig类的构造方法里又调用了SqlSource接口的getSql方法，而SqlSource接口只有一个实现类XMLSqlSource，继续看XMLSqlSource类里的getSql方法是怎么实现的。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>XMLSqlSource.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="n">Sql</span> <span class="nf">getSql</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">state</span><span class="o">.</span><span class="na">getConfig</span><span class="o">().</span><span class="na">getErrorContext</span><span class="o">().</span><span class="na">setActivity</span><span class="o">(</span><span class="s">&quot;processing an SQL statement&quot;</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="kt">boolean</span> <span class="n">isDynamic</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+</span><span class="line">    <span class="n">StringBuffer</span> <span class="n">sqlBuffer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">();</span>
+</span><span class="line">    <span class="n">DynamicSql</span> <span class="n">dynamic</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DynamicSql</span><span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="na">getConfig</span><span class="o">().</span><span class="na">getClient</span><span class="o">().</span><span class="na">getDelegate</span><span class="o">());</span>
+</span><span class="line">    <span class="n">isDynamic</span> <span class="o">=</span> <span class="n">parseDynamicTags</span><span class="o">(</span><span class="n">parentNode</span><span class="o">,</span> <span class="n">dynamic</span><span class="o">,</span> <span class="n">sqlBuffer</span><span class="o">,</span> <span class="n">isDynamic</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">sqlStatement</span> <span class="o">=</span> <span class="n">sqlBuffer</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">isDynamic</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">return</span> <span class="n">dynamic</span><span class="o">;</span>
+</span><span class="line">    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">return</span> <span class="k">new</span> <span class="nf">RawSql</span><span class="o">(</span><span class="n">sqlStatement</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>接下来我们就来看一下iBatis是怎么处理SQL映射的:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>DynamicSql.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">private</span> <span class="kt">void</span> <span class="nf">processBodyChildren</span><span class="o">(</span><span class="n">StatementScope</span> <span class="n">statementScope</span><span class="o">,</span> <span class="n">SqlTagContext</span> <span class="n">ctx</span><span class="o">,</span> <span class="n">Object</span>     <span class="n">parameterObject</span><span class="o">,</span> <span class="n">Iterator</span> <span class="n">localChildren</span><span class="o">,</span> <span class="n">PrintWriter</span> <span class="n">out</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">while</span> <span class="o">(</span><span class="n">localChildren</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">SqlChild</span> <span class="n">child</span> <span class="o">=</span> <span class="o">(</span><span class="n">SqlChild</span><span class="o">)</span> <span class="n">localChildren</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class="line">      <span class="k">if</span> <span class="o">(</span><span class="n">child</span> <span class="k">instanceof</span> <span class="n">SqlText</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">SqlText</span> <span class="n">sqlText</span> <span class="o">=</span> <span class="o">(</span><span class="n">SqlText</span><span class="o">)</span> <span class="n">child</span><span class="o">;</span>
+</span><span class="line">        <span class="n">String</span> <span class="n">sqlStatement</span> <span class="o">=</span> <span class="n">sqlText</span><span class="o">.</span><span class="na">getText</span><span class="o">();</span>
+</span><span class="line">        <span class="k">if</span> <span class="o">(</span><span class="n">sqlText</span><span class="o">.</span><span class="na">isWhiteSpace</span><span class="o">())</span> <span class="o">{</span>
+</span><span class="line">          <span class="n">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">sqlStatement</span><span class="o">);</span>
+</span><span class="line">        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(!</span><span class="n">sqlText</span><span class="o">.</span><span class="na">isPostParseRequired</span><span class="o">())</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">          <span class="c1">// BODY OUT</span>
+</span><span class="line">          <span class="n">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">sqlStatement</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">          <span class="n">ParameterMapping</span><span class="o">[]</span> <span class="n">mappings</span> <span class="o">=</span> <span class="n">sqlText</span><span class="o">.</span><span class="na">getParameterMappings</span><span class="o">();</span>
+</span><span class="line">          <span class="k">if</span> <span class="o">(</span><span class="n">mappings</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">mappings</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">              <span class="n">ctx</span><span class="o">.</span><span class="na">addParameterMapping</span><span class="o">(</span><span class="n">mappings</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+</span><span class="line">            <span class="o">}</span>
+</span><span class="line">          <span class="o">}</span>
+</span><span class="line">        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">          <span class="n">IterateContext</span> <span class="n">itCtx</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">peekIterateContext</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line">          <span class="k">if</span><span class="o">(</span><span class="kc">null</span> <span class="o">!=</span> <span class="n">itCtx</span> <span class="o">&amp;&amp;</span> <span class="n">itCtx</span><span class="o">.</span><span class="na">isAllowNext</span><span class="o">()){</span>
+</span><span class="line">            <span class="n">itCtx</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class="line">            <span class="n">itCtx</span><span class="o">.</span><span class="na">setAllowNext</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</span><span class="line">            <span class="k">if</span><span class="o">(!</span><span class="n">itCtx</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+</span><span class="line">              <span class="n">itCtx</span><span class="o">.</span><span class="na">setFinal</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class="line">            <span class="o">}</span>
+</span><span class="line">          <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">          <span class="k">if</span><span class="o">(</span><span class="n">itCtx</span><span class="o">!=</span><span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">            <span class="n">StringBuffer</span> <span class="n">sqlStatementBuffer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">(</span><span class="n">sqlStatement</span><span class="o">);</span>
+</span><span class="line">            <span class="n">iteratePropertyReplace</span><span class="o">(</span><span class="n">sqlStatementBuffer</span><span class="o">,</span> <span class="n">itCtx</span><span class="o">);</span>
+</span><span class="line">            <span class="n">sqlStatement</span> <span class="o">=</span> <span class="n">sqlStatementBuffer</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+</span><span class="line">          <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">          <span class="n">sqlText</span> <span class="o">=</span> <span class="n">PARAM_PARSER</span><span class="o">.</span><span class="na">parseInlineParameterMap</span><span class="o">(</span><span class="n">delegate</span><span class="o">.</span><span class="na">getTypeHandlerFactory</span><span class="o">(),</span> <span class="n">sqlStatement</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">          <span class="n">ParameterMapping</span><span class="o">[]</span> <span class="n">mappings</span> <span class="o">=</span> <span class="n">sqlText</span><span class="o">.</span><span class="na">getParameterMappings</span><span class="o">();</span>
+</span><span class="line">          <span class="n">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">sqlText</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+</span><span class="line">          <span class="k">if</span> <span class="o">(</span><span class="n">mappings</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">             <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">mappings</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">               <span class="n">ctx</span><span class="o">.</span><span class="na">addParameterMapping</span><span class="o">(</span><span class="n">mappings</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+</span><span class="line">             <span class="o">}</span>
+</span><span class="line">          <span class="o">}</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">      <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">child</span> <span class="k">instanceof</span> <span class="n">SqlTag</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="o">...</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>注意到在processBodyChildren方法里调用了InlineParameterMapParser类的parseInlineParameterMap方法，继续跟踪下去。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>InlineParameterMapParser.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="n">SqlText</span> <span class="nf">parseInlineParameterMap</span><span class="o">(</span><span class="n">TypeHandlerFactory</span> <span class="n">typeHandlerFactory</span><span class="o">,</span> <span class="n">String</span> <span class="n">sqlStatement</span><span class="o">,</span> <span class="n">Class</span> <span class="n">parameterClass</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">String</span> <span class="n">newSql</span> <span class="o">=</span> <span class="n">sqlStatement</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">List</span> <span class="n">mappingList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">StringTokenizer</span> <span class="n">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringTokenizer</span><span class="o">(</span><span class="n">sqlStatement</span><span class="o">,</span> <span class="n">PARAMETER_TOKEN</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+</span><span class="line">    <span class="n">StringBuffer</span> <span class="n">newSqlBuffer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">String</span> <span class="n">token</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">    <span class="n">String</span> <span class="n">lastToken</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">    <span class="k">while</span> <span class="o">(</span><span class="n">parser</span><span class="o">.</span><span class="na">hasMoreTokens</span><span class="o">())</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">token</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="na">nextToken</span><span class="o">();</span>
+</span><span class="line">      <span class="k">if</span> <span class="o">(</span><span class="n">PARAMETER_TOKEN</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">lastToken</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="o">(</span><span class="n">PARAMETER_TOKEN</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">token</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="line">          <span class="n">newSqlBuffer</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">PARAMETER_TOKEN</span><span class="o">);</span>
+</span><span class="line">          <span class="n">token</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">          <span class="n">ParameterMapping</span> <span class="n">mapping</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">          <span class="k">if</span> <span class="o">(</span><span class="n">token</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">PARAM_DELIM</span><span class="o">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">            <span class="n">mapping</span> <span class="o">=</span> <span class="n">oldParseMapping</span><span class="o">(</span><span class="n">token</span><span class="o">,</span> <span class="n">parameterClass</span><span class="o">,</span> <span class="n">typeHandlerFactory</span><span class="o">);</span>
+</span><span class="line">          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">            <span class="n">mapping</span> <span class="o">=</span> <span class="n">newParseMapping</span><span class="o">(</span><span class="n">token</span><span class="o">,</span> <span class="n">parameterClass</span><span class="o">,</span> <span class="n">typeHandlerFactory</span><span class="o">);</span>
+</span><span class="line">          <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">          <span class="n">mappingList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">mapping</span><span class="o">);</span>
+</span><span class="line">          <span class="n">newSqlBuffer</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;?&quot;</span><span class="o">);</span>
+</span><span class="line">          <span class="n">token</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="na">nextToken</span><span class="o">();</span>
+</span><span class="line">          <span class="k">if</span> <span class="o">(!</span><span class="n">PARAMETER_TOKEN</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">token</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="line">            <span class="k">throw</span> <span class="k">new</span> <span class="nf">SqlMapException</span><span class="o">(</span><span class="s">&quot;Unterminated inline parameter in mapped statement (&quot;</span> <span class="o">+</span> <span class="s">&quot;statement.getId()&quot;</span> <span class="o">+</span> <span class="s">&quot;).&quot;</span><span class="o">);</span>
+</span><span class="line">          <span class="o">}</span>
+</span><span class="line">          <span class="n">token</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="o">(!</span><span class="n">PARAMETER_TOKEN</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">token</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="line">          <span class="n">newSqlBuffer</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">token</span><span class="o">);</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">      <span class="n">lastToken</span> <span class="o">=</span> <span class="n">token</span><span class="o">;</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">newSql</span> <span class="o">=</span> <span class="n">newSqlBuffer</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">ParameterMapping</span><span class="o">[]</span> <span class="n">mappingArray</span> <span class="o">=</span> <span class="o">(</span><span class="n">ParameterMapping</span><span class="o">[])</span> <span class="n">mappingList</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="k">new</span> <span class="n">ParameterMapping</span><span class="o">[</span><span class="n">mappingList</span><span class="o">.</span><span class="na">size</span><span class="o">()]);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">SqlText</span> <span class="n">sqlText</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SqlText</span><span class="o">();</span>
+</span><span class="line">    <span class="n">sqlText</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">newSql</span><span class="o">);</span>
+</span><span class="line">    <span class="n">sqlText</span><span class="o">.</span><span class="na">setParameterMappings</span><span class="o">(</span><span class="n">mappingArray</span><span class="o">);</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">sqlText</span><span class="o">;</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>终于找到解析SQL的类了，在parseInlineParameterMap方法中会将下面的SQL</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="sql"><span class="line"><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="k">TABLE</span> <span class="k">WHERE</span> <span class="n">ID</span> <span class="o">=</span> <span class="o">#</span><span class="n">ID</span><span class="o">#</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>解析成能被JDBC执行的SQL</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="sql"><span class="line"><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="k">TABLE</span> <span class="k">WHERE</span> <span class="n">ID</span> <span class="o">=</span> <span class="o">?</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>等到解析完成后会把SQL保存到SqlText类中，再把SqlText保存到MappedStatement类里，有了MappedStatement对象就可以执行相应的CRUD操作了。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-10-23T19:14:00+08:00" pubdate data-updated="true">Oct 23<span>rd</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/opensource/'>opensource</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/10/23/ibatis-source-code-analysis-mapping/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/10/23/ibatis-source-code-analysis-mapping/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

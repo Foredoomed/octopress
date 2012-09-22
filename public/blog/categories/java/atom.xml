@@ -1,0 +1,1355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: java | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/java/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[JIT到底做了些什么事]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot/"/>
+    <updated>2011-12-03T15:15:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot</id>
+    <content type="html"><![CDATA[<p>最近在网上看到一篇关JIT(Just in Time)的文章<a href="http://java.dzone.com/articles/just-time-compiler-jit-hotspot?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+javalobby%2Ffrontpage+%28Javalobby+%2F+Java+Zone%29&amp;utm_content=Google+Reader" title="Just in Time Compiler (JIT) in Hotspot">Just in Time Compiler (JIT) in Hotspot</a>,这篇文章很短，但是对JIT的作用基本上说的比较清楚的，可以作为JIT的学习参考，所以我就决定把这篇文章翻译成中文，供以后复习参考用。</p>
+
+<!--more-->
+
+<p>================正文开始==================</p>
+
+<p>什么是JIT编译器</p>
+
+<p>JIT和更普便的自适应优化概念是在包括Java在内的许多编程语言，例如.Net, Lua, JRuby中所为人熟知的概念。</p>
+
+<p>为了解释什么是JIT编译器，我想从编译器的定义开始。根据维基百科上对于编译器的定义：
+&gt; 一个计算机程序是把源程序语言转换成目标语言。</p>
+
+<p>我们对静态Java编译器(javac)都很熟悉，它的作用是将人类能够阅读的.java文件编译成为能够被JVM解释的.class文件。现在问题来了，那么JIT用来编译什么东西呢？答案将在解释完什么是Just in Time后给出。</p>
+
+<p>根据许多研究得出的结果，20%的代码的执行时间要占到全部时间的80%。如果这时候有一种方法决定那些20%的代码并且优化他们，那将是令人兴奋的事。这就是JIT做的事：在运行时收集统计数据，找出那些经常执行的代码，把他们从字节码转换成操作系统能够直接执行的本地代码，并且重度优化他们。最小的编译单元是单个方法。编译和统计数据收集是靠特殊线程并行处理的。在统计数据收集期间，编译器会推测代码功能，并且通过时间的推移来验证这个推测。如果这个推测是错误的话，优化过的代码会被还原并且重新编译。</p>
+
+<p>Hotspot JVM这个名字的由来就是因为这个JVM的作用就是找到代码中的“hot spot(热点)”。</p>
+
+<p>JIT会做哪些优化？</p>
+
+<ul>
+  <li>内敛方法 - 方法不是直接在对象的实例上调用，而是拷贝到调用代码里去。为了防止产生任何开销，热门方法应该尽可能靠近调用着</li>
+  <li>如果监视器从别的线程是不可到达的，那就消除锁</li>
+  <li>用直接的方法调用代替接口以消除调用虚函数的开销</li>
+  <li>合并临近的在同一对象上的锁</li>
+  <li>消除不会被执行的代码(dead code)</li>
+  <li>对非volatile变量，忽略内存写</li>
+  <li>删除预先检查的NullPointerException和IndexOutOfBoundsException</li>
+  <li>等等</li>
+</ul>
+
+<p>当JVM调用一个Java方法，它会使用在已经加载类的方法块中的定义的调用方法。虚拟机有好几个调用方法，比如，如果方法是同步的，或者是本地方法的话，不同的调用者会被使用。JIT编译器使用的是它自己的调用者。虚拟机会检查ACC_MACHINE_COMPILED这个值，来通知解释器这个值对应的方法已经编译并且保持在已加载的类中。JIT编译器把方法块编译成本地代码，并且把它保存在那个方法的代码块中。一旦ACC_MACHINE_COMPILED位被设置，那么这个代码就被编译完成了。那我们怎么知道JIT在我们的程序中正在做什么，怎么样才能控制它？</p>
+
+<p>首先就是取消JIT的功能：Djava.compiler=NONE</p>
+
+<p>Hotspot中有2种JI编译器，一种是为客户端程序使用，另一种是服务器端程序。运行在服务器上的程序通常来说需要更多的资源，并且程序的吞吐量是非常重要的。因此，服务器版的JIT会消耗更多的资源，并且为了统计数据的准确，要花更多的时间来收集统计数据。而客户端版的JIT为一个方法收集统计数据会持续1500次方法调用，服务器版JIT则是15000次。这些默认值可以通过JVM参数:-XX:CompileThreshold=XXX来修改。</p>
+
+<p>JIT的不足</p>
+
+<p>JIT增加了Java程序的不可预测性和复杂性。它增加了一层程序员不是正真理解的另外一层。</p>
+
+<p>一个可能bug的例子：并发中的”happens before relations”。JIT会简单的记录在单线程中代码的改变是否安全。解决这个问题的方法是加上<strong>synchronized</strong>或着显式的加锁。</p>
+
+<p>JIT的优势</p>
+
+<ul>
+  <li>对于GC来说，程序必须到达安全点。为了这个目的，JIT通过在本地代码的相同间隔内注入<strong>yieldpoints</strong>。</li>
+  <li>除了扫描堆栈来找出根引用，寄存器也必须被扫描，因为他们可能会持有JIT创建的对象。</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Java常见疑惑和陷阱(三)]]></title>
+    <link href="http://liuxuan.info/blog/2011/08/11/java-puzzles-and-traps-three/"/>
+    <updated>2011-08-11T16:56:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/08/11/java-puzzles-and-traps-three</id>
+    <content type="html"><![CDATA[<p><strong>29.令人混淆的构造器案例</strong><br />
+下面的程序会打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Confusing</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="nf">Confusing</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Object</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="n">Confusing</span><span class="o">(</span><span class="kt">double</span><span class="o">[]</span> <span class="n">dArray</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="kt">double</span> <span class="n">array</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">new</span> <span class="nf">Confusing</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>如果运行该程序，你会发现打印的是“double array“。这是因为：Java的重载解析过程是以两阶段运行的。第一阶段选取所有可获得并且可应用的方法或构造器。第二阶段在第一阶段选取的方法或构造器中选取最精确的一个。<strong>如果一个方法或构造器可以接受传递给另一个方法或构造器的任何参数,那么我们就说第一个方法比第二个方法缺乏精确性。</strong></p>
+
+<p>如果想要调用<code>Confusing(Object)</code>构造方法,你需要这样改写代码:<code>new Confusing((Object)null)</code>。这可以确保只有<code>Confusing(Object)</code>是可应用的。更一般地讲,要想强制要求编译器选择一个精确的重载版本,需要将实际的参数转型为形式参数所声明的类型。 <!--more--></p>
+
+<p><strong>30.我所得到的都是静态的</strong><br />
+下面的程序将打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">Dog</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">bark</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="err">“</span><span class="n">woof</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">class</span> <span class="nc">Dog1</span> <span class="kd">extends</span> <span class="n">Dog</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">bark</span><span class="o">()</span> <span class="o">{</span> <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Bark</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Dog</span> <span class="n">woofer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Dog</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">Dog</span> <span class="n">nipper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Basenji</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">woofer</span><span class="o">.</span><span class="na">bark</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">nipper</span><span class="o">.</span><span class="na">bark</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>好像该程序应该只打印一个woof，毕竟Dog1继承自Dog,并且它的bark方法定义了什么也不做。main方法调用了bark方法,第一次是在Dog类型的woofer上调用,第二次是在Dog1类型的nipper上调用。但是如果你运行该程序,就会发现它打印的是 “woof woof“。</p>
+
+<p>问题在于bark是一个静态方法,而对静态方法的调用不存在任何动态的分派机制。当一个程序调用了一个静态方法时,要被调用的方法都是在编译时刻被选定的,而这种选定是基于修饰符的编译期类型而做出的,修饰符的编译期类型就是我们给出的方法调用表达式中圆点左边部分的名字。在本例中,两个方法调用的修饰符分别是变量woofer 和nipper,它们都被声明为Dog类型。因为它们具有相同的编译期类型,所以编译器使得它们调用的是相同的方法:Dog.bark。</p>
+
+<p><strong>31.比年龄小</strong><br />
+如果运行下面的程序会打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Age</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Age</span> <span class="n">INSTANCE</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Age</span><span class="o">();</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">age</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">CURRENT_YEAR</span><span class="o">=</span><span class="n">Calendar</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="n">Calendar</span><span class="o">.</span><span class="na">YEAR</span><span class="o">);&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="n">Age</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">age</span> <span class="o">=</span> <span class="n">CURRENT_YEAR</span> <span class="o">-</span> <span class="mi">1985</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kt">int</span> <span class="n">getAge</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">age</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">My</span> <span class="n">age</span> <span class="n">is</span> <span class="err">“</span> <span class="o">+</span> <span class="n">INSTANCE</span><span class="o">.</span><span class="na">getAge</span><span class="o">()</span> <span class="o">+</span> <span class="err">“</span> <span class="n">years</span> <span class="n">old</span><span class="o">.</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>这个程序是在计算当前的年份减去1985的值。如果它是正确的,那么在2011年,该程序将打印出”My age is 26 years old”。但是如果你尝试着去运行该程序,该程序将打印出”My age is -1985 years old”。</p>
+
+<p>该程序所遇到的问题是由类初始化顺序中的循环而引起的。让我们来看看其细节。首先,其静态域被设置为缺省值,其中INSTANCE被设置为null,CURRENT_YEAR被设置为0。接下来,静态域初始器按照其出现的顺序执行。第一个静态域是INSTANCE,它的值是通过调用 Age()构造器而计算出来的。这个构造器会用一个涉及静态域CURRENT_YEAR的表达式来初始化age。通常,读取一个静态域是会引起一个类被初始化的事件之一,但是我们已经在初始化Age类了，所以递归的初始化尝试会直接被忽略掉。因此,CURRENT_YEAR 的值仍旧是其缺省值0。这就是为什么我的年龄变成了-1985的原因。最后,从构造器返回以完成Age类的初始化,假设我们是在2011年运行该程序,那么我们就将静态域 CURRENT_YEAR初始化成了2011。但是已经太晚了，age的值已经是-1985了。这正是后续所有对Age.INSTANCE.getAge()的调用将返回的值。</p>
+
+<p>该程序表明,在final类型的静态域被初始化之前,存在着读取它的值的可能,而此时该静态域包含的还只是其所属类型的缺省值。这是与直觉相违背的,因为我们通常会将final类型的域看作是常量。final类型的域只有在其初始化表达式是常量表达式时才是常量。</p>
+
+<p>要想修正这个程序,需要重新对静态域的初始化进行排序,使得每一个初始化都出现在任何依赖于它的其他的初始化之前。</p>
+
+<p><strong>32.不是你的类型</strong><br />
+下面的三个程序每一个都会打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Type1</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">s</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">s</span> <span class="k">instanceof</span> <span class="n">String</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Type2</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="k">new</span> <span class="n">Type2</span><span class="o">()</span> <span class="k">instanceof</span> <span class="n">String</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Type3</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Type3</span> <span class="n">t3</span> <span class="o">=</span> <span class="o">(</span><span class="n">Type3</span><span class="o">)</span> <span class="k">new</span> <span class="n">Object</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>第一个程序,Type1展示了instanceof操作符应用于一个空对象引用时的行为。尽管null对于每一个引用类型来说都是其子类型,但是instanceof操作符被定义为在其左操作数为null时返回false。因此,Type1将打印false。这被证明是实践中非常有用的行为。如果instanceof告诉你一个对象引用是某个特定类型的实例,那么你就可以将其转型为该类型,并调用该类型的方法,而不用担心会抛出ClassCastException或NullPointerException。</p>
+
+<p>第二个程序,Type2展示了instanceof操作符在测试一个类的实例,以查看它是否是某个不相关的类的实例时所表现出来的行为。你可能会期望该程序打印出false。毕竟,Type2的实例不是String的实例,因此该测试应该失败。遗憾是,instanceof 测试在编译时刻就失败了,我们只能得到下面这样的出错消息:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Type2.java:3: inconvertible types
+</span><span class='line'>found: Type2, required: java.lang.String
+</span><span class='line'>       System.out.println<span class="o">(</span>new Type2<span class="o">()</span> instanceof String<span class="o">)</span>;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>该程序编译失败是因为instanceof操作符有这样的要求:<strong>如果两个操作数的类型都是类,其中一个必须是另一个的子类型</strong>。Type2和String彼此都不是对方的子类型,所以instanceof测试将导致编译期错误。</p>
+
+<p>第三个程序,Type3展示了当要被转型的表达式的静态类型是转型类型的超类时转型操作符的行为:如果在一个转型操作中的两种类型都是类,那么其中一个必须是另一个的子类型。尽管对我们来说,这个转型很显然会失败,但是类型系统还没有强大到能够洞悉表达式new Object()的运行期类型不可能是Type3的一个子类型。因此,该程序将在运行期抛出ClassCastException。</p>
+
+<p><strong>33.特创论</strong><br />
+下面的程序会打印出什么呢?
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Creator</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+</span><span class='line'>      <span class="n">Creature</span> <span class="n">creature</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Creature</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Creature</span><span class="o">.</span><span class="na">numCreated</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">class</span> <span class="nc">Creature</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kt">long</span> <span class="n">numCreated</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">Creature</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">numCreated</span><span class="o">++;</span>
+</span><span class='line'>    <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">long</span> <span class="n">numCreated</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">numCreated</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>该程序看起来似乎应该打印100,但是它没有打印任何东西,因为它根本就不能编译。如果你尝试着去编译它,你就会发现编译器的诊断信息基本没什么用处。下面就是javac打印的东西:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Creator.java:4: not a statement
+</span><span class='line'>Creature <span class="nv">creature</span> <span class="o">=</span> new Creature<span class="o">()</span>;&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;Creator.java:4: ‘;’ expected
+</span><span class='line'>Creature <span class="nv">creature</span> <span class="o">=</span> new Creature<span class="o">()</span>;&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>一个本地变量声明看起来像是一条语句,但是从技术上说,它不是;它应该是一个本地变量声明语句(local variable declaration statement)。Java语言规范不允许一个本地变量声明语句作为一条语句在for、while或do循环中重复执行。一个本地变量声明作为一条语句只能直接出现在一个语句块中。(一个语句块是由一对花括号以及包含在这对花括展中的语句和声明构成的)。</p>
+
+<p>有两种方式可以修正这个问题。最显而易见的方式是将这个声明至于一个语句块中:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">Creature</span> <span class="n">creature</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Creature</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>然而,请注意,该程序没有使用本地变量creature。因此,将该声明用一个无任何修饰的构造器调用来替代将更具实际意义,这样可以强调对新创建对象的引用正在被丢弃:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+</span><span class='line'>  <span class="k">new</span> <span class="nf">Creature</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Java常见疑惑和陷阱(二)]]></title>
+    <link href="http://liuxuan.info/blog/2011/08/07/java-puzzles-and-traps-two/"/>
+    <updated>2011-08-07T16:20:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/08/07/java-puzzles-and-traps-two</id>
+    <content type="html"><![CDATA[<p><strong>16.循环者的鬼魂</strong><br />
+请提供一个对i的声明,将下面的循环转变为一个无限循环:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">i</span><span class="err"> »</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="mi">1</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>对于无符号右移操作，0被从左移入到由移位操作而空出来的位上,即使被移位的负数也是如此。这个循环比前面三个循环要稍微复杂一点,因为其循环体非空。在其循环题中,i的值由它右移一位之后的值所替代。为了使移位合法,i必须是一个整数类型(byte、char、short、int或long)。无符号右移操作符把0从左边移入,因此看起来这个循环执行迭代的次数与最大的整数类型所占据的位数相同,即64次。如果你在循环的前面放置如下的声明,那么这确实就是将要发生的事情:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">long</span> <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span> <span class="c1">// -1L has all 64 bits set</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>你怎样才能将它转变为一个无限循环呢?解决本谜题的关键在于无符号右移是一个复合赋值操作符。有关混合操作符的一个不幸的事实是,它们可能会自动地执行窄化原始类型转换,这种转换把一种数字类型转换成了另一种更缺乏表示能力的类型。窄化原始类型转换可能会丢失级数的信息,或者是数值的精度。 <!--more--></p>
+
+<p>让我们更具体一些,假设你在循环的前面放置了下面的声明:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">short</span> <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>因为i的初始值((short)0xffff)是非0的,所以循环体会被执行。在执行移位操作时,第一步是将i提升为int类型。所有算数操作都会对short、byte和char类型的操作数执行这样的提升。这种提升是一个拓宽原始类型转换,因此没有任何信息会丢失。这种提升执行的是符号扩展,因此所产生的int数值是0xffffffff。然后,这个数值右移1位,但不使用符号扩展,因此产生了int数值0x7fffffff。最后,这个数值被存回到i 中。为了将int数值存入short类型的变量,Java执行的是可怕的窄化原始类型转换,它直接将高16位截掉。这样就只剩下(short)oxffff了,我们又回到了开始处。循环的第二次以及后续的迭代行为都是一样的,因此循环将永远不会终止。</p>
+
+<p>如果你将i声明为一个short或byte变量,并且初始化为任何负数,那么这种行为也会发生。如果你声明i为一个char,那么你将无法得到无限循环,因为char是无符号的,所以发生在移位之前的拓宽原始类型转换不会执行符号扩展。</p>
+
+<p>总之,不要在short、byte或char类型的变量之上使用复合赋值操作符。因为这样的表达式执行的是混合类型算术运算,它容易造成混乱。更糟的是,它们执行将隐式地执行会丢失信息的窄化转型,其结果是灾难性的。</p>
+
+<p><strong>17.循环者的诅咒</strong><br />
+请提供一个对i的声明,将下面的循环转变为一个无限循环:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="o">=</span> <span class="n">j</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">j</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;=</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>嘿,不要再给我看起来不可能的循环了！如果满足前2个条件，i不是肯定等于j吗?这一属性对实数肯定有效。事实上,它是如此地重要,以至于它有这样的定义:实数上的小于等于关系是反对称的，且在5.0版之前是反对称的,但是这从5.0版之后就不再是了。</p>
+
+<p>直到5.0版之前,Java的数字比较操作符要求它们的两个操作数都是原始数字类型的(byte、char、short、int、long、float 和 double)。但是在5.0版中,规范作出了修改,新规范描述道:每一个操作数的类型必须可以转换成原始数字类型。问题难就难在这里了，在5.0版中,自动包装和自动反包装被添加到了Java语言中。小于等于操作符在原始数字类型集上仍然是反对称的,但是现在它还被应用到了被包装的数字类型上。(被包装的数字类型有:Byte、Character、Short、Integer、Long、Float和Double)。</p>
+
+<p>让我们更具体一些,下面的声明会使表达式的值为true,从而将这个循环变成了一个无限循环：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Integer</span> <span class="n">i</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'><span class="n">Integer</span> <span class="n">j</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>前两个子表达式在i和j上执行解包转换,并且在数字上比较所产生的int数值。i和j都表示0,所以这两个子表达式都被计算为true。第三个子表达式(i!=j)在对象引用i和j上执行标识比较,因为它们都初始化为一个新的Integer实例,因此,第三个子表达式同样也被计算为true,循环也就永远地环绕下去了。</p>
+
+<p><strong>18.循环者遇到了狼人</strong><br />
+请提供一个对i的声明,将下面的循环转变为一个无限循环。这个循环不需要使用任何 5.0版的特性:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">i</span> <span class="o">==</span> <span class="o">-</span><span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>这仍然是一个循环。在上面的条件表达式中,一元减号操作符作用于i,这意味着它的类型必须是数字型的:一元减号操作符作用于一个非数字型操作数是非法的。因此,我们要寻找一个非0的数字型数值,它等于它自己的负值。NaN不能满足这个属性,因为它不等于任何数值,因此,i必须表示一个实际的数字。肯定没有任何数字满足这样的属性吗?</p>
+
+<p>除了0之外,没有任何浮点数等于其符号位反转之后的值,因此i的类型必然是整数。有符号的整数类型使用的是2的补码算术运算:为了对一个数值取其负值,你要反转其每一位,然后加1,从而得到结果。2的补码算术运算的一个很大的优势是,0具有唯一的示形式。如果你要对int数值0取负值,你将得到0xffffffff+1,它仍然是0。</p>
+
+<p>但是,这也有一个相应的不利之处,总共存在偶数个int数值（准确地说有232个）其中一个用来表示0,这样就剩下奇数个int数值来表示正整数和负整数,这意味着正的和负的int数值的数量必然不相等。这暗示着至少有一个int数值,其负值不能正确地表示成为一个int数值。</p>
+
+<p>事实上,恰恰就有一个这样的int数值,它就是Integer.MIN_VALUE,即-231。它的十六进制表示是0x80000000，其符号位为1,其余都是0。如果取个值的负数0x7fffffff+1=0x80000000=Integer.MIN_VALUE。换句话说,Integer.MIN_VALUE是它自己的负值,Long.MIN_VALUE也是一样。对这两个值取负值将会产生溢出,但是Java在整数计算中忽略了溢出。</p>
+
+<p>总之,Java使用2的补码的算术运算,它是非对称的。对于每一种有符号的整数类型 (int、long、byte 和 short),负的数值总是比正的数值多一个,这个对多出来的值总是这种类型所能表示的最小数值。Integer.MIN_VALUE取负值得到的还是它没有改变过的值,Long.MIN_VALUE也是如此。对Short.MIN_VALUE取负值并将所产生的int数值转型回short,返回的同样是最初的值(Short.MIN_VALUE)。对于Byte.MIN_VALUE来说,也会产生相似的结果。更一般地讲,千万要当心溢出:就像狼人一样,它是个杀手。</p>
+
+<p><strong>19.被计数击倒了</strong><br />
+下面的程序有一个单重的循环,它记录迭代的次数,并在循环终止时打印这个数。那么,这个程序会打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Count</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">final</span> <span class="kt">int</span> <span class="n">START</span> <span class="o">=</span> <span class="mi">2000000000</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="o">(</span><span class="kt">float</span> <span class="n">f</span> <span class="o">=</span> <span class="n">START</span><span class="o">;</span> <span class="n">f</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">START</span> <span class="o">+</span> <span class="mi">50</span><span class="o">;</span> <span class="n">f</span><span class="o">++){</span>
+</span><span class='line'>      <span class="n">count</span><span class="o">++;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">count</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>表面的分析也许会认为这个程序将打印50,然而,这种分析遗漏了关键的一点:循环变量是float类型的,而非int类型的。F的初始值接近于Integer.MAX_VALUE,因此它需要用31位来精确表示,而float类型只能提供24位的精度（整数部分24位，小数部分8位）。对如此巨大的一个float数值进行增量操作将不会改变其值。因此,这个程序看起来应该无限地循环下去,因为f永远也不可能解决其终止值。但是,如果你运行该程序,就会发现它并没有无限循环下去,事实上,它立即就终止了,并打印出0。怎么回事呢?</p>
+
+<p>问题在于终止条件测试失败了,其方式与增量操作失败的方式非常相似。这个循环只有在循环索引f比(float)(START+50)小的情况下才运行。在将一个int与一个float进行比较时,会自动执行从int到float的转换。遗憾的是,这种转换是会导致精度丢失的三种类型转换的一种(另外两个是从long到float和从long到double)。</p>
+
+<p>f的初始值太大了,以至于在对其加上50,然后将结果转型为float时,所产生的值等于直接将f转换成float的值，即(float)2000000000==(float)2000000050,因此在循环体第一次执行之前就是false,所以,循环体也就永远的不到机会去运行。注意到2000000000有10个因子都是2:它是一个2乘以9个10,而每个10都是5×2，这意味着2000000000的二进制表示是以10个0结尾的。50的二进制表示只需要6位,所以将50加到2000000000上不会对右边6位之外的其他为产生影响。特别是,从右边数过来的第7位和第8位仍旧是0。提升这个31位的int到具有24位精度的float会在第 7位和第8位之间四舍五入,从而直接丢弃最右边的7位，因此它们的float表示是相同的。</p>
+
+<p>这个谜题的教训是：不要使用浮点数作为循环索引,因为它会导致无法预测的行为。如果你在循环体内需要一个浮点数,那么请使用int或long循环索引,并将其转换为float或double。在将一个int或long转换成一个float或double时,你可能会丢失精度,但是至少它不会影响到循环本身。当你使用浮点数时,要使用double而不是 float,除非你肯定float提供了足够的精度,并且存在强制性的性能需求迫使你使用 float。适合使用float而不是double的时刻是非常非常少的。</p>
+
+<p><strong>20.一分钟又一分钟</strong><br />
+下面这段程序将打印分钟计数器，那么它会打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Clock</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minutes</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">ms</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">ms</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="mi">60</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="mi">60</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="mi">1000</span><span class="o">;</span> <span class="n">ms</span><span class="o">++){</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">ms</span> <span class="o">%</span> <span class="mi">60</span><span class="o">*</span><span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">minutes</span><span class="o">++;</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">minutes</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>你可能期望程序打印出60,毕竟,这就是一小时所包含的分钟数。但是,它打印的却是 60000。为什么它会如此频繁地对minutes执行了增量操作呢?</p>
+
+<p>问题就出在(ms % 60<em>1000 == 0)。你可能会认为这个表达式等价于(ms % 60000 == 0),但是其实它们并不等价。取余和乘法操作符具有相同的优先级,因此表达式ms % 60</em>1000等价于(ms % 60)*1000。</p>
+
+<p>订正该程序的最简单的方式就是在布尔表达式中插入一对括号,以强制规定计算的正确顺序:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">ms</span> <span class="o">%</span> <span class="o">(</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">)</span> <span class="o">==</span> <span class="mi">0</span><span class="o">){</span>
+</span><span class='line'>  <span class="n">minutes</span><span class="o">++;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>然而,有一个更好的方法可以订正该程序。用被恰当命名的常量来替代所有的魔幻数字:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Clock</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">MS_PER_HOUR</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">MS_PER_MINUTE</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minutes</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">ms</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">ms</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">MS_PER_HOUR</span><span class="o">;</span> <span class="n">ms</span><span class="o">++){</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">ms</span> <span class="o">%</span> <span class="n">MS_PER_MINUTE</span> <span class="o">==</span> <span class="mi">0</span><span class="o">){</span>
+</span><span class='line'>        <span class="n">minutes</span><span class="o">++;</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">minutes</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>21.极端不可思议</strong><br />
+下面的三个程序每一个都会打印些什么?不要假设它们都可以通过编译:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Arcane1</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Hello</span> <span class="n">world</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">I</span><span class="err">’</span><span class="n">ve</span> <span class="n">never</span> <span class="n">seen</span> <span class="n">println</span> <span class="n">fail</span><span class="o">!</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Arcane2</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="c1">// If you have nothing nice to say, say nothing</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">This</span> <span class="n">can</span><span class="err">’</span><span class="n">t</span> <span class="n">happen</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">interface</span> <span class="nc">Type1</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">CloneNotSupportedException</span><span class="o">;</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">interface</span> <span class="nc">Type2</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">InterruptedException</span><span class="o">;</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">interface</span> <span class="nc">Type3</span> <span class="kd">extends</span> <span class="n">Type1</span><span class="o">,</span> <span class="n">Type2</span> <span class="o">{</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Arcane3</span> <span class="kd">implements</span> <span class="n">Type3</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Hello</span> <span class="n">world</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Type3</span> <span class="n">t3</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Arcane3</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">t3</span><span class="o">.</span><span class="na">f</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>第一个程序Arcane1,展示了已检查异常的一个基本原则。它看起来应该是可以编译的:try子句执行 I/O,并且catch子句捕获IOException异常。但是这个程序不能编译。因为println方法没有声明会抛出任何被检查异常,而IOException却正是一个被检查异常。语言规范中描述道:如果一个catch子句要捕获一个类型为E的被检查异常,而其相对应的try子句不能抛出E的某种子类型的异常,那么这就是一个编译期错误。</p>
+
+<p>基于同样的理由,第二个程序Arcane2看起来应该是不可以编译的，但是它却可以。它之所以可以编译,是因为它唯一的catch子句检查了Exception。尽管Java语言规范在这一点上十分含混不清,但是捕获Exception或Throwble的catch子句是合法的,不管与其相对应的try子句的内容为何。</p>
+
+<p>第三个程序Arcane3,看起来它也不能编译，实际上却可以。为什么呢?上述分析的缺陷在于对“Type3.f可以抛出在Type1.f上声明的异常和在Type2.f 上声明的异常”所做的假设。但是这并不正确,因为每一个接口都限制了方法f可以抛出的被检查异常集合。一个方法可以抛出的被检查异常集合是它所适用的所有类型声明要抛出的被检查异常集合的交集,而不是合集。因此,静态类型为Type3的对象上的f方法根本就不能抛出任何被检查异常。因此,Arcane3可以毫无错误地通过编译。</p>
+
+<p><strong>22.不受欢迎的宾客</strong><br />
+将尝试着从其环境中读取一个用户ID,如果这种尝试失败了,则缺省地认为它是一个来宾用户。该程序的作者将面对有一个静态域的初始化表达式可能会抛出异常的情况。那么,下面的程序会打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UnwelcomeGuest</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">GUEST_USER_ID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">USER_ID</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">static</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">USER_ID</span> <span class="o">=</span> <span class="n">getUserIdFromEnvironment</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IdUnavailableException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">USER_ID</span> <span class="o">=</span> <span class="n">GUEST_USER_ID</span><span class="o">;</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Logging</span> <span class="n">in</span> <span class="n">as</span> <span class="n">guest</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kd">static</span> <span class="kt">long</span> <span class="n">getUserIdFromEnvironment</span><span class="o">()</span>
+</span><span class='line'>  <span class="kd">throws</span> <span class="n">IdUnavailableException</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="k">new</span> <span class="nf">IdUnavailableException</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">User</span> <span class="nl">ID:</span> <span class="err">“</span> <span class="o">+</span> <span class="n">USER_ID</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">class</span> <span class="nc">IdUnavailableException</span> <span class="kd">extends</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>该程序看起来很直观：getUserIdFromEnvironment方法将抛出一个异常,然后将GUEST_USER_ID(-1L)赋值给USER_ID,并打印“Loggin in as guest“,然后main方法执行,使程序打印“User ID: -1“。表象再次欺骗了我们,该程序并不能编译。如果你尝试着去编译它,你将看到和下面内容类似的一条错误信息:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">UnwelcomeGuest</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">10</span><span class="o">:</span>
+</span><span class='line'><span class="n">variable</span> <span class="n">USER_ID</span> <span class="n">might</span> <span class="n">already</span> <span class="n">have</span> <span class="n">been</span> <span class="n">assigned</span>
+</span><span class='line'><span class="n">USER_ID</span> <span class="o">=</span> <span class="n">GUEST_USER_ID</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>问题出在哪里了?USER_ID是一个空final(blank final),它是一个在声明中没有进行初始化操作的final值。很明显,只有在对USER_ID赋值失败时,才会在try语句块中抛出异常,因此,在catch语句块中赋值是相当安全的。不管怎样执行静态初始化操作语句块,只会对USER_ID赋值一次,这正是空final所要求的。为什么编译器不知道这些呢?</p>
+
+<p>要确定一个程序是否可以不止一次地对一个空final进行赋值是一个很困难的问题。事实上,这是不可能的。这等价于经典的停机问题,它通常被认为是不可能解决的。为了能够编写出一个编译器,语言规范在这一点上采用了保守的方式。在程序中,一个空 final域只有在它是明确未赋过值的地方才可以被赋值。</p>
+
+<p>解决这类问题的最好方式就是将这个烦人的域从空final类型改变为普通的final类型,用一个静态域的初始化操作替换掉静态的初始化语句块。实现这一点的最佳方式是重构静态语句块中的代码为一个助手方法:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UnwelcomeGuest</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">GUEST_USER_ID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">USER_ID</span> <span class="o">=</span> <span class="n">getUserIdOrGuest</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kt">long</span> <span class="n">getUserIdOrGuest</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nf">getUserIdFromEnvironment</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IdUnavailableException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Logging</span> <span class="n">in</span> <span class="n">as</span> <span class="n">guest</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">GUEST_USER_ID</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="err">…</span><span class="c1">// The rest of the program is unchanged</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>23.您好,再见!</strong><br />
+下面的程序在寻常的Hello world程序中添加了一段不寻常的曲折操作。那么,它将会打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloGoodbye</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Hello</span> <span class="n">world</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Goodbye</span> <span class="n">world</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>执行程序你会发现它永远不会说再见:它只打印了Hello world。我们已经知道不论 try语句块的执行是正常地还是意外地结束,finally语句块确实都会执行。然而在这个程序中,try语句块根本就没有结束其执行过程。System.exit方法将停止当前线程和所有其他当场死亡的线程。finally子句的出现并不能给予线程继续去执行的特殊权限。</p>
+
+<p>当System.exit方法被调用时,虚拟机在关闭前要执行两项清理工作。首先,它执行所有的关闭挂钩操作,这些挂钩已经注册到了Runtime.addShutdownHook上。这对于释放JVM以外的资源将很有帮助。务必要为那些必须在JVM退出之前发生的行为关闭挂钩。下面的程序版本示范了这种技术,它可以如我们所期望地打印出Hello world 和Goodbye world:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloGoodbye1</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Hello</span> <span class="n">world</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">Runtime</span><span class="o">.</span><span class="na">getRuntime</span><span class="o">().</span><span class="na">addShutdownHook</span><span class="o">(</span><span class="k">new</span> <span class="n">Thread</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Goodbye</span> <span class="n">world</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">});</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>JVM在System.exit方法被调用时执行的第二个清理任务与终结器有关。如果System.runFinalizerOnExit或Runtime.runFinalizersOnExit被调用了,那么JVM将在所有还未终结的对象上面调用终结器。这些方法很久以前就已经过时了,无论什么原因,永远不要调用System.runFinalizersOnExit和 Runtime.runFinalizersOnExit:它们属于Java类库中最危险的方法之一。调用这些方法导致的结果是,终结器会在那些其他线程正在并发操作的对象上面运行,从而导致不确定的行为或导致死锁。</p>
+
+<p>总之,System.exit将立即停止所有的程序线程,它并不会使finally语句块得到调用,但是它在停止JVM之前会执行关闭挂钩操作。当JVM被关闭时,请使用关闭挂钩来终止外部资源。通过调用System.halt可以在不执行关闭挂钩的情况下停止JVM,但是这个方法很少使用。</p>
+
+<p><strong>24.不情愿的构造器</strong><br />
+尽管在一个方法声明中看到一个throws子句是很常见的,但是在构造器的声明中看到一个throws子句就很少见了。下面的程序就有这样的一个声明。那么,它将打印出什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Reluctant</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Reluctant</span> <span class="n">internalInstance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Reluctant</span><span class="o">();</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">Reluctant</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="k">new</span> <span class="nf">Exception</span><span class="o">(</span><span class="err">“</span><span class="n">I</span><span class="err">’</span><span class="n">m</span> <span class="n">not</span> <span class="n">coming</span> <span class="n">out</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Reluctant</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Reluctant</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Surprise</span><span class="o">!</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">I</span> <span class="n">told</span> <span class="n">you</span> <span class="n">so</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>你可能期望catch子句能够捕获这个异常,并且打印“I told you so“。但是当你尝试着去运行它时,它却抛出StackOverflowError异常,为什么呢?</p>
+
+<p>与大多数抛出StackOverflowError异常的程序一样,本程序也包含了一个无限递归。当你调用一个构造器时,实例变量的初始化操作将先于构造器的程序体而运行。在本谜题中,internalInstance变量的初始化操作递归调用了构造器,而该构造器通过再次调用Reluctant构造器而初始化该变量自己的internalInstance,如此无限递归下去就会抛出StackOverflowError异常。因为StackOverflowError是 Error的子类型而不是Exception的子类型,所以catch子句无法捕获它。</p>
+
+<p>总之,实例初始化操作是先于构造器的程序体而运行的。实例初始化操作抛出的任何异常都会传播给构造器。如果初始化操作抛出的是被检查异常,那么构造器必须声明也会抛出这些异常,但是应该避免这样做,因为它会造成混乱。</p>
+
+<p><strong>25.域和流</strong><br />
+下面的方法将一个文件拷贝到另一个文件,并且被设计为要关闭它所创建的每一个流,即使它碰到I/O错误也要如此。遗憾的是,它并非总是能够做到这一点。为什么不能呢,你如何才能订正它呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">static</span> <span class="kt">void</span> <span class="nf">copy</span><span class="o">(</span><span class="n">String</span> <span class="n">src</span><span class="o">,</span> <span class="n">String</span> <span class="n">dest</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">InputStream</span> <span class="n">in</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>  <span class="n">OutputStream</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">in</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileInputStream</span><span class="o">(</span><span class="n">src</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">out</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileOutputStream</span><span class="o">(</span><span class="n">dest</span><span class="o">);</span>
+</span><span class='line'>    <span class="kt">byte</span><span class="o">[]</span> <span class="n">buf</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">];</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">n</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">while</span> <span class="o">((</span><span class="n">n</span> <span class="o">=</span> <span class="n">in</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buf</span><span class="o">))</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="mi">0</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">n</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">in</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="n">in</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">out</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="n">out</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>问题出在finally语句块自身中，close方法也可能会抛出IOException。如果这正好发生在in.close被调用之时,那么这个异常就会阻止out.close被调用,从而使输出流仍保持在开放状态。</p>
+
+<p>解决方式是将每一个close都包装在一个嵌套的try语句块中。下面的finally语句块的版本可以保证在两个流上都会调用close:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">in</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">in</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// There is nothing we can do if close fails</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">out</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">out</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// There is nothing we can do if close fails</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">//从5.0版本开始,你可以利用Closeable接口对代码进行重构:</span>
+</span><span class='line'><span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">closeIgnoringException</span><span class="o">(</span><span class="n">in</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">closeIgnoringEcception</span><span class="o">(</span><span class="n">out</span><span class="o">);</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">closeIgnoringException</span><span class="o">(</span><span class="n">Closeable</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">c</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// There is nothing we can do if close fails</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>总之,当你在finally语句块中调用close方法时,要用一个嵌套的try-catch语句来保护它,以防止IOException的传播。更一般地讲,对于任何在finally语句块中可能会抛出的被检查异常都要进行处理,而不是任其传播。</p>
+
+<p><strong>26.异常地危险</strong><br />
+在JDK1.2中,Thread.stop、Thread.suspend以及其他许多线程相关的方法都因为它们不安全而不推荐使用了。下面的方法展示了你用Thread.stop可以实现的可怕事情之一:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Don’t do this - circumvents exception checking!</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sneakyThrow</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">stop</span><span class="o">(</span><span class="n">t</span><span class="o">);</span> <span class="c1">// Deprecated</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>这个讨厌的小方法所做的事情正是throw语句要做的事情,但是它绕过了编译器的所有异常检查操作。你可以(卑鄙地)在你的代码的任意一点上抛出任何受检查的或不受检查的异常,而编译器对此连眉头都不会皱一下。</p>
+
+<p>不使用任何不推荐的方法,你也可以编写出在功能上等价于sneakyThrow的方法。事实上,至少有两种方式可以这么实现这一点,其中一种只能在5.0或更新的版本中运行。你能够编写出这样的方法吗?它必须是用Java 而不是用JVM字节码编写的,你不能在其客户对它编译完之后再去修改它。你的方法不必是完美无瑕的:如果它不能抛出一两个Exception的子类,也是可以接受的。</p>
+
+<p>本谜题的一种解决之道是利用Class.newInstance方法中的设计缺陷,该方法通过反射来对一个类进行实例化。引用有关该方法的文档中的话:“请注意,该方法将传播从空的(就是无参数的)构造器所抛出的任何异常,包括受检查的异常。使用这个方法可以有效地绕开在其他情况下都会执行的编译期异常检查。”一旦你了解了这一点,编写一个sneakyThrow的等价方法就不是太难了。</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Thrower</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="n">Throwable</span> <span class="n">t</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="nf">Thrower</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="n">t</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">sneakyThrow</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Thrower</span><span class="o">.</span><span class="na">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Thrower</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">newInstance</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InstantiationException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IllegalAccessException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Thrower</span><span class="o">.</span><span class="na">t</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">// Avoid memory leak</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>在这个解决方案中将会发生许多微妙的事情。我们想要在构造器执行期间所抛出的异常不能作为一个参数传递给该构造器,因为Class.newInstance调用的是一个类的无参数构造器。因此,sneakyThrow方法将这个异常藏匿于一个静态变量中。为了使该方法是线程安全的,它必须被同步,这使得对其的并发调用将顺序地使用静态域t。要注意的是,t这个域在从finally语句块中出来时是被赋为空的:这只是因为该方法虽然是卑鄙的,但这并不意味着它还应该是内存泄漏的。如果t不被赋为空,那么它阻止该异常被垃圾回收。注意,如果你让该方法抛出一个InstantiationException或IllegalAccessException异常,它将以抛出IllegalArgumentException,这是这项技术的一个内在限制。</p>
+
+<p>Class.newInstance的文档继续描述道：“Constructor.newInstance方法通过将构造器抛出的任何异常都包装在(已检查的)InvocationTargetException异常中而避免了这个问题”很明显,Class.newInstance应该是做了相同的处理。但是纠正这个缺陷已经为时过晚,因为这么做将引入源代码级别的不兼容性，这将使许多依赖于Class.newInstance的程序崩溃。而弃用这个方法也不切实际,因为它太常用了。当你在使用它时,一定要意识到Class.newInstance可以抛出它没有声明过的受检查异常。</p>
+
+<p>被添加到5.0版本中的“范型”可以为本谜题提供一个完全不同的解决方案。为了实现最大的兼容性,通用类型是通过类型擦除来实现的:通用类型信息是在编译期而非运行期检查的。下面的解决方案就利用了这项技术:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Don’t do this either - circumvents exception checking!</span>
+</span><span class='line'><span class="kd">class</span> <span class="nc">TigerThrower</span><span class="o">&lt;</span><span class="n">t</span> <span class="kd">extends</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="n">throwable</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="o">&gt;</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sneakyThrow</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">new</span> <span class="n">TigerThrower</span><span class="o">&lt;</span><span class="n">error</span><span class="o">&gt;().</span><span class="na">sneakyThrow2</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">error</span><span class="o">&gt;&lt;/</span><span class="n">t</span><span class="o">&gt;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kt">void</span> <span class="n">sneakyThrow2</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">T</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">throw</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span> <span class="n">t</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>这个程序在编译时将产生一条警告信息:</p>
+
+<dl>
+  <dt><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/dt&gt;
+</span><span class='line'>  &lt;dt&gt;TigerThrower.java:7:warning: <span class="o">[</span>unchecked<span class="o">]</span> unchecked cast found&lt;/dt&gt;
+</span><span class='line'>  &lt;dd&gt;java.lang.Throwable, required: T
+</span><span class='line'>throw <span class="o">(</span>T<span class="o">)</span> t;&lt;/dd&gt;
+</span><span class='line'>&lt;/dl&gt;
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>警告信息是编译器所采用的一种手段,用来告诉你:你可能正在搬起石头砸自己的脚,而且事实也正是如此。“不受检查的转型”警告告诉你这个有问题的转型将不会在运行时刻受到检查。当你获得了一个不受检查的转型警告时,你应该修改你的程序以消除它,或者你可以确信这个转型不会失败。如果你不这么做,那么某个其他的转型可能会在未来不确定的某个时刻失败,而你也就很难跟踪此错误到其源头了。对于本谜题所示的情况,其情况更糟糕:在运行期抛出的异常可能与方法的签名不一致。sneakyThrow2方法正是利用了这一点。</p>
+
+<p>总之,Java 的异常检查机制并不是虚拟机强制执行的。它只是一个编译期工具,被设计用来帮助我们更加容易地编写正确的程序,但是在运行期可以绕过它。要想减少你因为这类问题而被曝光的次数,就不要忽视编译器给出的警告信息。</p>
+
+<p><strong>27.切掉类</strong><br />
+请考虑下面的两个类:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Strange1</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Missing</span> <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Missing</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">NoClassDefFoundError</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Got</span> <span class="n">it</span><span class="o">!</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Strange2</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Missing</span> <span class="n">m</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Missing</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">NoClassDefFoundError</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Got</span> <span class="n">it</span><span class="o">!</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">class</span> <span class="nc">Missing</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">Missing</span><span class="o">()</span> <span class="o">{</span> <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>如果你编译后并且在运行Strange1和Strange2之前删Missing.class文件,你就会发现这两个程序的行为有所不同。其中一个抛出了NoClassDefFoundError,而另一个却打印出了“Got it!“到底哪一个程序具有哪一种行为,你又如何去解释这种行为上的差异呢?</p>
+
+<p>Strange1只在其try语句块中提及Missing类型,因此你可能会认为NoClassDefFoundError被捕获并打印“Got it!“。Strange2在try语句块之外声明了一个Missing类型的变量,因此你可能会认为NoClassDefFoundError不会被捕获。如果你试着运行这些程序,就会看到它们的行为正好相反，怎样才能解释这些奇怪的行为呢?</p>
+
+<p>如果你去查看Java规范以找出应该抛出NoClassDefFoundError的地方,那么你不会得到很多的信息。该规范描述道：这个错误可以“在(直接或间接)使用某个类的程序中的任何地方”抛出。当JVM调用Strange1和Strange2的main方法时,这些程序都间接使用了Missing类,因此,它们都在其权利范围内于这一点上抛出了该错误。于是,本谜题的答案就是这两个程序可以依据其实现而展示出各自不同的行为。但是这并不能解释为什么这些程序在所有我们所知的Java实现上的实际行为,与你所认为的必然行为都正好相反。要查明为什么会是这样,我们需要研究一下由编译器生成的这些程序的字节码。</p>
+
+<p>如果你去比较Strange1和Strange2的字节码,就会发现几乎是一样的。除了类名之外,唯一的差异就是catch语句块所捕获的参数ex与JVM本地变量之间的映射关系不同。尽管哪一个程序变量被指派给了哪一个JVM变量的具体细节会因编译器的不同而有所差异,但是对于和上述程序一样简单的程序来说,这些细节不太可能会差异很大。下面是通过执行<code>javap -c Strange1</code>命令而显示的Strange1.main的字节码:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>0   new info.liuxuan.test.Missing <span class="o">[</span>16<span class="o">]</span>
+</span><span class='line'>3   dup
+</span><span class='line'>4   invokespecial info.liuxuan.test.Missing<span class="o">()</span> <span class="o">[</span>18<span class="o">]</span>
+</span><span class='line'>7   astore&lt;em&gt;1 <span class="o">[</span>m<span class="o">]</span>
+</span><span class='line'>8   goto 20
+</span><span class='line'>11  astore&lt;/em&gt;1 <span class="o">[</span>ex<span class="o">]</span>
+</span><span class='line'>12  getstatic java.lang.System.out : java.io.PrintStream <span class="o">[</span>19<span class="o">]</span>
+</span><span class='line'>15  ldc &amp;lt;string “Got it!”&amp;gt; <span class="o">[</span>25<span class="o">]</span>
+</span><span class='line'>17  invokevirtual java.io.PrintStream.println<span class="o">(</span>java.lang.String<span class="o">)</span> : void <span class="o">[</span>27<span class="o">]</span>
+</span><span class='line'>20  <span class="k">return</span>
+</span><span class='line'><span class="k">      </span>Exception Table:
+</span><span class='line'>        <span class="o">[</span>pc: 0, pc: 8<span class="o">]</span> -&amp;gt; 11 when : java.lang.NoClassDefFoundError
+</span><span class='line'>      Line numbers:
+</span><span class='line'>        <span class="o">[</span>pc: 0, line: 14<span class="o">]</span>
+</span><span class='line'>        <span class="o">[</span>pc: 11, line: 15<span class="o">]</span>
+</span><span class='line'>        <span class="o">[</span>pc: 12, line: 16<span class="o">]</span>
+</span><span class='line'>        <span class="o">[</span>pc: 20, line: 18<span class="o">]</span>
+</span><span class='line'>      Local variable table:
+</span><span class='line'>        <span class="o">[</span>pc: 0, pc: 21<span class="o">]</span> <span class="nb">local</span>: args index: 0 <span class="nb">type</span>: java.lang.String<span class="o">[]</span>
+</span><span class='line'>        <span class="o">[</span>pc: 8, pc: 11<span class="o">]</span> <span class="nb">local</span>: m index: 1 <span class="nb">type</span>: info.liuxuan.test.Missing
+</span><span class='line'>        <span class="o">[</span>pc: 12, pc: 20<span class="o">]</span> <span class="nb">local</span>: ex index: 1 <span class="nb">type</span>: java.lang.NoClassDefFoundError
+</span><span class='line'>&amp;lt;/string&amp;gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Strange2.main相对应的字节码与其只有一条指令不同:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="mi">11</span><span class="o">:</span> <span class="n">astore_2</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>这是一条将catch语句块中的捕获异常存储到捕获参数ex中的指令。在Strange1中,这个参数是存储在JVM变量1中的,而在Strange2中,它是存储在JVM变量2中的。这就是两个类之间唯一的差异,但是它所造成的程序行为上的差异是多么地大呀!</p>
+
+<p>为了运行一个程序,JVM要加载和初始化包含main方法的类。在加载和初始化间,JVM 必须链接类。链接的第一阶段是校验,校验要确保一个类是良构的,并且遵循语言的语法要求。校验非常关键,它维护着可以将像Java这样的安全语言与像C或C++这样的不安全语言区分开的各种承诺。在Strange1和Strange2这两个类中,本地变量m碰巧都被存储在JVM变量1中。两个版本的main都有一个连接点,从两个不同位置而来的控制流汇聚于此。该连接点就是指令20,即从main返回的指令。在正常结束try语句块的情况下,我们执行到指令8,即goto20,从而可以到达指令20;对于在catch语句块中结束的情况,我们将执行指令17,并按顺序执行下去,到达指令20。连接点的存在使得在校验Strange1类时产生异常,而在校验Strange2类时并不会产生异常。当校验执行对Strange1.main的流分析时,由于指令20可以通过两条不同的路径到达,因此校验器必须合并在变量1中的类型。两种类型是通过计算它们的首个公共超类而合并的(两个类的首个公共超类是它们所共有的最详细而精确的超类)。在 Strange1.main方法中,当从指令8到达指令20时,JVM变量1的状态包含了一个 Missing类的实例。当从指令17到达时,它包含了一个NoClassDefFoundError 类的实例。为了计算首个公共超类,校验器必须加载Missing类以确定其超类。因为 Missing.class文件已经被删除了,所以校验器不能加载它,因而抛出了一个NoClassDefFoundError。请注意,这个异常是在校验期间、在类被初始化之前,并且在main方法开始执行之前很早就抛出的。这就解释了为什么没有打印出任何关于这个未被捕获异常的跟踪栈信息。要想编写一个能够探测出某个类是否丢失的程序,请使用反射来引用类而不要使用通常的语言结构。下面展示了用这种技巧重写的程序:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Strange</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span><span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Object</span> <span class="n">m</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="err">“</span><span class="n">Missing</span><span class="err">”</span><span class="o">).</span><span class="na">newInstance</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">err</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">Got</span> <span class="n">it</span><span class="o">!</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>总之,不要对捕获NoClassDefFoundError形成依赖。语言规范非常仔细地描述了类初始化是在何时发生的,但是类被加载的时机却显得更加不可预测。更一般地讲,捕获Error及其子类型几乎是完全不恰当的。这些异常是为那些不能被恢复的错误而保留的。</p>
+
+<p><strong>28.令人疲惫不堪的测验</strong><br />
+本谜题将测试你对递归的了解程度。下面的程序将做些什么呢?</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Workout</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">workHard</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">“</span><span class="n">It</span><span class="err">’</span><span class="n">s</span> <span class="n">nap</span> <span class="n">time</span><span class="o">.</span><span class="err">”</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">workHard</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">workHard</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">workHard</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>要不是有try-finally语句,该程序的行为将非常明显:workHard方法递归调用它自身,直到StackOverflowError被抛出而终止。但是,try-finally语句把事情搞得复杂了。当它试图抛出StackOverflowError 时,程序将会在finally语句块的workHard方法中终止。这样,它就递归调用了自己。这看起来确实就像是一个无限循环的秘方,但是这个程序真的会无限循环下去吗?如果你运行它,它似乎确实是这么做的,但是要想确认的唯一方式就是分析它的行为。</p>
+
+<p>Java虚拟机对栈的深度限制到了某个预设的水平。当超过这个水平时,JVM就抛出 StackOverflowError。为了让我们能够更方便地考虑程序的行为,我们假设栈的深度为3,这比它实际的深度要小得多。现在让我们来跟踪其执行过程。main方法调用 workHard,而它又从其try语句块中递归地调用了自己,然后它再一次从其try语句块中调用了自己。在此时,栈的深度是3。当workHard方法试图从其try语句块中再次调用自己时,该调用立即就会以抛出StackOverflowError而失败。这个错误是在最内部的finally语句块中被捕获的,在此处栈的深度已经达到了3。在那里,workHard 方法试图递归地调用它自己,但是该调用却以抛出StackOverflowError而失败。这个错误将在上一级的finally语句块中被捕获,在此处站的深度是2。该finally中的调用与相对应的try语句块具有相同的行为:都会产生一个StackOverflowError。</p>
+
+<p>所以，一个深度为0的调用(即main中的调用),两个深度为1的调用,四个深度为2的调用,和八个深度为3的调用,总共是15个调用。那八个深度为3的调用每一个都会立即产生StackOverflowError。至少在把栈的深度限制为3的JVM上,该程序不会是一个无限循环:它在15个调用和8个异常之后就会终止。但是对于真实的JVM又会怎样呢?它仍然不会是一个无限循环。其调用图与前面的图相似,只不过要大得多得多而已。那么,究竟大到什么程度呢?许多JVM都将栈的深度限制为1024,因此,调用的数量就是1+2+4+8…+21,024=21,025-1,而抛出的异常的数量是 21,024。假设我们的机器可以在每秒钟内执行1010个调用,并产生1010个异常,按照当前的标准,这个假设的数量已经相当高了。在这样的假设条件下,程序将在大约 1.7×10291年后终止。为了让你对这个时间有直观的概念,我告诉你,我们的太阳的生命周期大约是1010年,所以我们可以很确定,我们中没有任何人能够看到这个程序终止的时刻。尽管它不是一个无限循环,但是它也就算是一个无限循环吧。</p>
+
+<p>实际上,这个调用是一棵完全二叉树,它的深度就是JVM的栈深度的上限。WorkOut程序的执行过程等于是在先序遍历这棵树。在先序遍历中,程序先访问一个节点,然后递归地访问它的左子树和右子树。对于树中的每一条边,都会产生一个调用,而对于树中的每一个节点,都会抛出一个异常。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[initialization on demand holder idiom]]></title>
+    <link href="http://liuxuan.info/blog/2011/05/06/initialization-on-demand-holder-idiom/"/>
+    <updated>2011-05-06T20:04:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/05/06/initialization-on-demand-holder-idiom</id>
+    <content type="html"><![CDATA[<p>This implementation is a well-performing and concurrent implementation valid in all versions of Java. The original implementation from Bill Pugh (see links below), based on the earlier work of Steve Quirk, has been modified to reduce the scope of LazyHolder.something  to private and to make the field final. </p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Something.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Something</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="nf">Something</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">LazyHolder</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Something</span> <span class="n">something</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Something</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">static</span> <span class="n">Something</span> <span class="n">getInstance</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">LazyHolder</span><span class="o">.</span><span class="na">something</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<!--more-->
+
+<p><strong>How it works</strong></p>
+
+<p>The implementation relies on the well-specified initialization phase of execution within the Java Virtual Machine (JVM); see section 12.4 of Java Language Specification (JLS) for details.</p>
+
+<p>When the class Something is loaded by the JVM, the class goes through initialization. Since the class does not have any static variables to initialize, the initialization completes trivially. The static class definition LazyHolder within it is not initialized until the JVM determines that LazyHolder must be executed. The static class LazyHolder is only executed when the static method getInstance is invoked on the class Something, and the first time this happens the JVM will load and initialize the LazyHolder class. The initialization of the LazyHolder class results in static variable something being initialized by executing the (private) constructor for the outer class Something. Since the class initialization phase is guaranteed by the JLS to be serial, i.e., non-concurrent, no further synchronization is required in the static getInstance method during loading and initialization. And since the initialization phase writes the static variable something in a serial operation, all subsequent concurrent invocations of the getInstance will return the same correctly initialized something without incurring any additional synchronization overhead.</p>
+
+<p><strong>&gt;When to use it</strong></p>
+
+<p>Use this pattern if the initialization of the class is expensive and it cannot be done safely at class-loading time and the initialization is highly concurrent. The crux of the pattern is the safe removal of the synchronization overhead associated with accessing a singleton instance.</p>
+
+<p><strong>When not to use it</strong></p>
+
+<p>Using this pattern can result in unexpected behaviour if there is an error prone code inside the constructor of the singleton class Something. For instance, if the constructor is attempting to instantiate an external connection and the operation fails, the application will slip into a non-recoverable state. This is essentially because the nested static class LazyHolder has been initialized and loaded during the first call and the static variable INSTANCE has been assigned a null value (since the private constructor threw an exception). Any subsequent call to the static method getInstance() will fail with a NoClassDefFoundError while trying to access LazyHolder.something. </p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Java字节码invokeinterface,invokespecial,invokestatic和invokevirtual的含义和区别]]></title>
+    <link href="http://liuxuan.info/blog/2011/04/13/explain-java-bytecode-invokeinterface-invokespecial-invokestatic-invokevirtual/"/>
+    <updated>2011-04-13T19:13:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/04/13/explain-java-bytecode-invokeinterface-invokespecial-invokestatic-invokevirtual</id>
+    <content type="html"><![CDATA[<p>在解释之前，首先需要理解JVM中的两个数据结构：<strong>Frames(栈帧)</strong>和<strong>Operand Stack(操作数栈)</strong>。</p>
+
+<p><strong>栈帧</strong></p>
+
+<p>在JVM中，栈帧是用来保存数据和部分结果，执行动态链接，返回方法调用的结果，分发异常。</p>
+
+<p>每一次当一个方法被调用时就会创建一个新的栈帧，并且栈帧会在方法调用完毕后(无论方法是否正常执行结束或者因未捕获的异常而终止)消亡。</p>
+
+<p>栈帧是由JVM中创建栈帧的线程分配的。每个栈帧里含有：他自己的本地变量(基本数据类型或引用类型)的数组，他自己的操作数栈和一个当前方法所在类的常量池的引用。</p>
+
+<p>本地变量数组和操作数栈的大小在编译的时候就已经决定了，并且一直提供给和栈帧关联的方法使用。因此，栈帧的大小只跟JVM的实现以及方法被调用时这些数据结构同时在内存中被分配的大小决定。</p>
+
+<p>在一个线程执行过程中，任何时候只有一个栈帧(也就是正在执行的方法的栈帧)处于活动状态。这个栈帧就被认为是当前栈帧，并且他包含的方法就是当前正在执行的方法。当前方法所在的类称为当前类。在本地变量和操作数栈上的操作都含有当前栈帧的引用。</p>
+
+<p>当栈帧的方法调用另外的方法或者他的方法完成了，那么当前栈帧就会停止。当一个方法被调用的时候，会创建一个新的栈帧，并且当新的方法获得CPU控制权时这个新创建的栈帧会变成当前栈帧，当方法返回的时候，当前栈帧传回他的方法调用的结果，如果这个结果有的话将被传递给前一个栈帧。当之前的一个栈帧变成当前栈帧的时候，当前栈帧就会被丢弃。 <!--more--></p>
+
+<p><strong>操作数栈</strong></p>
+
+<p>每个栈帧都有一个last-in-first-out(LIFO)的栈，这个栈就被称为操作数栈。操作数栈的最大深度在编译时就已经确定，并且供与这个栈帧相关联的方法使用。</p>
+
+<p>当栈帧被创建时，操作数栈是空的。JVM发出指令装载本地变量中的常量和值到操作数栈中去。另外的指令是从操作数栈中取数，运算完成后把结果再放入操作数栈中。操作数栈还被用来保存方法的参数和方法的返回值。</p>
+
+<p>操作数栈中的值都是一个Java基本类型或者引用类型。操作数栈中的值必须在适合他们的类型的方式下操作。一小部分JVM指令(dup，swap)执行时不考虑值的类型，这些指令不能修改和分开单个的值，这些操作数栈的限制通过类文件检查时强制执行。</p>
+
+<p>long和double类型在操作数栈有2个单元长度，其他类型都是1个单元长度。</p>
+
+<p><strong>invokeinterface</strong></p>
+
+<p>当调用接口中的方法的时候，就会使用invokeinterface指令。</p>
+
+<p>Operand Stack
+    …, objectref, [arg1, [arg2 …]]  …</p>
+
+<p>实际被调用的方法将会遵循下面的查找步骤：</p>
+
+<p>(1)如果objectref这个类中含有和将要被调用的方法有相同的方法名和参数的方法，那么objectref这个类中的方法将会被调用，并且查找过程结束。</p>
+
+<p>(2)如果经过(1)后没有找到合适的方法，并且如果objectref有父类的话，那么就会在他的父类里迭代执行。</p>
+
+<p>(3)如果(1)，(2)后都没有找到，则会抛出AbstractMethodError。</p>
+
+<p><strong>invokespecial</strong></p>
+
+<p>当调用类的任何构造方法时，就会使用invokespecial指令。</p>
+
+<p>Operand Stack
+    …, objectref, [arg1, [arg2 …]]  …</p>
+
+<p>如果将要被调用的构造方法是“protected”的，并且要么是当前类的成员，要么是当前类父类的成员，那么objectref必须要么是当前类，要么是当前类的子类。</p>
+
+<p>当下面的条件都为“true”时，才会调用方法：</p>
+
+<p>(1)当前类已经设置好ACC_SUPER标志位。</p>
+
+<p>(2)要调用构造方法所在的类是当前类的父类。</p>
+
+<p>(3)要调用的构造方法所在的类还没有被实例化。</p>
+
+<p>当上面的条件都为“true”时，实际将要被调用的方法将会遵循下面的查找步骤。(假定C是当前类的直接父类):</p>
+
+<p>(1)如果C中有声明过相同的方法(包括方法签名和参数)，那么这个方法将会被调用，并且查找过程结束。</p>
+
+<p>(2)如果(1)不满足，并且C有父类，那么会在C的父类中迭代(1)，实际被调用的方法就是这个迭代查找过程的结果，并且查找过程结束。</p>
+
+<p>(3)如果(1),(2)都不满足，将会抛出AbstractMethodError。</p>
+
+<p><strong>invokestatic</strong></p>
+
+<p>当调用类的静态方法时，就会使用invokestatic指令。</p>
+
+<p>Operand Stack
+    …, [arg1, [arg2 …]]  …</p>
+
+<p>被调用的方法必须是静态方法，而且不能是抽象方法，并且如果要使用类的属性的话，那么类的属性也必须是静态的。</p>
+
+<p>如果这个静态方法是synchronized的，那么需要获得与这个类相关的monitor。</p>
+
+<p>如果这个被调用的方法不是native的话，操作数栈里保存的参数将会被弹出，并且为这个方法创建一个新的栈帧，弹出的参数按顺序赋值给新创建的栈帧的本地变量。如果弹出的参数是浮点类型的值的话，那么在保存为新栈帧的本地变量之前将会被类型转型(转换为最接近这个浮点类型值的类型)。</p>
+
+<p><strong>invokevirtual</strong></p>
+
+<p>当调用类的实例方法时，就会使用invokevirtual指令。</p>
+
+<p>值得注意的是，Java中的所有实例方法默认都是virtual的。</p>
+
+<p>Operand Stack
+    …, objectref, [arg1, [arg2 …]]  …</p>
+
+<p>如果被调用的方法是protected，并且他要么是当前类的成员，要么是当前类的父类里的成员，那么objectref必须要么是当前类，要么是当前类的子类。</p>
+
+<p>实际被调用的方法将会遵循以下查找过程：</p>
+
+<p>(1)如果objectref中有相同方法签名和参数的方法，并且这个方法可以从objectref中访问到，那么这个方法就会被调用，并且查找过程结束。</p>
+
+<p>(2)如果(1)不满足，并且objectref有一个父类，那么会在父类中迭代(1)，实际被调用的方法就是这个迭代查找过程的结果，并且查找过程结束。</p>
+
+<p>(3)如果(1),(2)都不满足，将会抛出AbstractMethodError 。</p>
+
+]]></content>
+  </entry>
+  
+</feed>

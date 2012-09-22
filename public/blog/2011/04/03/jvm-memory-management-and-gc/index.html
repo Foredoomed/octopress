@@ -1,0 +1,496 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>JVM内存管理和垃圾收集 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="一.Java基本类型和类的大小 1.Java手册上的类型大小 byte : 8-bit short : 16-bit Int : 32-bit long : 64-bit char : 16 bit unsigned integer float : 32-bit double: 64-bit &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/04/03/jvm-memory-management-and-gc/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">JVM内存管理和垃圾收集</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-03T18:52:00+08:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>一.Java基本类型和类的大小</strong></p>
+
+<p>1.Java手册上的类型大小</p>
+
+<p>byte : 8-bit                           <br />
+short : 16-bit                           <br />
+Int : 32-bit                              <br />
+long : 64-bit                               <br />
+char : 16 bit unsigned integer         <br />
+float : 32-bit                             <br />
+double: 64-bit                              <br />
+boolean: 1-bit                             </p>
+
+<p>2.实际存储大小(根据JVM实现而定)</p>
+
+<p>Byte : 16 bytes<br />
+Short : 16 bytes<br />
+Integer : 16 bytes<br />
+Long : 16 bytes<br />
+Character : 16 bytes<br />
+Float : 16 bytes<br />
+Double : 16 bytes<br />
+Boolean : 16 bytes<br />
+Object ：8 bytes  </p>
+
+<!--more-->
+
+<p><strong>二.JVM的堆结构</strong></p>
+
+<p><a href="http://www.flickr.com/photos/60110479@N08/5504939947/" title="Flickr 上 Foredoomed 的 JVMHeapStructure"><img src="http://farm6.static.flickr.com/5136/5504939947_19ed9a8dbc.jpg" width="500" height="330" alt="JVMHeapStructure" /></a></p>
+
+<p>运行时数据区域，所有类实例和数组的内存均从此处分配，由Java 虚拟机启动时创建。对象的堆内存由称为垃圾回收器的自动内存管理系统回收。</p>
+
+<p>堆由两部分组成:</p>
+
+<p><code>Eden</code>+<code>From Space</code>+<code>To Space</code>也叫做<code>Young Generation(年轻代)</code>,<code>Tenured Space</code>也叫做<code>Old Generation(老年代)</code>。</p>
+
+<p><code>Survivor Space</code>包括<code>S0</code>和<code>S1</code>。</p>
+
+<p><code>Permanent Space(方法区)</code>： JVM具有一个由所有线程共享的方法区。它存储每个类结构，如运行时常数池、字段和方法数据，以及方法和构造方法的代码，它是在Java虚拟机启动时创建的，<strong>不包括在JVM堆内</strong>，默认为4M。 </p>
+
+<p>这个区域主要存放：</p>
+
+<p>1.Class的信息</p>
+
+<ul>
+  <li>包名</li>
+  <li>父类的包名</li>
+  <li>类或接口</li>
+  <li>类型修饰符</li>
+  <li>父接口包名</li>
+</ul>
+
+<p>2.其它信息</p>
+
+<ul>
+  <li>类型的常量池</li>
+  <li>属性 </li>
+  <li>方法</li>
+  <li>类里的静态变量(除了常量)</li>
+  <li>一个指向<code>ClassLoader</code>的引用 </li>
+  <li>一个指向<code>Class</code>类的引用</li>
+</ul>
+
+<p><strong>三.GC的工作流程</strong></p>
+
+<ol>
+  <li>绝大多数情况下对象初始化被分配在<code>Eden</code>中(一个非常大的对象会被分配在老年代中)。</li>
+  <li>如果<code>Eden</code>空间占满了， 会触发 minor GC。 Minor GC 后仍然存活的对象会被复制到<code>S0</code>中去。这样<code>Eden</code>就被清空可以分配给新的对象。</li>
+  <li>又触发了一次 Minor GC ， <code>S0</code>和<code>Eden</code>中存活的对象被复制到<code>S1</code>中， 并且<code>S0</code>和<code>Eden</code>被清空。 在同一时刻, 只有<code>Eden</code>和一个<code>Survivor Space</code>同时被操作。</li>
+  <li>当每次对象从<code>Eden</code>复制到<code>Survivor Space</code>或者从<code>Survivor Space</code>中的一个复制到另外一个，有一个计数器会自动增加值。 默认情况下如果复制发生超过16次， JVM 会停止复制并把他们移到老年代中去。</li>
+  <li>如果一个对象不能在<code>Eden</code>中被创建，它会直接被创建在老年代中。 如果老年代的空间被占满会触发老年代的 GC，也被称为 Full GC。full GC 是一个压缩处理过程，所以它比<code>Minor GC</code>要慢很多。</li>
+</ol>
+
+<p><strong>四.GC算法</strong></p>
+
+<ol>
+  <li>Serial Collector</li>
+</ol>
+
+<p>大部分平台或者强制<code>java -client</code>默认会使用这种。
+Young Generation  = Serial
+Old Generation  = Serial (Mark-Sweep-Compact)
+这种方法的缺点很明显，Stop-the-world, 速度慢。服务器应用不推荐使用。</p>
+
+<ol>
+  <li>Parallel Collector</li>
+</ol>
+
+<p>在Linux x64上默认是这种算法，其他平台要加<code>java -server</code>参数。
+Young Generation = parallel，多个thread同时copy
+Old Generation = Mark-Sweep-Compact = 1
+优点：新生代回收更快。因为系统大部分时间做的GC都是新生代的，这样提高了Throughput(CPU用于非GC时间)。
+缺点：当运行在8G/16G Server 上 Old Generation 存活对象太多的时候暂停时间(Pause Time)过长。</p>
+
+<ol>
+  <li>Parallel Compacting Collector (ParallelOld)</li>
+</ol>
+
+<p>Young Generation = parallel 
+Old Generation = parallel
+优点：Old Generation 上性能较 Parallel Collector 方式有提高。
+缺点：大部分Server系统Old Generation内存占用会达到60%-80%, Compact方面开销比起Parallel Collector并没明显减少。</p>
+
+<ol>
+  <li>Concurent Mark-Sweep(CMS) Collector (low-latency collector)</li>
+</ol>
+
+<p>Young Generation = parallel 
+Old Generation = CMS
+同时不做 compact 操作。
+优点：Pause Time会降低, Pause Time敏感但CPU有空闲的场景需要建议使用策略4。
+缺点：CPU占用过多，CPU密集型服务器不适合。需要更大的堆空间，会造成很多碎片。</p>
+
+<p><strong>五.JVM的默认设置</strong></p>
+
+<p>1.堆（heap）即（New Generation 和Old Generaion 之和）的设置</p>
+
+<ul>
+  <li>
+    <p>初始分配的内存由<code>-Xms</code>指定，默认是物理内存的1/64但小于1G。</p>
+  </li>
+  <li>
+    <p>最大分配的内存由<code>-Xmx</code>指定，默认是物理内存的1/4但小于1G。</p>
+  </li>
+  <li>
+    <p>默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制，可以由<code>-XX:MinHeapFreeRatio</code>指定。</p>
+  </li>
+  <li>
+    <p>默认空余堆内存大于70%时，JVM会减少堆直到-Xms的最小限制，可以由<code>-XX:MaxHeapFreeRatio</code>指定。</p>
+  </li>
+  <li>
+    <p>服务器一般设置<code>-Xms</code>、<code>-Xmx</code>相等以避免在每次GC后调整堆的大小，所以上面的两个参数没啥用。 </p>
+  </li>
+  <li>
+    <p><code>-Xmn</code>设置Young Generation的heap大小</p>
+  </li>
+  <li>
+    <p><code>-XX:MinHeapFreeRatio</code>与<code>-XX:MaxHeapFreeRatio</code>设定空闲内存占总内存的比例范围，这两个参数会影响GC的频率和单次GC的耗时。<code>-XX:NewRatio</code>决定Young与Old Generation的比例。Young generation空间越大，Minor GC频率越低，但是Old Generation空间小了，又可能导致Major GC频率增加。<code>-XX:NewSize</code>和<code>-XX:MaxNewSize</code>直接指定了Young Generation的缺省大小和最大大小。</p>
+  </li>
+</ul>
+
+<p>2.非堆内存的设置</p>
+
+<p>默认分配为64M</p>
+
+<p><code>-XX:PermSize</code>设置最小分配空间，<code>-XX:MaxPermSize</code>设置最大分配空间。一般把这两个数值设为相同，以减少申请内存空间的时间。</p>
+
+<p><strong>六.GC调优</strong></p>
+
+<p>参考：<a href="http://java.sun.com/docs/hotspot/gc1.4.2/example.html" title="GC调优例子">GC调优例子</a></p>
+
+<ol>
+  <li>设置Xms=Xmx=3/4物理内存，-Xmn为1/4的-Xmx值</li>
+  <li>如果是CPU密集型服务器，使用–XX:+UseParallelOldGC, 否则–XX:+UseConcMarkSweepGC</li>
+  <li>新生代,Parallel/ParallelOld可设大于Xmx1/4，CMS可设小，小于Xmx1/4</li>
+  <li>经验之谈：通常情况下，JVM堆的大小应为物理内存的80%</li>
+</ol>
+
+<p><strong>七.Dump heap</strong></p>
+
+<p>1.Linux下：<code>jmap -dump:file=xxx.hprof pid</code>，其中<code>pid</code>通过<code>ps -aux</code>命令查看</p>
+
+<p>2.命令行:<code>jstat -gcutil pid p1 p2</code>，其中<code>p1</code>表示每多少毫秒打印一次；<code>p2</code>表示一共打印几次。</p>
+
+<p>输出的参数含义：</p>
+
+<ul>
+  <li>S0：Heap上的 Survivor space 0 段已使用空间的百分比</li>
+  <li>S1：Heap上的 Survivor space 1 段已使用空间的百分比</li>
+  <li>E： Heap上的 Eden space 段已使用空间的百分比</li>
+  <li>O： Heap上的 Old space 段已使用空间的百分比</li>
+  <li>P： Perm space 已使用空间的百分比</li>
+  <li>YGC：从程序启动到采样时发生Young GC的次数</li>
+  <li>YGCT：Young GC所用的时间(单位秒)</li>
+  <li>FGC：从程序启动到采样时发生Full GC的次数</li>
+  <li>FGCT：Full GC所用的时间(单位秒)</li>
+  <li>GCT：用于垃圾回收的总时间(单位秒)</li>
+</ul>
+
+<p>jstat 命令其他参数含义：</p>
+
+<ul>
+  <li>jstat -class pid:显示加载class的数量，及所占空间等信息。 </li>
+  <li>jstat -compiler pid:显示VM实时编译的数量等信息。 </li>
+  <li>jstat -gc pid:可以显示gc的信息，查看gc的次数，及时间。其中最后五项，分别是young gc的次数，young gc的时间，full gc的次数，full  gc的时间，gc的总时间。 </li>
+  <li>jstat -gccapacity:可以显示，VM内存中三代（young,old,perm）对象的使用和占用大小，如：PGCMN显示的是最小perm的内存使用量，PGCMX显示的是perm的内存最大使用量，PGC是当前新生成的perm内存占用量，PC是但前perm内存占用量。其他的可以根据这个类推， OC是old内纯的占用量。 </li>
+  <li>jstat -gcnew pid:new对象的信息。 </li>
+  <li>jstat -gcnewcapacity pid:new对象的信息及其占用量。 </li>
+  <li>jstat -gcold pid:old对象的信息。 </li>
+  <li>jstat -gcoldcapacity pid:old对象的信息及其占用量。 </li>
+  <li>jstat -gcpermcapacity pid: perm对象的信息及其占用量。 </li>
+  <li>jstat -util pid:统计gc信息统计。 </li>
+  <li>jstat -printcompilation pid:当前VM执行的信息。 </li>
+</ul>
+
+<p>3.GC Log  </p>
+
+<p>-Xloggc:d:\gc.log
+-XX:+PrintGC
+-XX:+PrintGCDetails
+-XX:+PrintGCTimeStamps – add time stamp </p>
+
+<p><strong>八.Out of Memory - java.lang.OutOfMemoryError</strong></p>
+
+<p>1.Java heap space</p>
+
+<ul>
+  <li>Configuration issue: -Xmx</li>
+  <li>Memory Leak: The excessive use of finalizers</li>
+  <li>PermGen space: Too many classes<code>-XX:MaxPermSize</code></li>
+  <li>Requested array size exceeds VM limit: Need a so big array?</li>
+  <li>Request <size> bytes for <reason>: Out of swap space?</reason></size></li>
+  <li>Native Memory Leak</li>
+  <li>
+    <reason> <stack trace=""> (Native method)
+</stack></reason>
+  </li>
+  <li>Native Memory Allocation Issue </li>
+</ul>
+
+<p>2.Perm Memory Leak</p>
+
+<p>(1)Too Many Interned String</p>
+
+<ul>
+  <li>String.intern()</li>
+  <li>Constant String will be interned implicitly</li>
+  <li>No Enough Info provided by Heap Dump on Interned String</li>
+  <li>If Perm Memory increased dynamically, be careful</li>
+</ul>
+
+<p>(2)Too Many Classes or Class Load Leak</p>
+
+<ul>
+  <li>Enlarge the perm generation</li>
+  <li>Avoid duplicated class loader</li>
+</ul>
+
+<p>3.Out of Swap Space</p>
+
+<ul>
+  <li>Enlarge the swap space</li>
+  <li>Systems with 4GB of ram or less require a minimum of 2GB of swap space</li>
+  <li>Systems with 4GB to 16GB of ram require a minimum of 4GB of swap space</li>
+  <li>For Unix Family OS, use pmdump or pmap, libumem for Solaris</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-03T18:52:00+08:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>java</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/04/03/jvm-memory-management-and-gc/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/04/03/jvm-memory-management-and-gc/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

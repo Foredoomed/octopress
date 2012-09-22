@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: notes | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/notes/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[读《浪潮之巅》有感]]></title>
+    <link href="http://liuxuan.info/blog/2011/11/10/lang-chao-zhi-dian-note/"/>
+    <updated>2011-11-10T22:43:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/11/10/lang-chao-zhi-dian-note</id>
+    <content type="html"><![CDATA[<p>最近终于把《浪潮之巅》看完了，当最后一页合上之后我感慨万千，就像穿过了时空隧道一样经历了那些在IT界非常有名的大公司从创立到达到顶峰，潮起和潮落，成长和落败。这是一本IT界的历史书，它几乎囊括了整个IT界的发展史，但是要把它写的简单易读是非常不容易的，但是这位作者做到了，即使不是计算机专业的人也能很容易的读懂。</p>
+
+<p>读完整本书后，最令我感到唏嘘的就是Sun公司。当初Sun公司的James Gosling发明了Java，以其跨平台特性风靡全球，至今还在编程语言榜上排名第一，而我现在还在靠Java吃饭，但是不幸的是Sun公司已经被Oracle收购，不再作为一个独立的公司存在了。太多的实例告诉我们，一个公司光有技术还不行，要在这个竞争激烈的世界生存下去必须要有一个卓越的领导者带领着这个公司不断前进。而Sun公司就缺这么一个领导者，这不得不说是种遗憾。</p>
+
+<p>Google是我一直非常喜欢的公司，而作者用了很长的篇幅介绍了Google这家公司，正好让我更全面地了解了这家公司。但是现在的Google给人有点微软的感觉，而Facebook给人的感觉就是以前的Google。作者也说了，明年Facebook就会上市，这件事也许也会是2012年IT界最令人激动振奋的一件事，那就让我一起等待2012年4月28日这天的到来吧。</p>
+
+<p>唯一感到有点遗憾的是作者只用了很少的篇幅来讲述twitter这家公司，而twitter又是我非常喜欢的应用，虽然在中国因为众所周知的原因无法使用twitter，但这并不会阻止我对它的向往。twitter已经是我获取信息的重要来源，甚至已经超过了电视和门户网站，我现在还把上twitter衡量为一种价值观取向。</p>
+
+<p>世界在不断的发展，还会有更多的公司脱颖而出，谁会是下一个Google和Facebook呢，让我们拭目以待吧。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[《Pragmatic Programmers - Practices of an Agile Developer》读书笔记]]></title>
+    <link href="http://liuxuan.info/blog/2011/05/08/pragmatic-programmers-practices-of-an-agile-developer-note/"/>
+    <updated>2011-05-08T21:26:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/05/08/pragmatic-programmers-practices-of-an-agile-developer-note</id>
+    <content type="html"><![CDATA[<p><strong>一.Beginning Agility</strong></p>
+
+<p>1.Work for Outcome</p>
+
+<p>2.Quick Fixes Become Quicksand</p>
+
+<p>3.Criticize Ideas,Not People</p>
+
+<p>4.Damnthe Torpedoes,Go Ahead</p>
+
+<p><strong>二.Feeding Agility</strong></p>
+
+<p>5.Keep Up with Change</p>
+
+<p>6.Invest in Your Team</p>
+
+<p>7.Know When to Un learn</p>
+
+<p>8.Question Until You Understand</p>
+
+<p><strong>9.Feel the Rhythm</strong><br />
+(我觉得软件开发的节奏是很重要的。但是敏捷有迭代周期，不使用敏捷这个节奏就比较难控制了，要么需求变化不大并且前期设计考虑周全。我碰到过一个项目，前期需求分析和设计都做的相当差，到了编码阶段都是在不断的修正前期的错误，时间就这样过去了，前期制定的计划都没有按时完成，项目来不及就往后拖。每次自己感觉编码差不多了可以进行集成测试了，拿到客户那里演示后发觉距离他们的真正的需求还有十万八千里，我们就这样迭代下去。。。交付日期也遥遥无期。。。这个时候是真正陷入了焦油地啊） <!--more--></p>
+
+<p><strong>三.Delivering What Users Want</strong></p>
+
+<p><strong>10.Let Customers Make Decisions</strong><br />
+(对于这点我也是深有体会。“拍脑袋”或许就是那些所谓PM的特征吧。。。当我们做的和真正的需求渐行渐远的时候，最终是妥协还是部分妥协，还是以技术难题为理由一意孤行？我的实际经验是部分妥协。。。最终是不是全部妥协就不得而知了）</p>
+
+<p><strong>11.Let Design Guide,Not Dictate</strong><br />
+（我觉得文档是必须的，因为“拍脑袋”的PM记性也不怎么样，如果有一天他问我：“你为什么这么做？“的时候直接把文档甩给他，让他涨涨记性）</p>
+
+<p><strong>12.Justify Technology Use</strong><br />
+（当遇到用项目套技术的PM的时候，那个无奈啊。。。）</p>
+
+<p>13.Keep It Releasable</p>
+
+<p><strong>14.Integrate Early,Integrate Often</strong><br />
+（这个集成并不是整个系统的测试，应该把集成的粒度变细。。。）</p>
+
+<p><strong>15.Automate Deployment Early</strong><br />
+（能用自动化的就用自动化）</p>
+
+<p>16.Get Frequent Feedback Using Demos</p>
+
+<p>17.Use Short Iterations,Release in Increments</p>
+
+<p>18.Fixed Prices Are Broken Promises</p>
+
+<p><strong>四.Agile Feed back</strong></p>
+
+<p>19.Put Angels on Your Shoulders</p>
+
+<p>20.Use It Before You Build It</p>
+
+<p>21.Different Makes a Difference</p>
+
+<p>22.Automate Acceptance Testing</p>
+
+<p>23.Measure Real Progress</p>
+
+<p>24.Listen to Users</p>
+
+<p><strong>五.Agile Coding</strong></p>
+
+<p>25.Program Intently and Expressively</p>
+
+<p>26.Communicate in Code</p>
+
+<p>27.Actively Evaluate Trade-Offs</p>
+
+<p>28.Code in Increments</p>
+
+<p>29.Keep It Simple</p>
+
+<p>30.Write Cohesive Code</p>
+
+<p>31.Tell,Don’t Ask</p>
+
+<p>32.Substitute by Contract</p>
+
+<p><strong>六.Agile Debugging</strong></p>
+
+<p>33.Keep a Solutions Log</p>
+
+<p><strong>34.Warnings Are Really Errors</strong><br />
+（你能容忍你的项目有上千个warnings吗？至少有些PM能。。。）</p>
+
+<p>35.Attack Problems in Isolation</p>
+
+<p>36.Report All Exceptions</p>
+
+<p>37.Provide Useful Error Messages</p>
+
+<p><strong>七.Agile Collaboration</strong></p>
+
+<p>38.Schedule Regular Face Time</p>
+
+<p>39.Architects Must Write Code</p>
+
+<p>40.Practice Collective Ownership</p>
+
+<p>41.Be a Mentor</p>
+
+<p>42.Allow People to Figure It Out</p>
+
+<p>43.Share Code Only When Ready</p>
+
+<p><strong>44.Review Code</strong><br />
+（现在越发觉得这个的重要性）</p>
+
+<p>45.Keep Others Informed</p>
+
+<p>读后感：当老外在深入研究软件开发方法论的时候，我们还在为按时交付软件而苦恼。正确的方 法可以使增加达到正确的结果的可能，但是很多时候我们不重视方法而只重视结果，只要项目完成就可以了，遗憾的是软件开发完成但是他的生命周期并没有结束，为此付出的代价会更加沉重。。。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[《HTTP: The Definitive Guide》读书笔记]]></title>
+    <link href="http://liuxuan.info/blog/2011/05/04/http-definitive-guide-note/"/>
+    <updated>2011-05-04T19:20:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/05/04/http-definitive-guide-note</id>
+    <content type="html"><![CDATA[<p>1.MIME(Multipurpose Internet Mail Extensions):是一个数据格式标签，用来解决不同的电子邮件系统中传输消息时遇到的问题。 </p>
+
+<p>MIME是一个文本类型的标签，用一个主要对象类型和一个特指的子类型，中间加上斜杠表示<br />
+例如：</p>
+
+<ul>
+  <li>An HTML-formatted text document would be labeled with type text/html.  </li>
+  <li>A plain ASCII text document would be labeled with type text/plain.  </li>
+  <li>A JPEG version of an image would be image/jpeg.  </li>
+</ul>
+
+<p>2.URI（Uniform resource identifier）：每个服务器资源都有个名字，这个名字就叫做URI。它是唯一制定的。</p>
+
+<p>3.URL（Uniform resource locator）：是URI的最常用的表示形式。URL表示的是一个资源在特定服务器上的指定位置。它是URI的一个子集。 <!--more--></p>
+
+<p>URI与URL的区别：</p>
+
+<p>URI例子:<br />
+  ftp://ftp.is.co.za/rfc/rfc1808.txt<br />
+  http://www.ietf.org/rfc/rfc2396.txt<br />
+  ldap://[2001:db8::7]/c=GB?objectClass?one<br />
+  mailto:John.Doe@example.com<br />
+  news:comp.infosystems.www.servers.unix<br />
+  tel:+1-816-555-1212<br />
+  telnet://192.0.2.16:80/<br />
+  urn:oasis:names:specification:docbook:dtd:xml:4.1.2  </p>
+
+<p>URL：指定协议，网络地址和服务器上的资源名。协议多为http。</p>
+
+<p>URN（Uniform Resource Name）：特定内容唯一的名字，与资源目前的位置无关。也是URI的一个子集。</p>
+
+<p>4.http支持几个不同的请求命令，称为http方法。每个http请求消息都有一个方法。这个方法告诉服务器去执行什么动作。</p>
+
+<p>GET：Send named resource from the server to the client.</p>
+
+<p>PUT：Store data from client into a named server resource.</p>
+
+<p>DELETE：Delete the named resource from a server.</p>
+
+<p>POST：Send client data into a server gateway application.</p>
+
+<p>HEAD：Send just the HTTP headers from the response for the named resource.</p>
+
+<p>5.状态码</p>
+
+<p>200：OK. Document returned correctly.</p>
+
+<p>302：Redirect. Go someplace else to get the resource.</p>
+
+<p>404：Not Found. Can’t find this resource.</p>
+
+<p>HTTP会和数字状态码一起发送一段解释性的文本，例如：200 OK</p>
+
+<p>6.http消息有三部分组成：</p>
+
+<ol>
+  <li>start line：消息的第一行，表示请求要去做什么或者应答要发生什么。</li>
+  <li>header fields：0个或多个头部信息在start line之后，每个头部信息有一个名字和对应的值组成，用“：”隔开,头部消息用一行空行结束。</li>
+  <li>在一行空行之后是一个可选的正文消息，不同于上面2种是有组织的并且是文本类型的，这个消息可以是任何类型的数据。</li>
+</ol>
+
+<p>7.TCP/IP</p>
+
+<p>TCP提供：（1）无错的数据传输  （2）有组织的分发  （3）不分段的数据流</p>
+
+<p>8.OSI七层从下到上：物理层，数据链路层，网络层，传输层，会话层，表示层，应用层</p>
+
+<p>9.浏览器访问http页面的步骤：</p>
+
+<ol>
+  <li>The browser extracts the server’s hostname from the URL.</li>
+  <li>The browser converts the server’s hostname into the server’s IP address.</li>
+  <li>The browser extracts the port number (if any) from the URL.</li>
+  <li>The browser establishes a TCP connection with the web server.</li>
+  <li>The browser sends an HTTP request message to the server.</li>
+  <li>The server sends an HTTP response back to the browser.</li>
+  <li>The connection is closed, and the browser displays the document.</li>
+</ol>
+
+<p>10.Status code classes </p>
+
+<p>Overall range  Defined range  Category</p>
+
+<p>100-199        100-101        Informational</p>
+
+<p>200-299        200-206        Successful</p>
+
+<p>300-399        300-305        Redirection</p>
+
+<p>400-499        400-415        Client error</p>
+
+<p>500-599        500-505        Server error</p>
+
+<p>11.Header example                    Description</p>
+
+<p>Date: Tue, 3 Oct 1997 02:16:03 GMT  The date the server generated the response</p>
+
+<p>Content-length: 15040               The entity body contains 15,040 bytes of data</p>
+
+<p>Content-type: image/gif             The entity body is a GIF image</p>
+
+<p>Accept: image/gif, image/jpeg, text/html   The client accepts GIF and JPEG images and HTML</p>
+
+<p>Cache-Control: max-age: The max-age value defines the maximum age of the document—the maximum legal elapsed time(in seconds) from when a document is first generated to when it can no longer be                          considered fresh enough to serve.(Cache-Control: max-age=484200)</p>
+
+<p>Expires: Specifies an absolute expiration date. If the expiration date is in the past, the document is no longer fresh.(Expires: Fri, 05 Jul 2002, 05:00:00 GMT)</p>
+
+<p>If-Modified-Since: </p>
+
+<p>Perform the requested method if the document has been modified since the specified date. This is used in conjunction with the Last-Modified server response header, to fetch content only if the content has been modified from the cached version.</p>
+
+<p>If-None-Match: </p>
+
+<p>Instead of matching on last-modified date, the server may provide special tags (see ETag) on the document that act like serial numbers. The If-None-Match header performs the requested method if the cached tags differ from the tags in the server’s document.</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Objective-C学习笔记]]></title>
+    <link href="http://liuxuan.info/blog/2011/02/24/objective-c-note/"/>
+    <updated>2011-02-24T14:26:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/02/24/objective-c-note</id>
+    <content type="html"><![CDATA[<p><strong>一.基本数据类型</strong></p>
+
+<p><a href="http://www.flickr.com/photos/60110479@N08/5488573123/" title="Flickr 上 Foredoomed 的 objectivecprimitivetype"><img src="http://farm6.static.flickr.com/5214/5488573123_a7dfd0551c_z.jpg" width="640" height="563" alt="objectivecprimitivetype" /></a>
+<a href="http://www.flickr.com/photos/60110479@N08/5488563233/" title="Flickr 上 Foredoomed 的 basicdatatypes"><img src="http://farm6.static.flickr.com/5176/5488563233_153dd27348_z.jpg" width="640" height="513" alt="basicdatatypes" /></a></p>
+
+<!--more-->
+
+<p>id : 可以保存任何类型的对象，也就是对象的泛型类型。(id类型非常重要，因为他是Objective-C中的重要特性多态和动态绑定的基础)</p>
+
+<p><strong>二.类,对象和函数</strong></p>
+
+<p>(1)函数调用方式</p>
+
+<p><code>[ ClassOrInstance method ]</code>   也可以理解为：  <code>[ receiver message ]</code></p>
+
+<p>(2)类的声明与实现</p>
+
+<p><code>@interface</code>是类的声明关键字，一般的格式为：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Example  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="k">@interface</span> <span class="nc">NewClassName</span>: <span class="nc">ParentClassName</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">memberDeclarations</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="n">br</span> <span class="o">/&gt;</span>
+</span><span class='line'><span class="n">methodDeclarations</span><span class="p">;</span>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><code>@implementation</code>是类的实现关键字，一般的格式为：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Example  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="k">@implementation</span> <span class="nc">NewClassName</span>
+</span><span class='line'>    <span class="n">methodDefinitions</span><span class="p">;</span>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>(3)自动生成类属性的<code>setter</code>和<code>getter</code>函数的方法</p>
+
+<p>先在类的声明里用<code>@property</code>关键字定义类的属性，然后在类实现文件中用<code>@synthesize</code>关键字。</p>
+
+<p>(4)<code>self</code>：本类的实例</p>
+
+<p>(5)<code>@class</code>：此关键字可以让编译器知道要引用的类的类型，但如果用到类中的属性或函数，那就要用<code>#import “XXX.h</code>来代替。</p>
+
+<p>(6)如果某个对象调用继承自<code>NSObject</code>中的<code>release</code>函数，那么这个对象只会在没有任何引用的情况下才会释放内存，<code>release</code>函数通过调用实际释放内存的 <code>dealloc</code>函数来实现释放内存的操作(不要重写<code>release</code>函数，而是重写<code>dealloc</code>函数)。</p>
+
+<p>(6)异常捕获
+<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Example  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="k">@try</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">statement</span>
+</span><span class='line'>  <span class="n">statement</span>
+</span><span class='line'>  <span class="err">…</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">@catch</span> <span class="p">(</span><span class="n">NSException</span> <span class="o">*</span><span class="n">exception</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">statement</span>
+</span><span class='line'>  <span class="n">statement</span>
+</span><span class='line'>  <span class="err">…</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>(7)<code>volatile</code>：防止编译器优化看似多余的变量赋值</p>
+
+<p>(8)<code>@protocol</code>：类似于Java中的接口，跟在<code>@interface</code>后尖括号（&lt; …&gt;）中。声明在<code>@protocol</code>中的函数必须实现，而声明在<code>@optional</code>中的函数可以不实现。</p>
+
+<p>(9)属性特性</p>
+
+<p><a href="http://www.flickr.com/photos/60110479@N08/5488588537/" title="Flickr 上 Foredoomed 的 propertyattributes"><img src="http://farm6.static.flickr.com/5180/5488588537_1f41be3c8e_z.jpg" width="564" height="504" alt="propertyattributes" /></a></p>
+]]></content>
+  </entry>
+  
+</feed>

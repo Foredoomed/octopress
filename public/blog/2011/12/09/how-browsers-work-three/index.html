@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>浏览器是如何工作的(三) - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="3.1 解析 从渲染引擎解析开始是非常重要的阶段，我们会对它作更深入的研究。首先还是简略的介绍一下什么是解析。 解析一个文档(document)的含义是：把这个文档转换成一些有意义的结构或可以被理解和使用的代码。解析的结果通常是一棵，它的节点代表文档的结构。这棵树被称为解析树或语法树。 实例 - &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/12/09/how-browsers-work-three/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">浏览器是如何工作的(三)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-09T23:54:00+08:00" pubdate data-updated="true">Dec 9<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>3.1 解析</p>
+
+<p>从渲染引擎解析开始是非常重要的阶段，我们会对它作更深入的研究。首先还是简略的介绍一下什么是解析。</p>
+
+<p>解析一个文档(document)的含义是：把这个文档转换成一些有意义的结构或可以被理解和使用的代码。解析的结果通常是一棵，它的节点代表文档的结构。这棵树被称为解析树或语法树。</p>
+
+<p>实例 - <code>2 + 3 - 1</code>这个表达式的解析结果会返回下面的树：</p>
+
+<p><img src="http://farm8.staticflickr.com/7158/6481798259_420d333218.jpg&quot; width=&quot;400&quot; height=&quot;155&quot;" alt="paring tree" /></p>
+
+<!-- more -->
+
+<p>3.1.1 语法</p>
+
+<p>解析是建立在文档遵守的语法规(语言和格式)则上的。每个可以被解析的格式必须有词汇和语法规则。这被称为与内容无关的语法。人类语言不是这种语言，因此不能被约定的解析技术而解析。</p>
+
+<p>3.1.2 解析器</p>
+
+<p>整个解析过程可以被分成两个子过程 - 词法分析和语法分析</p>
+
+<p>词法分析是把输入分解成标记(token)的过程。标记是语言的词汇，在人类语言中，它是由字典里的所有单词组成的。</p>
+
+<p>语法分析就是应用语言的语法规则。</p>
+
+<p>分析器一般由它的两个组件承担不同的工作。一个是lexer(有时也会被称为tokenizer)，它主要是把输入分解成合法的标记。另一个是parser，它主要是根据语言的语法规则，分析文档构建解析树。lexer知道怎么消除不相关的字符，像空格符和还行符。</p>
+
+<p><img src="http://farm8.staticflickr.com/7011/6481889667_2fe7dd07cb.jpg&quot; width=&quot;101&quot; height=&quot;300&quot;" alt="paring tree" /></p>
+
+<p>解析的过程是迭代式的。parser一般会向lexer请求一个新的标记，然后尝试用语法规则来匹配这个标记。如果匹配一个规则，跟这个标记对应的节点会被加入到解析树，然后请求另一个标记。</p>
+
+<p>如果没有规则匹配，parser会把标记保存在内部，直到所有与保存在内部的标记相匹配的规则被找到之前，它会一直请求新的标记。如果没有找到相应的规则，parser会抛出一个异常。这意味着这个文档是不合法的，并且有语法错误。</p>
+
+<p>3.1.3 翻译</p>
+
+<p>大多数情况下，解析树不是最终的成品。解析在翻译中经常被用到，把输入文档转换成另一种格式。一个例子就是编译。编译器是把源代码编译成为机器代码，首先解析为解析树，然后把解析树翻译成为机器代码稳定。</p>
+
+<p><img src="http://farm8.staticflickr.com/7026/6481955767_7abc1f157b.jpg&quot; width=&quot;104&quot; height=&quot;400&quot;" alt="compilation flow" /></p>
+
+<p>3.1.4 解析实例</p>
+
+<p>让我们试着定义一个简单的数学语言，然后分析表达式<code>2 + 3 - 1</code>解析结果。</p>
+
+<p>词汇：可以有整数，加号和减号。</p>
+
+<p>语法：</p>
+
+<ol>
+  <li>代码块是表达式，数据项和操作符。</li>
+  <li>可以包括任何数字的表达式。</li>
+  <li>一个表达式是被定义为两个数据项之间有一个操作符。</li>
+  <li>操作符是加号或减号的其中之一。</li>
+  <li>数据项是一个整数或表达式。</li>
+</ol>
+
+<p>现在来分析输入：<code>2 + 3 - 1</code></p>
+
+<p>第一次匹配规则的是<strong>2</strong>，然后根据规则#5，它是一个数据项。第二次匹配的是<code>2 + 3</code>，根据规则#3。下一次匹配就是整个表达式。<code>2 + 3 - 1</code>之所以是一个表达式是因为我们已经知道，<code>2 + 3</code>是一个数据项，而且它后面跟着操作符，操作符后面跟着数据项。<code>2 + +</code>不会匹配任何规则，因此这是个非法的输入。</p>
+
+<p>3.1.5 词汇和语法的正式定义</p>
+
+<p>词汇一般用正则表达式来表示。比如，我们上面的例子可以被定义成：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">INTEGER :0|[1-9][0-9]*
+</span><span class="line">PLUS : +
+</span><span class="line">MINUS: -</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>语法一般会被定义成一种叫做<strong>BNF</strong>的格式，我们的语言会被定义成：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">expression :=  term  operation  term
+</span><span class="line">operation :=  PLUS | MINUS
+</span><span class="line">term := INTEGER | expression</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>我们知道一个语言如果是内容无关的语言，那么这个语言是可以被一般解析器解析的。内容无关语法的粗略定义是它可以用BNF表示。正式的定义可以参考<a href="http://en.wikipedia.org/wiki/Context-free_grammar" title="Wikipedia's article on Context-free grammar">Wikipedia’s article on Context-free grammar</a>。</p>
+
+<p>3.1.6 解释器的种类</p>
+
+<p>解释器有两种：<strong>自上而下</strong>和<strong>自下而上</strong>的解析器。一个简单的解释是：自上而下的解析器在更高层次上关注语法，然后尝试匹配他们。自下而上的解析器是从输入开始，渐进的把他们转换进入语法规则，从低级规则到高级规则变化。</p>
+
+<p>让我们来看一下两种类型的解析器是如何解析我们的例子的：</p>
+
+<p>自上而下的解析器从更高层次的规则开始：它会先确定<code>2 + 3</code>是一个表达式，然后再确定<code>2 + 3 + 1</code>是一个表达式(确定表达式的过程涉及其他的规则匹配，但是起点是最高层次的规则)。</p>
+
+<p>而自下而上的表达式会扫描输入，直到有一个规则匹配。然后把匹配的输入换成规则，这个过程会持续到输入的结尾。部分匹配的表达式会被放在解析栈中。</p>
+
+<table id="stack">
+  <tbody><tr><th>Stack</th>                <th>Input</th></tr>
+  <tr><td>&nbsp;</td><td><samp>2 + 3 - 1</samp></td></tr>  
+  <tr><td>term</td><td><samp>+ 3 - 1</samp></td></tr> 
+  <tr><td>term operation</td><td><samp>3 - 1</samp></td></tr>
+  <tr><td>expression</td><td><samp>- 1</samp></td></tr> 
+  <tr><td>expression operation</td><td><samp>1         </samp></td></tr> 
+  <tr><td>expression</td>           <td><samp>&nbsp;</samp></td></tr>                                             
+</tbody></table>
+
+<p>这种类型的自下而上的解析器被称为移位消除解析器(shift-reduce parser)，因为输入被移到了右边(想象有个指针指向输入头，然后往右边移动)，并且根据规则递减。</p>
+
+<p>3.1.7 自动生成解析器</p>
+
+<p>有很多工具可以为你生成解析器。他们被称为解析器生成器。你把语言的语法输入其中，他们就会自动生成解析器。创建一个解析器需要对解析有很深的理解，并且手工创建一个优化过的解析器是比较困难的。</p>
+
+<p>Webkit使用的是两个有名的解析器生成器：<a href="http://en.wikipedia.org/wiki/Flex_lexical_analyser" title="Flex">Flex</a>用来生成词法分析器，<a href="http://www.gnu.org/software/bison/" title="Bison">Bison</a>用来生成语法分析器。Flex的输入是一个包含正则表达式定义的标记的文件；Bison的输入是BNF格式的语法规则。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-09T23:54:00+08:00" pubdate data-updated="true">Dec 9<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/browsers/'>browsers</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/12/09/how-browsers-work-three/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/12/09/how-browsers-work-three/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

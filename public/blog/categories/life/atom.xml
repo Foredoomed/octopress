@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: life | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/life/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[2011年终总结加2012年计划]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/30/plans-for-2012/"/>
+    <updated>2011-12-30T10:31:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/30/plans-for-2012</id>
+    <content type="html"><![CDATA[<p>时间那是一个飞逝，光阴那是一个荏苒。一转眼，我写博客已经有一年的时间了。期间我的博客也有很大的变化，从最初的独立空间到现在的VPS，从Wordpress变到了Octopress，应该说折腾的不算少，但也乐在其中。</p>
+
+<!-- more -->
+
+<p>现在回头看我在年初写的这篇<a href="http://liuxuan.info/blog/2011/01/01/plans-for-2011/" title="2011年计划">2011年计划</a>，其中的计划基本上都完成了。不过也有点遗憾的是，因为工作比较忙，韩语的学习被耽搁了，希望今年能够加强韩语的学习。还有为了找寻我理想中的工作，今年我换了两份工作，但是情况都不是很理想，跟我理想的还是有不小的差距，希望明年在这方面也有改善。</p>
+
+<p>2011年中国发生了很多事，很多事，但是2012年注定是更加不平静的一年。对于我来说只有静下心来，多读一点书，是自己更加充实，这是当下最好的应对方式了吧。</p>
+
+<p>我给自己制定的2012年计划如下：</p>
+
+<ul>
+  <li>继续多读书，目标50本</li>
+  <li>加强韩语的学习</li>
+  <li>写一个MVC和ORM框架</li>
+</ul>
+
+<p>就这样吧，一切贵在坚持！</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Code Rush]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/06/code-rush/"/>
+    <updated>2011-12-06T22:38:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/06/code-rush</id>
+    <content type="html"><![CDATA[<p>在<a href="http://www.ruanyifeng.com/blog/2009/09/code_rush.html" title="纪录片《Code Rush》">阮一峰的博客</a>看到了这个纪录片，不过年代有些久远了，记录了Netscape公司从1998年到1999年这一年之间的事，在其中还看到了Jamie Zawinski这位牛人，果真是那样特立独行啊。总之强力推荐，看完后也许你会像我一样找到一些共鸣。</p>
+
+<embed src="http://player.youku.com/player.php/sid/XMTc5OTc5Njcy/v.swf" allowfullscreen="true" quality="high" width="480" height="400" align="middle" allowscriptaccess="always" type="application/x-shockwave-flash" />
+<p>&lt;/embed&gt;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[我的Macbook Pro之旅正式开始了]]></title>
+    <link href="http://liuxuan.info/blog/2011/11/17/my-macbook-life-starts/"/>
+    <updated>2011-11-17T23:36:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/11/17/my-macbook-life-starts</id>
+    <content type="html"><![CDATA[<p>最近一直感觉现在用的笔记本有点慢，特别是打开eclipse的话要等上最起码半分钟时间，这对于我来说是不能忍受的。所以我决定鸟枪换炮，把从大学时期开始就陪伴着我到现在的IBM R60给我爸用，我自己就再去买台笔记本电脑。</p>
+
+<p>目标其实早就决定了，在今年年初定的<a href="http://liuxuan.info/blog/2011/01/01/plans-for-2011" title="2011年的计划">2011年的计划</a>里我就希望今年能够买个苹果笔记本，终于快到了年末的时候实现了。这次我买的是13寸版的MBP MD313，这个是刚刚上市不久的型号，较年初的版本有了一点的升级，比如CPU主频提高了，硬盘加多了等，总之是一款非常适合入手的笔记本电脑。</p>
+
+<!-- more -->
+
+<p>由于之前一直在用Linux，所以过度到Mac OS完全没有问题。然后就是要安装各种软件了，这是比较蛋疼的事，Mac上有很多非常优秀的软件都是要收费的，而且有的还是每次升级版本都要付钱。。。好吧，所以我决定相同类型的软件尽量找免费的，免费的也有宝啊！</p>
+
+<p>下面是我目前安装的软件列表：</p>
+
+<p><strong>非编程类</strong>  </p>
+
+<ul>
+  <li>Chrome - 唯一使用的浏览器</li>
+  <li>Sunpinyin - 中文输入法</li>
+  <li>Parallels Desktop - 虚拟机</li>
+  <li>AppCleaner - 软件清理</li>
+  <li>Thunder - 迅雷</li>
+  <li>iChm - chm文件阅读</li>
+  <li>
+    <s>Secret Socks - SSH工具</s>
+  </li>
+  <li>iTerm2 - 控制台工具</li>
+  <li>AppFresh - 软件更新</li>
+  <li>Cyberduck - FTP工具</li>
+  <li>AliWangwang - 旺旺</li>
+  <li>Caffeine - 屏保停止</li>
+  <li>ClipMenu - 剪贴板增强</li>
+  <li>Growl - 系统提示</li>
+  <li>invisibliX - 隐藏文件浏览</li>
+  <li>Mou - markdown文件编辑</li>
+  <li>MPlayerX - 视频播放</li>
+  <li>
+    <s>OnyX - 系统清理</s>
+  </li>
+  <li>QQ - 不解释</li>
+  <li>Paragon NTFS for Mac OS X - 读写NTFS文件</li>
+  <li>TestWrangler - 文件编辑</li>
+  <li>The Unarchiver - 解压缩工具</li>
+  <li>
+    <s>Twitter - 不解释</s>
+  </li>
+  <li>Micosoft Office - 不解释</li>
+</ul>
+
+<p><strong>编程类</strong></p>
+
+<ul>
+  <li>Homebrew - 类似于Linux下的apt和yum</li>
+  <li>eclipse - 不解释</li>
+  <li>MacVim - 神器</li>
+  <li>MySQL - 数据库</li>
+  <li>Sequel Pro - MySQL的GUI客户端</li>
+  <li>
+    <s>GitHub - 不解释</s>
+  </li>
+  <li>
+    <s>GitX - git的GUI客户端</s>
+  </li>
+</ul>
+
+<p>2012.6.19 更新：</p>
+
+<ul>
+  <li>Alfred - 快速启动软件</li>
+  <li>CCleaner - 系统清理</li>
+  <li>Echofon - Twitter客户端</li>
+  <li>Google Drive</li>
+  <li>Reeder - RSS阅读器</li>
+  <li>Skim - PDF阅读器</li>
+  <li>SourceTree - git的GUI客户端</li>
+  <li>Temperature Monitor - 显示温度</li>
+  <li>TotalFinder - Finder增强</li>
+</ul>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[史蒂夫·乔布斯,R.I.P]]></title>
+    <link href="http://liuxuan.info/blog/2011/10/06/rip-steve-jobs/"/>
+    <updated>2011-10-06T18:46:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/10/06/rip-steve-jobs</id>
+    <content type="html"><![CDATA[<p>多年以前，当我听说乔布斯患上癌症时，我简直不敢相信我的耳朵。在大学的时候，我就买了第一代的iPod。当时它那超薄的机身以及旋转式触摸按键让我惊为神器，爱不释手。几年过去，iPhone横空出世，虽然我没有买过iPhone,但还是被乔布斯的创造力所折服。如今，iPad又带来了一股平板电脑的旋风，人们争相购买。可以这么说，乔布斯在不断地改变人们的生活方式，在不断地改变着这个世界。</p>
+
+<p>但是今天是一个灰暗的日子，乔布斯离开了我们，我们无比悲伤。但是逝者已矣，乔布斯留给我们的是他那对创新的孜孜不倦，热爱自己喜欢的工作，“stay hungry, stay foolish”是他一生最好的注解。下面是乔布斯于2005年在斯坦福毕业典礼上的演讲全文，谨以此文与喜欢乔布斯的朋友共勉：stay hungry， stay foolish。 <!--more--></p>
+
+<p>I am honored to be with you today at your commencement from one of the finest universities in the world. I never graduated from college. Truth be told, this is the closest I’ve ever gotten to a college graduation. Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories.</p>
+
+<p>The first story is about connecting the dots.</p>
+
+<p>I dropped out of Reed College after the first 6 months, but then stayed around as a drop-in for another 18 months or so before I really quit. So why did I drop out?</p>
+
+<p>It started before I was born. My biological mother was a young, unwed college graduate student, and she decided to put me up for adoption. She felt very strongly that I should be adopted by college graduates, so everything was all set for me to be adopted at birth by a lawyer and his wife. Except that when I popped out they decided at the last minute that they really wanted a girl. So my parents, who were on a waiting list, got a call in the middle of the night asking: “We have an unexpected baby boy; do you want him?” They said: “Of course.” My biological mother later found out that my mother had never graduated from college and that my father had never graduated from high school. She refused to sign the final adoption papers. She only relented a few months later when my parents promised that I would someday go to college.</p>
+
+<p>And 17 years later I did go to college. But I naively chose a college that was almost as expensive as Stanford, and all of my working-class parents’ savings were being spent on my college tuition. After six months, I couldn’t see the value in it. I had no idea what I wanted to do with my life and no idea how college was going to help me figure it out. And here I was spending all of the money my parents had saved their entire life. So I decided to drop out and trust that it would all work out OK. It was pretty scary at the time, but looking back it was one of the best decisions I ever made. The minute I dropped out I could stop taking the required classes that didn’t interest me, and begin dropping in on the ones that looked interesting.</p>
+
+<p>It wasn’t all romantic. I didn’t have a dorm room, so I slept on the floor in friends’ rooms, I returned coke bottles for the 5¢ deposits to buy food with, and I would walk the 7 miles across town every Sunday night to get one good meal a week at the Hare Krishna temple. I loved it. And much of what I stumbled into by following my curiosity and intuition turned out to be priceless later on. Let me give you one example:</p>
+
+<p>Reed College at that time offered perhaps the best calligraphy instruction in the country. Throughout the campus every poster, every label on every drawer, was beautifully hand calligraphed. Because I had dropped out and didn’t have to take the normal classes, I decided to take a calligraphy class to learn how to do this. I learned about serif and san serif typefaces, about varying the amount of space between different letter combinations, about what makes great typography great. It was beautiful, historical, artistically subtle in a way that science can’t capture, and I found it fascinating.</p>
+
+<p>None of this had even a hope of any practical application in my life. But ten years later, when we were designing the first Macintosh computer, it all came back to me. And we designed it all into the Mac. It was the first computer with beautiful typography. If I had never dropped in on that single course in college, the Mac would have never had multiple typefaces or proportionally spaced fonts. And since Windows just copied the Mac, it’s likely that no personal computer would have them. If I had never dropped out, I would have never dropped in on this calligraphy class, and personal computers might not have the wonderful typography that they do. Of course it was impossible to connect the dots looking forward when I was in college. But it was very, very clear looking backwards ten years later.</p>
+
+<p>Again, you can’t connect the dots looking forward; you can only connect them looking backwards. So you have to trust that the dots will somehow connect in your future. You have to trust in something — your gut, destiny, life, karma, whatever. This approach has never let me down, and it has made all the difference in my life.</p>
+
+<p>My second story is about love and loss.</p>
+
+<p>I was lucky — I found what I loved to do early in life. Woz and I started Apple in my parents garage when I was 20. We worked hard, and in 10 years Apple had grown from just the two of us in a garage into a $2 billion company with over 4000 employees. We had just released our finest creation — the Macintosh — a year earlier, and I had just turned 30. And then I got fired. How can you get fired from a company you started? Well, as Apple grew we hired someone who I thought was very talented to run the company with me, and for the first year or so things went well. But then our visions of the future began to diverge and eventually we had a falling out. When we did, our Board of Directors sided with him. So at 30 I was out. And very publicly out. What had been the focus of my entire adult life was gone, and it was devastating.</p>
+
+<p>I really didn’t know what to do for a few months. I felt that I had let the previous generation of entrepreneurs down - that I had dropped the baton as it was being passed to me. I met with David Packard and Bob Noyce and tried to apologize for screwing up so badly. I was a very public failure, and I even thought about running away from the valley. But something slowly began to dawn on me — I still loved what I did. The turn of events at Apple had not changed that one bit. I had been rejected, but I was still in love. And so I decided to start over.</p>
+
+<p>I didn’t see it then, but it turned out that getting fired from Apple was the best thing that could have ever happened to me. The heaviness of being successful was replaced by the lightness of being a beginner again, less sure about everything. It freed me to enter one of the most creative periods of my life.</p>
+
+<p>During the next five years, I started a company named NeXT, another company named Pixar, and fell in love with an amazing woman who would become my wife. Pixar went on to create the worlds first computer animated feature film, Toy Story, and is now the most successful animation studio in the world. In a remarkable turn of events, Apple bought NeXT, I returned to Apple, and the technology we developed at NeXT is at the heart of Apple’s current renaissance. And Laurene and I have a wonderful family together.</p>
+
+<p>I’m pretty sure none of this would have happened if I hadn’t been fired from Apple. It was awful tasting medicine, but I guess the patient needed it. Sometimes life hits you in the head with a brick. Don’t lose faith. I’m convinced that the only thing that kept me going was that I loved what I did. You’ve got to find what you love. And that is as true for your work as it is for your lovers. Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work. And the only way to do great work is to love what you do. If you haven’t found it yet, keep looking. Don’t settle. As with all matters of the heart, you’ll know when you find it. And, like any great relationship, it just gets better and better as the years roll on. So keep looking until you find it. Don’t settle.</p>
+
+<p>My third story is about death.</p>
+
+<p>When I was 17, I read a quote that went something like: “If you live each day as if it was your last, someday you’ll most certainly be right.” It made an impression on me, and since then, for the past 33 years, I have looked in the mirror every morning and asked myself: “If today were the last day of my life, would I want to do what I am about to do today?” And whenever the answer has been “No” for too many days in a row, I know I need to change something.</p>
+
+<p>Remembering that I’ll be dead soon is the most important tool I’ve ever encountered to help me make the big choices in life. Because almost everything — all external expectations, all pride, all fear of embarrassment or failure - these things just fall away in the face of death, leaving only what is truly important. Remembering that you are going to die is the best way I know to avoid the trap of thinking you have something to lose. You are already naked. There is no reason not to follow your heart.</p>
+
+<p>About a year ago I was diagnosed with cancer. I had a scan at 7:30 in the morning, and it clearly showed a tumor on my pancreas. I didn’t even know what a pancreas was. The doctors told me this was almost certainly a type of cancer that is incurable, and that I should expect to live no longer than three to six months. My doctor advised me to go home and get my affairs in order, which is doctor’s code for prepare to die. It means to try to tell your kids everything you thought you’d have the next 10 years to tell them in just a few months. It means to make sure everything is buttoned up so that it will be as easy as possible for your family. It means to say your goodbyes.</p>
+
+<p>I lived with that diagnosis all day. Later that evening I had a biopsy, where they stuck an endoscope down my throat, through my stomach and into my intestines, put a needle into my pancreas and got a few cells from the tumor. I was sedated, but my wife, who was there, told me that when they viewed the cells under a microscope the doctors started crying because it turned out to be a very rare form of pancreatic cancer that is curable with surgery. I had the surgery and I’m fine now.</p>
+
+<p>This was the closest I’ve been to facing death, and I hope it’s the closest I get for a few more decades. Having lived through it, I can now say this to you with a bit more certainty than when death was a useful but purely intellectual concept:</p>
+
+<p>No one wants to die. Even people who want to go to heaven don’t want to die to get there. And yet death is the destination we all share. No one has ever escaped it. And that is as it should be, because Death is very likely the single best invention of Life. It is Life’s change agent. It clears out the old to make way for the new. Right now the new is you, but someday not too long from now, you will gradually become the old and be cleared away. Sorry to be so dramatic, but it is quite true.</p>
+
+<p>Your time is limited, so don’t waste it living someone else’s life. Don’t be trapped by dogma — which is living with the results of other people’s thinking. Don’t let the noise of others’ opinions drown out your own inner voice. And most important, have the courage to follow your heart and intuition. They somehow already know what you truly want to become. Everything else is secondary.</p>
+
+<p>When I was young, there was an amazing publication called The Whole Earth Catalog, which was one of the bibles of my generation. It was created by a fellow named Stewart Brand not far from here in Menlo Park, and he brought it to life with his poetic touch. This was in the late 1960’s, before personal computers and desktop publishing, so it was all made with typewriters, scissors, and polaroid cameras. It was sort of like Google in paperback form, 35 years before Google came along: it was idealistic, and overflowing with neat tools and great notions.</p>
+
+<p>Stewart and his team put out several issues of The Whole Earth Catalog, and then when it had run its course, they put out a final issue. It was the mid-1970s, and I was your age. On the back cover of their final issue was a photograph of an early morning country road, the kind you might find yourself hitchhiking on if you were so adventurous. Beneath it were the words: “Stay Hungry. Stay Foolish.” It was their farewell message as they signed off. Stay Hungry. Stay Foolish. And I have always wished that for myself. And now, as you graduate to begin anew, I wish that for you.</p>
+
+<p>Stay Hungry. Stay Foolish.</p>
+
+<p>Thank you all very much.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[悲凉和无奈]]></title>
+    <link href="http://liuxuan.info/blog/2011/06/09/nothing-but-sad/"/>
+    <updated>2011-06-09T14:28:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/06/09/nothing-but-sad</id>
+    <content type="html"><![CDATA[<p>今天一下子看完了两本我认为非常好的书，一本是时寒冰老师的《经济大棋局，我们怎么办》，另一本是彼得.海斯勒（中文名：何伟）的《寻路中国》。</p>
+
+<p>读完这两本书，我的心情就是悲凉中参杂着无奈，无奈中渗透着悲凉。时寒冰老师用10年的时间写成的这本书来告诉我们中国人，现在的中国已经走到了什么地步。他用通俗易懂的语言告诉我们老百姓世界经济的走势和规律。时老师还在苦口婆心的给政府提建议，可是效果有多少呢？正如时老师的预言，因果报应将在不久的将来真正到来。</p>
+
+<p>《寻路中国》又是另一个风格，讲述的是作者在中国的生活故事和见闻，作者何伟以他一个美国人的角度审视着中国，特别是2002年以后经济发展迅速的中国。在书中可以看到作者对中国的了解和研究之深足以让很多中国专家汗颜。那是整个中国的缩影，而在作者的眼中是那么的奇怪。</p>
+
+<p>最近还在看另一本书《春秋大义》，再结合上面两本书，我突然发现一切是那么的自然。</p>
+]]></content>
+  </entry>
+  
+</feed>

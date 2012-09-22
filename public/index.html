@@ -1,0 +1,763 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="Skip List(以下简称SL)是由William Pugh在1989年提出的，从字面上解释的话差不多就是“跳跃链表”，它是普通有序链表的一种改进，目的是为了提高搜索，插入和删除的速度。我们知道，普通List的搜索，插入和删除的时间复杂度都是O(n)，而SL则可以提高到O(log n)， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-26T14:05:00+08:00" pubdate data-updated="true">Aug 26<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/26/skip-list-in-a-netshell/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Skip List(以下简称SL)是由<a href="http://en.wikipedia.org/wiki/William_Pugh" title="William Pugh">William Pugh</a>在1989年提出的，从字面上解释的话差不多就是“跳跃链表”，它是普通有序链表的一种改进，目的是为了提高搜索，插入和删除的速度。我们知道，普通List的搜索，插入和删除的时间复杂度都是<code>O(n)</code>，而SL则可以提高到<code>O(log n)</code>，这就使得SL变成了一个非常有用的数据结构，像现在大热的NoSQL之一<a href="http://redis.io/" title="Redis">Redis</a>就是使用了SL。JDK6之后也加入了<a href="http://g.oswego.edu/" title="Doug Lea">Doug Lea</a>的SL实现<a href="http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentSkipListSet.html" title="ConcurrentSkipListSet">ConcurrentSkipListSet</a>和<a href="http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentSkipListMap.html" title="ConcurrentSkipListMap">ConcurrentSkipListMap</a>。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/08/26/skip-list-in-a-netshell/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-18T22:55:00+08:00" pubdate data-updated="true">Aug 18<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/18/head-first-coroutine/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>说到coroutine(中文一般翻译成<strong>协程</strong>)，对于Java程序员来说可能有点陌生，因为Java语言本身并不支持coroutine，但是早在1963年这个想法就被提出来了。到目前为止，已经有很多语言提供了对coroutine的支持，比如Ruby，Python，Go，Erlang等。所以，理解coroutine是很有必要的。Lua是原生支持coroutine的语言之一，下面关于coroutine的例子都将使用Lua。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/08/18/head-first-coroutine/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-17T13:42:00+08:00" pubdate data-updated="true">Jun 17<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/06/17/install-munin-on-vps/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>因为换了vps，所以还要重新安装监控软件。而Linux平台上的系统监控软件还是很多的，比如大名顶顶的<a href="http://www.nagios.org/">Nagios</a>，<a href="http://www.cacti.net/">Cacti</a>和<a href="http://www.zabbix.com/">Zabbix</a>,还有<a href="http://oss.oetiker.ch/mrtg/">MRTG</a>。Nagios是一个比较重量级的软件，而且还必须搭配许多插件才能满足需求，所以在小内存vps上不适用；Cacti是通过<a href="http://en.wikipedia.org/wiki/Simple_Network_Management_Protocol">SNMP</a>协议来监控系统，这意味着还要为它在后台开启SNMP进程，这对于小内存vps也不可取，还有cacti需要数据库的支持，web前端还需要php，所以综上也放弃；Zabbix虽然不错，但它也需要有数据库的支持，所以也放弃；而MRTG只能够监控网络使用情况，不能够监控CPU，磁盘等设备，所以还是放弃。最后我选择的是<a href="http://munin-monitoring.org/">Munin</a>,它的有点是不仅轻量，不需要数据库，可以直接生成静态页面，应该说Munin是小内存vps上的理想选择。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/06/17/install-munin-on-vps/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-16T14:16:00+08:00" pubdate data-updated="true">Jun 16<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/06/16/linux-frequently-used-commands/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>不定期更新一些在Linux下经常会用到的命令，其中一些也是在别的地方看到就加入到这个集合来了。</p>
+
+<p><strong>系统</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">uname -a               <span class="c"># 查看内核/操作系统/CPU信息  </span>
+</span><span class="line">head -n 1 /etc/issue   <span class="c"># 查看操作系统版本  </span>
+</span><span class="line">cat /proc/cpuinfo      <span class="c"># 查看CPU信息  </span>
+</span><span class="line">hostname               <span class="c"># 查看计算机名  </span>
+</span><span class="line">lspci -tv              <span class="c"># 列出所有PCI设备  </span>
+</span><span class="line">lsusb -tv              <span class="c"># 列出所有USB设备  </span>
+</span><span class="line">lsmod                  <span class="c"># 列出加载的内核模块  </span>
+</span><span class="line">env                    <span class="c"># 查看环境变量  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/06/16/linux-frequently-used-commands/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-14T23:04:00+08:00" pubdate data-updated="true">Jun 14<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/06/14/setup-octopress-on-vps/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>这次为一个新买的VPS安装博客环境，特此记录如下。</p>
+
+<p><strong>1.删除和替换已有软件</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">servive sendmail stop
+</span><span class="line">yum remove sendmail
+</span><span class="line">
+</span><span class="line">service httpd stop
+</span><span class="line">yum remove httpd
+</span><span class="line">
+</span><span class="line">service rsyslog stop
+</span><span class="line">yum remove rsyslog
+</span><span class="line">
+</span><span class="line">// 添加EPEL软件库
+</span><span class="line">rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
+</span><span class="line">
+</span><span class="line">// 安装syslog-ng代替rsyslog
+</span><span class="line">yum install syslog-ng
+</span><span class="line">chkconfig syslog-ng on
+</span><span class="line">
+</span><span class="line">// 安装dropbear代替openssh
+</span><span class="line">yum install dropbear
+</span><span class="line">chkconfig dropbear on
+</span><span class="line">// 等dropbear配置好后
+</span><span class="line">service sshd stop
+</span><span class="line">yum remove openssh
+</span><span class="line">
+</span><span class="line">// 安装vsftpd作为ftp服务器
+</span><span class="line">yum install vsftpd
+</span><span class="line">chkconfig vsftpd on
+</span><span class="line">
+</span><span class="line">// 添加用户
+</span><span class="line">groupadd www
+</span><span class="line">useradd -g www username
+</span><span class="line">passwd username
+</span><span class="line">
+</span><span class="line">// 设定ftp登陆目录权限
+</span><span class="line">chown -R usernmae /path/to/ftp/folder
+</span><span class="line">
+</span><span class="line">// 更新软件
+</span><span class="line">yum update
+</span><span class="line">yum upgrade
+</span><span class="line">
+</span><span class="line">// 安装ppp
+</span><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm
+</span><span class="line">
+</span><span class="line">// 安装pptpd
+</span><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/06/14/setup-octopress-on-vps/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/30/plans-for-2012/">2011年终总结加2012年计划</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-30T10:31:00+08:00" pubdate data-updated="true">Dec 30<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/30/plans-for-2012/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>时间那是一个飞逝，光阴那是一个荏苒。一转眼，我写博客已经有一年的时间了。期间我的博客也有很大的变化，从最初的独立空间到现在的VPS，从Wordpress变到了Octopress，应该说折腾的不算少，但也乐在其中。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/30/plans-for-2012/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/25/programming-experience/">编程经验</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-25T15:09:00+08:00" pubdate data-updated="true">Dec 25<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/25/programming-experience/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>今天在整理移动硬盘时发现的一篇收藏的旧文，再次读完后发现写的太好了，基本上涵盖了程序员会碰到的问题，不过可惜的是原文已经找不到了。我觉得把这篇文章作为编程指导更合适，所以记录在这里。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/25/programming-experience/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/17/quicksort-note/">快速排序复习笔记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-17T14:27:00+08:00" pubdate data-updated="true">Dec 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/17/quicksort-note/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近晚上躺在床上没事就拿着手机看了几节MIT的公开课《Introduction to Algorithms》，看着看着就觉得自己关于排序算法的原理基本上都忘光了。顿感非常失落，所以特意又对算法复习了一遍，特别是快速排序，这篇博客就是复习笔记，毕竟发表是最好的记忆嘛。</p>
+
+<p>这门课是由两位老师来上的的，一位是<a href="http://people.csail.mit.edu/cel/" title="Charles E.Leiserson">Charles E.Leiserson</a>教授，光听这个名字可能有点陌生，但是如果提到他参与编写的《算法导论》这本书，对于学计算机的人来说那是无人不知无人不晓的经典著作；另一位是80后的Erik Demaine<a href="http://www.csail.mit.edu/user/666" title="Erik Demaine">Erik Demaine</a>，据说此人在20岁时就当上了MIT的教授，真是牛人啊，而且大多数的课也都是由他来讲的。还有一点我比较在意的是一节课的时间大约是1个小时20分钟左右，这跟中国大学的45分钟一节课很不一样，个人觉得这样的时间安排可以使一节课更加连贯，学习效率也会更好。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/17/quicksort-note/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/14/how-browsers-work-ten/">浏览器是如何工作的(十)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-14T00:26:00+08:00" pubdate data-updated="true">Dec 14<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/14/how-browsers-work-ten/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>6 绘制</strong></p>
+
+<p>在绘制阶段会遍历渲染树和调用renderer的<code>paint</code>方法来把他们的内容显示在屏幕上。绘制使用的是UI基础组件。</p>
+
+<p><strong>6.1 全局和增量</strong></p>
+
+<p>像布局一样，可以全局绘(绘制整个渲染树)，也可以是增量绘制。在增量绘制中，一部分renderer的变化不会影响这棵渲染树。变化过的renderer会使它在屏幕上的矩形区域无效，这就会造成OS把它当作“脏区域”(dirty region)并且生成<code>paint</code>事件。OS会聪明地把多个脏区域合并成一个。在Chrome中则更复杂一点，因为renderer不是在主进程中，而是在其他进程中。Chrome模拟OS行为并且扩展它们，表现层监听这些事件而且把消息代理给渲染树的根元素。遍历渲染树直到遇见相关的renderer，渲染树重新绘制自己(经常连同它的孩子节点)。</p>
+
+<p><strong>6.2 绘制顺序</strong></p>
+
+<p>CSS2的规范中规定了绘制的顺序。这个顺序实际上就是元素在上下文中堆积的顺序。因为是从后往前绘制的，所以这个顺序会影响绘制。renderer的堆积顺序是：</p>
+
+<ol>
+  <li>background color</li>
+  <li>background image</li>
+  <li>border</li>
+  <li>children</li>
+  <li>outline</li>
+</ol>
+
+<p><strong>6.3 Firefox的显示列表</strong></p>
+
+<p>Firefox会再次遍历渲染树，然后构造一个已经绘制的矩形区域的显示列表。其中包含矩形区域相关的renderer，从右往左的绘制顺序(背景，边框等)。这种方式只需要遍历一次渲染树就可以重新绘制(所有背景，再所有图片，再所有边框等)。</p>
+
+<p>Firefox通过不把hidden的元素加入到列表中来优化这个过程。</p>
+
+<p><strong>6.4 Webkit的矩形存储</strong></p>
+
+<p>在重新绘制之前，webkit把旧的矩形保存为一个<code>bitmap</code>，然后只重新绘制新旧矩形的不同之处。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/14/how-browsers-work-ten/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/12/how-browsers-work-nine/">浏览器是如何工作的(九)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-12T22:19:00+08:00" pubdate data-updated="true">Dec 12<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/12/how-browsers-work-nine/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>5 布局</strong></p>
+
+<p>当renderer被创建和加入到树中时，它是没有位置和大小的，计算这两个值称为布局或回流(reflow)。</p>
+
+<p>HTML使用的是基于布局模型的流，这意味着大多数时间内，单一路径下计算几何值是可能的。后进入流的元素不会影响比它先进入流的元素的几何属性值，所以布局文档可以被从左到右，从上到下处理。但是也有例外：比如，HTML的table元素可能需要多条路径。</p>
+
+<p>坐标系统是和根框架相关的，而且使用的是上坐标和左坐标。</p>
+
+<p>布局是一个迭代的过程，它从根renderer(对应于HTML文档的<code>&lt;html&gt;</code>元素)开始。布局迭代部分或整个框架，计算每个renderer的几何信息。</p>
+
+<p>根renderer的位置是<code>0,0</code>，它的范围是viewport(浏览器窗口的可视区域)。所有的renderer都有<code>layout</code>或<code>reflow</code>方法，每个renderer调用需要生成布局的孩子的<code>layout</code>方法。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/12/how-browsers-work-nine/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/2/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

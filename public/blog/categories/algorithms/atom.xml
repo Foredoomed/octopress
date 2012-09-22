@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: algorithms | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/algorithms/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Skip List原理简述]]></title>
+    <link href="http://liuxuan.info/blog/2012/08/26/skip-list-in-a-netshell/"/>
+    <updated>2012-08-26T14:05:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/08/26/skip-list-in-a-netshell</id>
+    <content type="html"><![CDATA[<p>Skip List(以下简称SL)是由<a href="http://en.wikipedia.org/wiki/William_Pugh" title="William Pugh">William Pugh</a>在1989年提出的，从字面上解释的话差不多就是“跳跃链表”，它是普通有序链表的一种改进，目的是为了提高搜索，插入和删除的速度。我们知道，普通List的搜索，插入和删除的时间复杂度都是<code>O(n)</code>，而SL则可以提高到<code>O(log n)</code>，这就使得SL变成了一个非常有用的数据结构，像现在大热的NoSQL之一<a href="http://redis.io/" title="Redis">Redis</a>就是使用了SL。JDK6之后也加入了<a href="http://g.oswego.edu/" title="Doug Lea">Doug Lea</a>的SL实现<a href="http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentSkipListSet.html" title="ConcurrentSkipListSet">ConcurrentSkipListSet</a>和<a href="http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentSkipListMap.html" title="ConcurrentSkipListMap">ConcurrentSkipListMap</a>。</p>
+
+<!-- more -->
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/Skip_list.png"></p>
+
+<p>上面这张图是维基上的SL结构示意图，我们可以清楚地看到与普通链表不同的是，SL是由多层链表组成，而且元素会重复出现在多个层次上，只不过越往上层元素出现的概率越低。通常情况下在<code>i</code>层出现的元素也出现在<code>i+1</code>层的概率<code>p</code>取<code>1/2</code>或<code>1/4</code>，然后根据<a href="http://en.wikipedia.org/wiki/Geometric_distribution" title="Geometric distribution">几何分布</a>的公式逆运算来求出元素出现在第几层。</p>
+
+<p><strong>搜索</strong></p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/search42.gif"></p>
+
+<p>每次搜索都从最上层开始，知道遇到大于要搜索的元素才转入下一层搜索。首先从第3层(层数从0开始)开始搜索42，首先遇到的是9，再后面就到底了，而42&gt;9，所以转入下一层往右搜索；下一层首先遇到的是19，而42&gt;19，所以再转入下一层，如此反复最终找到了我们所需要的元素42。其实在这个搜索过程中已经能够看出这个搜索的过程有点像<a href="http://en.wikipedia.org/wiki/Binary_search_algorithm" title="Binary Search">二分查找</a>，但不完全相同。但是可以控制元素出现的概率使SL和二分查找完全相同。而我们知道二分查找的时间复杂度为<code>O(log n)</code>，所以SL的搜索时间复杂度也为<code>O(log n)</code>。</p>
+
+<p><strong>插入</strong></p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/insert.gif"></p>
+
+<p>我们需要通过计算来得出元素在哪个层次出现，一般来说几何分布是比较好的元素分布情况，因为这样的话有50%的元素只出现在第0层，25%的元素出现在第0层和第1层，12.5%的元素出现在第0，1，2层，以此类推，这样一来就跟二叉排序树差不多了。根据几何分布公式<code>F(k) = 1 - (1 - p)^k</code>，我们可以得到层数<code>k = log (1 - F(k)) / log (1 - p)</code>。</p>
+
+<p><strong>删除</strong></p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/delete.gif"></p>
+
+<p>在SL中删除一个元素需要把在所有层次上的该元素都删除。如上图所示，要删除元素9，则需要把所以层次上的9全部都删除。</p>
+
+<p><strong>实现</strong></p>
+
+<p>网上有很多种的SL实现，但是我认为最简单直观的还是<a href="http://igoro.com/archive/skip-lists-are-fascinating">这里</a>，虽然他用的是C#实现的，但改成Java不是一件难事。</p>
+
+<p><strong>参考资料</strong></p>
+
+<p>[1] <a href="http://en.wikipedia.org/wiki/Skip_list">Skip List on Wikipedia</a><br />
+[2] <a href="http://www.sable.mcgill.ca/~dbelan2/cs251/skip_lists.html">DATA STRUCTURES AND ALGORITHMS Project #25: SKIP LISTS</a><br />
+[3] <a href="http://igoro.com/archive/skip-lists-are-fascinating/">Skip lists are fascinating</a></p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: linux | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/linux/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Linux常用命令]]></title>
+    <link href="http://liuxuan.info/blog/2012/06/16/linux-frequently-used-commands/"/>
+    <updated>2012-06-16T14:16:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/06/16/linux-frequently-used-commands</id>
+    <content type="html"><![CDATA[<p>不定期更新一些在Linux下经常会用到的命令，其中一些也是在别的地方看到就加入到这个集合来了。</p>
+
+<p><strong>系统</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>uname -a               <span class="c"># 查看内核/操作系统/CPU信息&lt;br /&gt;</span>
+</span><span class='line'>head -n 1 /etc/issue   <span class="c"># 查看操作系统版本&lt;br /&gt;</span>
+</span><span class='line'>cat /proc/cpuinfo      <span class="c"># 查看CPU信息&lt;br /&gt;</span>
+</span><span class='line'>hostname               <span class="c"># 查看计算机名&lt;br /&gt;</span>
+</span><span class='line'>lspci -tv              <span class="c"># 列出所有PCI设备&lt;br /&gt;</span>
+</span><span class='line'>lsusb -tv              <span class="c"># 列出所有USB设备&lt;br /&gt;</span>
+</span><span class='line'>lsmod                  <span class="c"># 列出加载的内核模块&lt;br /&gt;</span>
+</span><span class='line'>env                    <span class="c"># 查看环境变量&lt;br /&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<!-- more -->
+
+<p><strong>资源</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>free -m                       <span class="c"># 查看内存使用量和交换区使用量&lt;br /&gt;</span>
+</span><span class='line'>df -h                         <span class="c"># 查看各分区使用情况&lt;br /&gt;</span>
+</span><span class='line'>du -sh &lt;folder&gt;               <span class="c"># 查看指定目录的大小  </span>
+</span><span class='line'>grep MemTotal /proc/meminfo   <span class="c"># 查看内存总量  </span>
+</span><span class='line'>grep MemFree /proc/meminfo    <span class="c"># 查看空闲内存量  </span>
+</span><span class='line'>uptime                        <span class="c"># 查看系统运行时间、用户数、负载  </span>
+</span><span class='line'>cat /proc/loadavg             <span class="c"># 查看系统负载  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></folder></p>
+
+<p><strong>磁盘和分区</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mount | column -t      <span class="c"># 查看挂接的分区状态&lt;br /&gt;</span>
+</span><span class='line'>fdisk -l               <span class="c"># 查看所有分区&lt;br /&gt;</span>
+</span><span class='line'>swapon -s              <span class="c"># 查看所有交换分区&lt;br /&gt;</span>
+</span><span class='line'>hdparm -i /dev/hda     <span class="c"># 查看磁盘参数(仅适用于IDE设备)&lt;br /&gt;</span>
+</span><span class='line'>dmesg | grep IDE       <span class="c"># 查看启动时IDE设备检测状况&lt;br /&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>网络</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ifconfig               <span class="c"># 查看所有网络接口的属性&lt;br /&gt;</span>
+</span><span class='line'>iptables -L            <span class="c"># 查看防火墙设置&lt;br /&gt;</span>
+</span><span class='line'>route -n               <span class="c"># 查看路由表&lt;br /&gt;</span>
+</span><span class='line'>netstat -lntp          <span class="c"># 查看所有监听端口&lt;br /&gt;</span>
+</span><span class='line'>netstat -antp          <span class="c"># 查看所有已经建立的连接&lt;br /&gt;</span>
+</span><span class='line'>netstat -s             <span class="c"># 查看网络统计信息&lt;br /&gt;</span>
+</span><span class='line'>进程
+</span><span class='line'>ps -ef                 <span class="c"># 查看所有进程&lt;br /&gt;</span>
+</span><span class='line'>top                    <span class="c"># 实时显示进程状态&lt;br /&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>用户</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>w                         <span class="c"># 查看活动用户&lt;br /&gt;</span>
+</span><span class='line'>id &lt;username&gt;             <span class="c"># 查看指定用户信息  </span>
+</span><span class='line'>last                      <span class="c"># 查看用户登录日志  </span>
+</span><span class='line'>cut -d: -f1 /etc/passwd   <span class="c"># 查看系统所有用户  </span>
+</span><span class='line'>cut -d: -f1 /etc/group    <span class="c"># 查看系统所有组  </span>
+</span><span class='line'>crontab -l                <span class="c"># 查看当前用户的计划任务  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></username></p>
+
+<p><strong>服务</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chkconfig –list              <span class="c"># 列出所有系统服务&lt;br /&gt;</span>
+</span><span class='line'>chkconfig –list | grep on    <span class="c"># 列出所有启动的系统服务&lt;br /&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>程序</strong></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>rpm -Uvh http://xxx.rpm   <span class="c"># 添加软件库</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+</feed>

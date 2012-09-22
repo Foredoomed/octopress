@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>单精度浮点类型的二进制表示格式 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="这两天在Stack Overflow上闲逛的时候，发现有个关于Java中单精度浮点数（float）的问题:what-is-the-maximum-number-in-the-mantissa-part-of-a-java-float。我不得不承认，我被震精了。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/08/01/single-precision-binary-floating-point-format/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">单精度浮点类型的二进制表示格式</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-01T16:12:00+08:00" pubdate data-updated="true">Aug 1<span>st</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>这两天在<a href="http://stackoverflow.com" title="Stack Overflow">Stack Overflow</a>上闲逛的时候，发现有个关于Java中单精度浮点数（float）的问题:<a href="http://stackoverflow.com/questions/5849741/what-is-the-maximum-number-in-the-mantissa-part-of-a-java-float" title="what-is-the-maximum-number-in-the-mantissa-part-of-a-java-float">what-is-the-maximum-number-in-the-mantissa-part-of-a-java-float</a>。我不得不承认，我被震精了。因为以前只知道float在Java中占4个字节（即32位），并不知道它内部用来表示1个小数的具体格式是什么。我记得我以前刚学Java的时候，最开始要学的就是基本数据类型（当然其他语言也一样），那时候我就对1个小数用二进制来表示产生过疑问，而且，书上对这个也没有详细的解释。难道这个底层的float表示格式不重要吗？我觉得这个很重要，人家不是都有问题出来了么？那么就乘这次把float的底层的二进制表示格式搞清楚吧。 
+<!--more--></p>
+
+<p>在Java中，float采用的是<a href="http://en.wikipedia.org/wiki/IEEE_754-2008" title="IEEE Standard for Floating-Point Arithmetic (IEEE 754)">IEEE Standard for Floating-Point Arithmetic (IEEE 754)</a>标准,即float占4个字节，也就是32位，具体分配如下：</p>
+
+<ul>
+  <li>符号位：<strong>1</strong> 位</li>
+  <li>幂底数位：<strong>8</strong> 位</li>
+  <li>指数有效位：<strong>23</strong> 位</li>
+</ul>
+
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/e/e8/IEEE_754_Single_Floating_Point_Format.svg" alt="single precision float point format" /></p>
+
+<p>1.符号位是从左边数起的第一位数，0代表正数或零，1代表负数，这个没有什么疑问。</p>
+
+<p>2.幂底数位是从右边数起的第23位到第30位。我们需要注意的是，这个数是用<a href="http://en.wikipedia.org/wiki/Offset_binary" title="offset binary">偏移二进制（offset binary）</a>表示的，并不是用二进制的补码来表示，并且这个8位二进制数是没有符号位的。</p>
+
+<p>这个偏移二进制与二进制补码的对应关系可以查看下面的表格：
+&lt;table style=&#8221;text-align:center；margin: 1em 1em 1em 0;background: #F9F9F9;border: 1px #AAA solid;border-collapse: collapse;color: black;&#8221;&gt;</p>
+<tbody><tr>
+<th>Offset Binary code, K=8</th>
+<th>Decimal code</th>
+<th>Twos&#8217; complement Binary</th>
+</tr>
+<tr>
+<td>1111</td>
+<td>7</td>
+<td>0111</td>
+</tr>
+<tr>
+<td>1110</td>
+<td>6</td>
+<td>0110</td>
+</tr>
+<tr>
+<td>1101</td>
+<td>5</td>
+<td>0101</td>
+</tr>
+<tr>
+<td>1100</td>
+<td>4</td>
+<td>0100</td>
+</tr>
+<tr>
+<td>1011</td>
+<td>3</td>
+<td>0011</td>
+</tr>
+<tr>
+<td>1010</td>
+<td>2</td>
+<td>0010</td>
+</tr>
+<tr>
+<td>1001</td>
+<td>1</td>
+<td>0001</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>0</td>
+<td>0000</td>
+</tr>
+<tr>
+<td>0111</td>
+<td>−1</td>
+<td>1111</td>
+</tr>
+<tr>
+<td>0110</td>
+<td>−2</td>
+<td>1110</td>
+</tr>
+<tr>
+<td>0101</td>
+<td>−3</td>
+<td>1101</td>
+</tr>
+<tr>
+<td>0100</td>
+<td>−4</td>
+<td>1100</td>
+</tr>
+<tr>
+<td>0011</td>
+<td>−5</td>
+<td>1011</td>
+</tr>
+<tr>
+<td>0010</td>
+<td>−6</td>
+<td>1010</td>
+</tr>
+<tr>
+<td>0001</td>
+<td>−7</td>
+<td>1001</td>
+</tr>
+<tr>
+<td>0000</td>
+<td>−8</td>
+<td>1000</td>
+</tr>
+</tbody>
+<p>&lt;/table&gt;</p>
+
+<p>我们可以从上面的表格看到，偏移和补码的区别只是最高位的区别（右边数起）。当补码最高为是1的（也就是这个数是负数）时候，偏移表示的最高位是0，反之亦然。好了，既然指数的有效位使用偏移来表示的话，那么它的值就不是实际真正的值，而是要用它来与偏移量相减，从而得到真正的指数有效位值。这个偏移量为2<sup>n−1</sup>−1 ，其中n为所有位数。例如float里是用8位来表示，那么偏移量就是127。</p>
+
+<p>细心的朋友可能会发现应该减去2<sup>n-1</sup>才是真正的值，但是为什么不减去2<sup>n</sup>，而是减去2<sup>n−1</sup>−1呢？<a href="http://en.wikipedia.org/wiki/Offset_binary&quot;" title="offset binary">维基</a>上是这么说的：</p>
+
+<blockquote>
+  <p>Unusually however, instead of using “excess 2^(n-1)” it uses “excess 2^(n-1)-1” which means that inverting the leading (high-order) bit of the exponent will not convert the exponent to correct twos’ complement notation.</p>
+</blockquote>
+
+<p>也就是说这是有意这么做的，为了不把指数转换成正确的二进制补码形式。我搞不懂为什么要这样做，所以就在StackOverflow上提了个<a href="http://stackoverflow.com/questions/6871501/offset-binary-format-for-float-in-java" title="offset-binary-format-for-float-in-java">问题</a>，大家可以参考一下。</p>
+
+<p>这样一来，8位无符号指数的范围是0-255，再减去偏移量127，结果则为-127-128。另外全0和全1作为特殊处理,所以表示范围就变成了-126到127。特殊处理说明参考下表：
+&lt;table style=&#8221;text-align:center；margin: 1em 1em 1em 0;background: #F9F9F9;border: 1px #AAA solid;border-collapse: collapse;color: black;&#8221;&gt;</p>
+<tbody><tr>
+<th>Exponent</th>
+<th>Significand zero</th>
+<th>Significand non-zero</th>
+<th>Equation</th>
+</tr>
+<tr>
+<td>00<sub>H</sub></td>
+<td><a href="http://en.wikipedia.org/wiki/0_(number)" title="0 (number)">zero</a>, <a href="http://en.wikipedia.org/wiki/%E2%88%920" title="−0" class="mw-redirect">−0</a></td>
+<td><a href="http://en.wikipedia.org/wiki/Subnormal_numbers" title="Subnormal numbers" class="mw-redirect">subnormal numbers</a></td>
+<td>(−1)<sup>signbits</sup>×2<sup>−126</sup>× 0.significandbits</td>
+</tr>
+<tr>
+<td>01<sub>H</sub>, &#8230;, FE<sub>H</sub></td>
+<td colspan="2">normalized value</td>
+<td>(−1)<sup>signbits</sup>×2<sup>exponentbits−127</sup>× 1.significandbits</td>
+</tr>
+<tr>
+<td>FF<sub>H</sub></td>
+<td>±<a href="http://en.wikipedia.org/wiki/Infinity" title="Infinity">infinity</a></td>
+<td><a href="http://en.wikipedia.org/wiki/NaN" title="NaN">NaN</a> (quiet, signalling)</td>
+</tr>
+</tbody>
+<p>&lt;/table&gt;</p>
+
+<p>3.剩下的23位就是所谓的小数位了。但是注意：如果这23位全部是0的话，最高位将多出1位来，且这位上的值是1。</p>
+
+<p>好了，这样所有32位都有了，自然可以得到二进制转换成十进制的推导公式为：</p>
+
+<p><img src="http://upload.wikimedia.org/math/1/d/e/1de9cd706cf2343bf03714ed2d4e4e65.png" alt="formula" /></p>
+
+<p>对应到上图的例子为：</p>
+
+<p><img src="http://upload.wikimedia.org/math/2/5/6/2567776ddd65d7deb6b0a8e63dd82e52.png" alt="example" /></p>
+
+<p>最后，双精度浮点数（double）的64位分配和单精度数差不多，具体情况如下图所示：
+<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/IEEE_754_Double_Floating_Point_Format.svg/618px-IEEE_754_Double_Floating_Point_Format.svg.png" alt="double precision floating-point format" /></p>
+
+<p>参考文章</p>
+
+<p>[1] <a href="http://en.wikipedia.org/wiki/Single_precision_floating-point_format" title="Single_precision_floating-point_format">Single_precision_floating-point_format</a><br />
+[2] [IEEE<em>754-1985#Exponent_biasing](http://en.wikipedia.org/wiki/IEEE</em>754-1985#Exponent_biasing “IEEE_754-1985#Exponent_biasing”)</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-01T16:12:00+08:00" pubdate data-updated="true">Aug 1<span>st</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>programming</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/08/01/single-precision-binary-floating-point-format/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/08/01/single-precision-binary-floating-point-format/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

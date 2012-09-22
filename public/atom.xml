@@ -1,0 +1,2586 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Skip List原理简述]]></title>
+    <link href="http://liuxuan.info/blog/2012/08/26/skip-list-in-a-netshell/"/>
+    <updated>2012-08-26T14:05:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/08/26/skip-list-in-a-netshell</id>
+    <content type="html"><![CDATA[<p>Skip List(以下简称SL)是由<a href="http://en.wikipedia.org/wiki/William_Pugh" title="William Pugh">William Pugh</a>在1989年提出的，从字面上解释的话差不多就是“跳跃链表”，它是普通有序链表的一种改进，目的是为了提高搜索，插入和删除的速度。我们知道，普通List的搜索，插入和删除的时间复杂度都是<code>O(n)</code>，而SL则可以提高到<code>O(log n)</code>，这就使得SL变成了一个非常有用的数据结构，像现在大热的NoSQL之一<a href="http://redis.io/" title="Redis">Redis</a>就是使用了SL。JDK6之后也加入了<a href="http://g.oswego.edu/" title="Doug Lea">Doug Lea</a>的SL实现<a href="http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentSkipListSet.html" title="ConcurrentSkipListSet">ConcurrentSkipListSet</a>和<a href="http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentSkipListMap.html" title="ConcurrentSkipListMap">ConcurrentSkipListMap</a>。</p>
+
+<!-- more -->
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/Skip_list.png" /></p>
+
+<p>上面这张图是维基上的SL结构示意图，我们可以清楚地看到与普通链表不同的是，SL是由多层链表组成，而且元素会重复出现在多个层次上，只不过越往上层元素出现的概率越低。通常情况下在<code>i</code>层出现的元素也出现在<code>i+1</code>层的概率<code>p</code>取<code>1/2</code>或<code>1/4</code>，然后根据<a href="http://en.wikipedia.org/wiki/Geometric_distribution" title="Geometric distribution">几何分布</a>的公式逆运算来求出元素出现在第几层。</p>
+
+<p><strong>搜索</strong></p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/search42.gif" /></p>
+
+<p>每次搜索都从最上层开始，知道遇到大于要搜索的元素才转入下一层搜索。首先从第3层(层数从0开始)开始搜索42，首先遇到的是9，再后面就到底了，而42&gt;9，所以转入下一层往右搜索；下一层首先遇到的是19，而42&gt;19，所以再转入下一层，如此反复最终找到了我们所需要的元素42。其实在这个搜索过程中已经能够看出这个搜索的过程有点像<a href="http://en.wikipedia.org/wiki/Binary_search_algorithm" title="Binary Search">二分查找</a>，但不完全相同。但是可以控制元素出现的概率使SL和二分查找完全相同。而我们知道二分查找的时间复杂度为<code>O(log n)</code>，所以SL的搜索时间复杂度也为<code>O(log n)</code>。</p>
+
+<p><strong>插入</strong></p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/insert.gif" /></p>
+
+<p>我们需要通过计算来得出元素在哪个层次出现，一般来说几何分布是比较好的元素分布情况，因为这样的话有50%的元素只出现在第0层，25%的元素出现在第0层和第1层，12.5%的元素出现在第0，1，2层，以此类推，这样一来就跟二叉排序树差不多了。根据几何分布公式<code>F(k) = 1 - (1 - p)^k</code>，我们可以得到层数<code>k = log (1 - F(k)) / log (1 - p)</code>。</p>
+
+<p><strong>删除</strong></p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/delete.gif" /></p>
+
+<p>在SL中删除一个元素需要把在所有层次上的该元素都删除。如上图所示，要删除元素9，则需要把所以层次上的9全部都删除。</p>
+
+<p><strong>实现</strong></p>
+
+<p>网上有很多种的SL实现，但是我认为最简单直观的还是<a href="http://igoro.com/archive/skip-lists-are-fascinating">这里</a>，虽然他用的是C#实现的，但改成Java不是一件难事。</p>
+
+<p><strong>参考资料</strong></p>
+
+<p>[1] <a href="http://en.wikipedia.org/wiki/Skip_list">Skip List on Wikipedia</a><br />
+[2] <a href="http://www.sable.mcgill.ca/~dbelan2/cs251/skip_lists.html">DATA STRUCTURES AND ALGORITHMS Project #25: SKIP LISTS</a><br />
+[3] <a href="http://igoro.com/archive/skip-lists-are-fascinating/">Skip lists are fascinating</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[深入浅出Coroutine]]></title>
+    <link href="http://liuxuan.info/blog/2012/08/18/head-first-coroutine/"/>
+    <updated>2012-08-18T22:55:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/08/18/head-first-coroutine</id>
+    <content type="html"><![CDATA[<p>说到coroutine(中文一般翻译成<strong>协程</strong>)，对于Java程序员来说可能有点陌生，因为Java语言本身并不支持coroutine，但是早在1963年这个想法就被提出来了。到目前为止，已经有很多语言提供了对coroutine的支持，比如Ruby，Python，Go，Erlang等。所以，理解coroutine是很有必要的。Lua是原生支持coroutine的语言之一，下面关于coroutine的例子都将使用Lua。</p>
+
+<!-- more -->
+
+<p>维基上给出的Coroutine定义是：</p>
+
+<blockquote>
+  <p>Coroutines are computer program components that generalize subroutines to allow multiple entry points for suspending and resuming execution at certain locations.</p>
+</blockquote>
+
+<p>上面这段中包含了另一个名词：subroutine，所以先来看一下subroutine的定义：</p>
+
+<blockquote>
+  <p>In computer science, a subroutine, also termed procedure, function, routine, method, or subprogram, is a part of source code within a larger computer program that performs a specific task and is relatively independent of the remaining code.</p>
+</blockquote>
+
+<p>也就是说subroutine就是方法或代码片段，方法或代码片段就是subroutine。现在就能翻译coroutine的定义了：</p>
+
+<p><strong>Coroutine是允许多入口，即使方法或代码片段能够在某个地方挂起和继续执行的特性的程序组件。</strong></p>
+
+<p>这句话对于Java程序员来说是具有颠覆性作用的，因为对于Java和那些不支持coroutine的语言来说，方法只有一个入口，也就是从方法体的大括号开始到结束的大括号为止。比如有个方法：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">foo</span><span class="o">(){</span>
+</span><span class="line">	<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">&quot;hello&quot;</span><span class="o">);</span>
+</span><span class="line">	<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">&quot;world&quot;</span><span class="o">);</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>每当foo方法被调用的时候，方法体中的语句都会被执行，即每次都会打印“helloworld”。然而coroutine允许方法执行到一半就挂起(通常是碰到yield关键字)，然后上下文状态会被保存下来，并且可以在之后恢复这个coroutine。考虑下面这段lua代码：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="lua"><span class="line"><span class="k">function</span> <span class="nf">foo</span><span class="p">()</span>
+</span><span class="line">	<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="s">hello&quot;</span><span class="p">)</span>
+</span><span class="line">	<span class="nb">coroutine.yield</span><span class="p">()</span> <span class="c1">-- 在这里挂起coroutine</span>
+</span><span class="line">	<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="s">world&quot;</span><span class="p">)</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">local</span> <span class="n">co</span> <span class="o">=</span> <span class="nb">coroutine.create</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span> <span class="c1">-- co保存的是上下文变量</span>
+</span><span class="line"><span class="nb">coroutine.resume</span><span class="p">(</span><span class="n">co</span><span class="p">)</span>         <span class="c1">-- 只打印出 hello</span>
+</span><span class="line"><span class="nb">coroutine.resume</span><span class="p">(</span><span class="n">co</span><span class="p">)</span>         <span class="c1">-- 只打印出 world</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>第一次执行coroutine.resume(co)的时候，会从头开始执行foo函数，当遇到yield关键字时就会挂起coroutine，等到第二次执行coroutine.resume(co)的时候，会从上次coroutine挂起的地方继续执行，直到再次遇到yield或着函数结束。</p>
+
+<p>coroutine在yield时还可以指定另一个coroutine，下面是维基上的例子：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">var q := new queue
+</span><span class="line">
+</span><span class="line">coroutine produce
+</span><span class="line">    loop
+</span><span class="line">        while q is not full
+</span><span class="line">            create some new items
+</span><span class="line">            add the items to q
+</span><span class="line">        yield to consume
+</span><span class="line">
+</span><span class="line">coroutine consume
+</span><span class="line">    loop
+</span><span class="line">        while q is not empty
+</span><span class="line">            remove some items from q
+</span><span class="line">            use the items
+</span><span class="line">        yield to produce</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>注意到Lua的coroutine不支持上面的这种指定另外coroutine的特性，所以类似Lua的coroutine实现又被称为asymmetric coroutine(非对称协程)。</p>
+
+<p>其实也可以使用多线程来实现上面例子中的生产者-消费者问题，但线程相比于协程的实现又有哪些区别呢？一般来说有以下几点不同：</p>
+
+<ul>
+  <li>线程需要有操作系统来调度，而coroutine则是由程序自己来调度</li>
+  <li>线程的上下文切换开销较大，coroutine则要小的多</li>
+  <li>线程会有竞争，coroutine则没有</li>
+  <li>多线程的实现在某一时刻会有多个线程在运行，而coroutine则是只有一个</li>
+</ul>
+
+<p>[1] <a href="http://en.wikipedia.org/wiki/Coroutine" title="Coroutine From Wikipedia">Coroutine From Wikipedia</a><br />
+[2] <a href="http://www.lua.org/manual/5.2/manual.html#2.6" title="Lua Coroutines Documentation">Lua Coroutines Documentation</a></p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[用Munin监控VPS的运行情况]]></title>
+    <link href="http://liuxuan.info/blog/2012/06/17/install-munin-on-vps/"/>
+    <updated>2012-06-17T13:42:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/06/17/install-munin-on-vps</id>
+    <content type="html"><![CDATA[<p>因为换了vps，所以还要重新安装监控软件。而Linux平台上的系统监控软件还是很多的，比如大名顶顶的<a href="http://www.nagios.org/">Nagios</a>，<a href="http://www.cacti.net/">Cacti</a>和<a href="http://www.zabbix.com/">Zabbix</a>,还有<a href="http://oss.oetiker.ch/mrtg/">MRTG</a>。Nagios是一个比较重量级的软件，而且还必须搭配许多插件才能满足需求，所以在小内存vps上不适用；Cacti是通过<a href="http://en.wikipedia.org/wiki/Simple_Network_Management_Protocol">SNMP</a>协议来监控系统，这意味着还要为它在后台开启SNMP进程，这对于小内存vps也不可取，还有cacti需要数据库的支持，web前端还需要php，所以综上也放弃；Zabbix虽然不错，但它也需要有数据库的支持，所以也放弃；而MRTG只能够监控网络使用情况，不能够监控CPU，磁盘等设备，所以还是放弃。最后我选择的是<a href="http://munin-monitoring.org/">Munin</a>,它的有点是不仅轻量，不需要数据库，可以直接生成静态页面，应该说Munin是小内存vps上的理想选择。</p>
+
+<!-- more -->
+
+<p>如果想要安装Munin的最新版本就需要自己编译安装，软件库里的版本还是有点旧。但是自己编译安装会比较麻烦，因为要安装编译所需要的很多依赖库，所以我还是选择从软件库里直接安装。好了，下面就开始安装Munin，操作系统是CentOS 6 32位。</p>
+
+<p>首先安装EPEL软件库，如果已经装过就跳过此步</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后安装munin</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">yum -y install munin munin-node
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>设置开机启动和目录权限</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">chkconfig munin-node on
+</span><span class="line">
+</span><span class="line">chown -R munin:munin /var/www/html/munin/
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>接下来就是配置munin</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nb">cd</span> /etc/munin
+</span><span class="line">
+</span><span class="line">vim munin.conf
+</span><span class="line">
+</span><span class="line">// 打开下面几行的注释
+</span><span class="line">dbdir   /var/lib/munin
+</span><span class="line">htmldir /var/www/html/munin
+</span><span class="line">logdir  /var/log/munin
+</span><span class="line">rundir  /var/run/munin
+</span><span class="line">
+</span><span class="line">tmpldir /etc/munin/templates
+</span><span class="line">
+</span><span class="line">// 修改munin页面上显示的munin
+</span><span class="line"><span class="o">[</span>liuxuan.info<span class="o">]</span>
+</span><span class="line">    address 127.0.0.1
+</span><span class="line">    use_node_name yes
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>配置munin-node</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">// 修改hostname
+</span><span class="line">host_name   liuxuan.info
+</span><span class="line">
+</span><span class="line">// 如果有多台机器需要监控的话还需要加上他们的IP地址
+</span><span class="line">allow ^xxx<span class="se">\.</span>xxx<span class="se">\.</span>xxx<span class="se">\.</span>xxx<span class="err">$</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>配置对nginx的监控</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nb">cd</span> /etc/munin/plugins/
+</span><span class="line">ln -s /usr/share/munin/plugins/nginx_request nginx_request
+</span><span class="line">ln -s /usr/share/munin/plugins/nginx_status nginx_status
+</span><span class="line">
+</span><span class="line">// 修改nginx_request里的hostname，搜索<span class="nv">$URL</span>,把其中的<span class="nv">$fqdn</span>改为localhost
+</span><span class="line">// 然后输入下面的命令，如果输出yes则说明配置成功
+</span><span class="line">perl nginx_request autoconf
+</span><span class="line">
+</span><span class="line">// 配置nginx
+</span><span class="line"><span class="nb">cd</span> /etc/nginx/conf.d
+</span><span class="line">vim munin.conf
+</span><span class="line">// 然后加入下面的配置
+</span><span class="line">server <span class="o">{</span>
+</span><span class="line">        listen 127.0.0.1;
+</span><span class="line">        server_name localhost;
+</span><span class="line">        location /nginx_status <span class="o">{</span>
+</span><span class="line">                stub_status on;
+</span><span class="line">                access_log   off;
+</span><span class="line">                allow 127.0.0.1;
+</span><span class="line">                deny all;
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">	    location /munin <span class="o">{</span>
+</span><span class="line">        	root /var/www/html/munin;
+</span><span class="line">  			expires off;
+</span><span class="line">  			access_log   off;
+</span><span class="line">  			auth_basic <span class="s2">&quot;Munin&quot;</span>;
+</span><span class="line">  			auth_basic_user_file /etc/nginx/.htpasswd;
+</span><span class="line">		 <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">// 重启nginx使配置生效
+</span><span class="line">nginx -s reload
+</span><span class="line">
+</span><span class="line">// 设置访问munin的用户名和秘密
+</span><span class="line">htpasswd -c /etc/nginx/.htpasswd username
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>// 最后设置计划任务每5分钟获取数据</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">sudo -u munin crontab -e
+</span><span class="line">*/5 * * * *  /usr/bin/munin-cron
+</span><span class="line">// 一定要先执行下面这行命令，否则不会生成index.html，访问会报403错误
+</span><span class="line">sudo -u munin munin-cron
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>到现在为止配置基本完成了，启动munin试下吧</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/etc/init.d/munin-node restart
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后打开浏览器访问<code>http://your.domain/munin/</code>，输入用户名和密码后就应可以看到munin的首页了，一开始是没有数据的，耐心等待几分钟后数据就会更新了。</p>
+
+<p>参考文章</p>
+
+<ol>
+  <li><a href="http://www.darkcoding.net/software/setting-up-munin-on-ubuntu/">Setting up Munin on Ubuntu</a></li>
+  <li><a href="http://munin-monitoring.org/wiki/Documentation">Munin Documentation</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linux常用命令]]></title>
+    <link href="http://liuxuan.info/blog/2012/06/16/linux-frequently-used-commands/"/>
+    <updated>2012-06-16T14:16:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/06/16/linux-frequently-used-commands</id>
+    <content type="html"><![CDATA[<p>不定期更新一些在Linux下经常会用到的命令，其中一些也是在别的地方看到就加入到这个集合来了。</p>
+
+<p><strong>系统</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">uname -a               <span class="c"># 查看内核/操作系统/CPU信息  </span>
+</span><span class="line">head -n 1 /etc/issue   <span class="c"># 查看操作系统版本  </span>
+</span><span class="line">cat /proc/cpuinfo      <span class="c"># 查看CPU信息  </span>
+</span><span class="line">hostname               <span class="c"># 查看计算机名  </span>
+</span><span class="line">lspci -tv              <span class="c"># 列出所有PCI设备  </span>
+</span><span class="line">lsusb -tv              <span class="c"># 列出所有USB设备  </span>
+</span><span class="line">lsmod                  <span class="c"># 列出加载的内核模块  </span>
+</span><span class="line">env                    <span class="c"># 查看环境变量  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<!-- more -->
+
+<p><strong>资源</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">free -m                       <span class="c"># 查看内存使用量和交换区使用量  </span>
+</span><span class="line">df -h                         <span class="c"># 查看各分区使用情况  </span>
+</span><span class="line">du -sh &lt;folder&gt;               <span class="c"># 查看指定目录的大小  </span>
+</span><span class="line">grep MemTotal /proc/meminfo   <span class="c"># 查看内存总量  </span>
+</span><span class="line">grep MemFree /proc/meminfo    <span class="c"># 查看空闲内存量  </span>
+</span><span class="line">uptime                        <span class="c"># 查看系统运行时间、用户数、负载  </span>
+</span><span class="line">cat /proc/loadavg             <span class="c"># 查看系统负载  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>磁盘和分区</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">mount | column -t      <span class="c"># 查看挂接的分区状态  </span>
+</span><span class="line">fdisk -l               <span class="c"># 查看所有分区  </span>
+</span><span class="line">swapon -s              <span class="c"># 查看所有交换分区  </span>
+</span><span class="line">hdparm -i /dev/hda     <span class="c"># 查看磁盘参数(仅适用于IDE设备)  </span>
+</span><span class="line">dmesg | grep IDE       <span class="c"># 查看启动时IDE设备检测状况  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>网络</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">ifconfig               <span class="c"># 查看所有网络接口的属性  </span>
+</span><span class="line">iptables -L            <span class="c"># 查看防火墙设置  </span>
+</span><span class="line">route -n               <span class="c"># 查看路由表  </span>
+</span><span class="line">netstat -lntp          <span class="c"># 查看所有监听端口  </span>
+</span><span class="line">netstat -antp          <span class="c"># 查看所有已经建立的连接  </span>
+</span><span class="line">netstat -s             <span class="c"># 查看网络统计信息  </span>
+</span><span class="line">进程
+</span><span class="line">ps -ef                 <span class="c"># 查看所有进程  </span>
+</span><span class="line">top                    <span class="c"># 实时显示进程状态  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>用户</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">w                         <span class="c"># 查看活动用户  </span>
+</span><span class="line">id &lt;username&gt;             <span class="c"># 查看指定用户信息  </span>
+</span><span class="line">last                      <span class="c"># 查看用户登录日志  </span>
+</span><span class="line">cut -d: -f1 /etc/passwd   <span class="c"># 查看系统所有用户  </span>
+</span><span class="line">cut -d: -f1 /etc/group    <span class="c"># 查看系统所有组  </span>
+</span><span class="line">crontab -l                <span class="c"># 查看当前用户的计划任务  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>服务</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">chkconfig --list              <span class="c"># 列出所有系统服务  </span>
+</span><span class="line">chkconfig --list | grep on    <span class="c"># 列出所有启动的系统服务  </span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>程序</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">rpm -Uvh http://xxx.rpm   <span class="c"># 添加软件库</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[快速搭建Octopress博客环境]]></title>
+    <link href="http://liuxuan.info/blog/2012/06/14/setup-octopress-on-vps/"/>
+    <updated>2012-06-14T23:04:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/06/14/setup-octopress-on-vps</id>
+    <content type="html"><![CDATA[<p>这次为一个新买的VPS安装博客环境，特此记录如下。</p>
+
+<p><strong>1.删除和替换已有软件</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">servive sendmail stop
+</span><span class="line">yum remove sendmail
+</span><span class="line">
+</span><span class="line">service httpd stop
+</span><span class="line">yum remove httpd
+</span><span class="line">
+</span><span class="line">service rsyslog stop
+</span><span class="line">yum remove rsyslog
+</span><span class="line">
+</span><span class="line">// 添加EPEL软件库
+</span><span class="line">rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
+</span><span class="line">
+</span><span class="line">// 安装syslog-ng代替rsyslog
+</span><span class="line">yum install syslog-ng
+</span><span class="line">chkconfig syslog-ng on
+</span><span class="line">
+</span><span class="line">// 安装dropbear代替openssh
+</span><span class="line">yum install dropbear
+</span><span class="line">chkconfig dropbear on
+</span><span class="line">// 等dropbear配置好后
+</span><span class="line">service sshd stop
+</span><span class="line">yum remove openssh
+</span><span class="line">
+</span><span class="line">// 安装vsftpd作为ftp服务器
+</span><span class="line">yum install vsftpd
+</span><span class="line">chkconfig vsftpd on
+</span><span class="line">
+</span><span class="line">// 添加用户
+</span><span class="line">groupadd www
+</span><span class="line">useradd -g www username
+</span><span class="line">passwd username
+</span><span class="line">
+</span><span class="line">// 设定ftp登陆目录权限
+</span><span class="line">chown -R usernmae /path/to/ftp/folder
+</span><span class="line">
+</span><span class="line">// 更新软件
+</span><span class="line">yum update
+</span><span class="line">yum upgrade
+</span><span class="line">
+</span><span class="line">// 安装ppp
+</span><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm
+</span><span class="line">
+</span><span class="line">// 安装pptpd
+</span><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<!-- more -->
+
+<p><strong>2.安装Octopress所需软件</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">// 安装git
+</span><span class="line">yum install git
+</span><span class="line">
+</span><span class="line">// 安装RVM
+</span><span class="line">curl -L get.rvm.io | bash -s stable
+</span><span class="line">
+</span><span class="line">// 安装ruby的依赖包
+</span><span class="line">yum install -y gcc-c++ patch readline readline-devel zlib zlib-devel libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison
+</span><span class="line">
+</span><span class="line">// 添加nginx软件库
+</span><span class="line">rpm -Uvh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+</span><span class="line">
+</span><span class="line">// 安装nginx
+</span><span class="line">yum install nginx
+</span><span class="line">
+</span><span class="line">// 安装ruby
+</span><span class="line">rvm install 1.9.2
+</span><span class="line">
+</span><span class="line">// 安装Octopress的依赖包
+</span><span class="line">yum install python-devel
+</span><span class="line">
+</span><span class="line">// 安装Octopress
+</span><span class="line">mkdir /data
+</span><span class="line"><span class="nb">cd</span> /data
+</span><span class="line">git clone git://github.com/imathis/octopress.git octopress
+</span><span class="line">
+</span><span class="line">gem install bundler
+</span><span class="line">rbenv rehash //If you use rbenv, rehash to be able to run the bundle <span class="nb">command</span>
+</span><span class="line">bundle install
+</span><span class="line">rake install
+</span><span class="line">
+</span><span class="line"><span class="nb">cd </span>octopress
+</span><span class="line">rake generate
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>3.VPS设置</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">// 配置vim
+</span><span class="line">vim /etc/vimrc
+</span><span class="line">// 加入下面几行
+</span><span class="line">syntax on
+</span><span class="line"><span class="nb">set </span>nu
+</span><span class="line"><span class="nb">set </span><span class="nv">mouse</span><span class="o">=</span>a
+</span><span class="line"><span class="nb">set </span><span class="nv">tabstop</span><span class="o">=</span>4
+</span><span class="line">
+</span><span class="line">// 禁用IPv6
+</span><span class="line">vim /etc/sysconfig/network
+</span><span class="line"><span class="nv">NETWORKING_IPV6</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
+</span><span class="line">
+</span><span class="line">// 设置文件最大打开数
+</span><span class="line">vim /etc/security/limits.conf
+</span><span class="line">// 加入下面两行
+</span><span class="line">* soft nofile 65535
+</span><span class="line">* hard nofile 65535
+</span><span class="line">
+</span><span class="line">// 把服务器时间改为上海时间
+</span><span class="line">cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+</span><span class="line">
+</span><span class="line">// 关闭不需要的服务
+</span><span class="line">ntsysv  //按空格选择和取消，按F12退出
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>4.其他设置</strong></p>
+
+<p>因为众所周知的原因在天朝twitter是无法访问的，所以最好去掉内置的twitter插件，这样就不会去请求twitter的js文件。方法是修改source/_includes文件夹下_twitter_sharing.html的文件名。</p>
+
+<p>关于dropbear/vsftp/pptp的配置可以参考<a href="http://liuxuan.info/blog/2011/08/21/install-dropbear-vsftp-pptpd-on-vps/">这里</a>，nginx的配置则可以参考<a href="http://liuxuan.info/blog/2011/11/08/switching-from-wordpress-to-octopress/">这里</a>。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[2011年终总结加2012年计划]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/30/plans-for-2012/"/>
+    <updated>2011-12-30T10:31:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/30/plans-for-2012</id>
+    <content type="html"><![CDATA[<p>时间那是一个飞逝，光阴那是一个荏苒。一转眼，我写博客已经有一年的时间了。期间我的博客也有很大的变化，从最初的独立空间到现在的VPS，从Wordpress变到了Octopress，应该说折腾的不算少，但也乐在其中。</p>
+
+<!-- more -->
+
+<p>现在回头看我在年初写的这篇<a href="http://liuxuan.info/blog/2011/01/01/plans-for-2011/" title="2011年计划">2011年计划</a>，其中的计划基本上都完成了。不过也有点遗憾的是，因为工作比较忙，韩语的学习被耽搁了，希望今年能够加强韩语的学习。还有为了找寻我理想中的工作，今年我换了两份工作，但是情况都不是很理想，跟我理想的还是有不小的差距，希望明年在这方面也有改善。</p>
+
+<p>2011年中国发生了很多事，很多事，但是2012年注定是更加不平静的一年。对于我来说只有静下心来，多读一点书，是自己更加充实，这是当下最好的应对方式了吧。</p>
+
+<p>我给自己制定的2012年计划如下：</p>
+
+<ul>
+  <li>继续多读书，目标50本</li>
+  <li>加强韩语的学习</li>
+  <li>写一个MVC和ORM框架</li>
+</ul>
+
+<p>就这样吧，一切贵在坚持！</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[编程经验]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/25/programming-experience/"/>
+    <updated>2011-12-25T15:09:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/25/programming-experience</id>
+    <content type="html"><![CDATA[<p>今天在整理移动硬盘时发现的一篇收藏的旧文，再次读完后发现写的太好了，基本上涵盖了程序员会碰到的问题，不过可惜的是原文已经找不到了。我觉得把这篇文章作为编程指导更合适，所以记录在这里。</p>
+
+<!-- more -->
+
+<p>==========正文开始==========</p>
+
+<p><strong>1.估算解决问题所需要的时间</strong></p>
+
+<p>不要怕，承认吧！我曾见过一些程序员为了解决一个特殊问题而坐在显示器前面8小时。为自己定一个时间限制吧，1小时、30分钟或甚至15分钟。如果在这期间你不能解决问题，那就去寻求帮助，或到网上找答案，而不是尝试去做“超级堆码员”。</p>
+
+<p><strong>2.编程语言是一种语言，只是一种语言</strong></p>
+
+<p>随着时光推移，只要你理解了一种语言的原理，你会发现各种语言之间的相似之处 。你所选择的语言，你应该觉得“舒服”，并且能够写出有效（而且简洁）的代码。最重要的，让语言去适应项目，反之亦然。</p>
+
+<p><strong>3.不要过于注重程序的“设计模式”</strong></p>
+
+<p>有时候，写一个简单的算法，要比引入某种模式更容易。在多数情况下，程序代码应是简单易懂，甚至清洁工也能看懂。 </p>
+
+<p><strong>4.经常备份代码</strong></p>
+
+<p>在我年轻时，我就有过因硬盘故障而丢了大量代码的经历，这经历很恐怖的。只要你一次没有备份，就应当像有着严格的期限，客户明天就需要。此时就该版本控制软件大显身手了。</p>
+
+<p><strong>5.承认自己并不是最顶尖的程序员 - 知不足</strong></p>
+
+<p>我常想，我对编程了解已足够多，但是总有其他人比你优秀。正所谓，“一山总比一山高”。所以，向他们看齐吧！</p>
+
+<p><strong>6.学习再学习</strong></p>
+
+<p>正如第5点所说，我经常会在手里拿一本计算机或编程相关的杂志或书（不信，可以问我的朋友）。诚然，总有很多你不知道的技术，你可以从中学习以保持不落后。如果你有一种灵巧的方式来获取你需要的新技术，那你每天都应该坚持学习。</p>
+
+<p><strong>7.永恒的变化</strong></p>
+
+<p>你对待技术和编程知识，就应像你对待股票一样：多样化。不要在某一特定技 术上自我感觉良好。如果那种技术或语言已经没有足够支持，那你还不如现在就开始更新你的简历，并启动培训新计划。我能保持前行的主要原则是什么呢？至少了 解两到三种语言，所以，如果某种语言过时了，你在学习新技术的时候还可以依靠另一种语言。</p>
+
+<p><strong>8.提携新人</strong></p>
+
+<p>协助并且培养初级/入门的开发人员学习优秀的编程方法和技巧。也许你还不知道，在帮助他们向更高一层前进时，你自己也在向更高一层提升，你会更加自信。</p>
+
+<p><strong>9.简化算法</strong></p>
+
+<p>代码如恶魔，在你完成编码后，应回头并且优化它。从长远来看，这里或那里一些的改进，会让后来的支持人员更加轻松。</p>
+
+<p><strong>10.编写文档</strong></p>
+
+<p>无论是Web服务的API，还是一个简单的类，你尽量编写相应文档。我曾经引以为豪的代码注释，因过度注释而有人指责。给三行代码加一行注释，只需要你几秒时间。如果那是一个比较难以理解的技术，千万别担心过多注释。如果你能很好做好自己的工作，大多数架 构师、后备程序员、支持组都会感激你。</p>
+
+<p><strong>11.测试、测试再测试</strong></p>
+
+<p>我是一名黑盒测试粉丝。当你完成编码后，你“被认可”的时候就开始了。如果你们公司有QA部门，如果你的代码中有错误，那你得到的评论，会比项目经理还多。如果你不彻底测试自己的代码，那恐怕你开发的就不只是代码，可能还会声名狼藉。</p>
+
+<p><strong>12.庆祝每一次成功</strong></p>
+
+<p>我见过很多程序员在解决编程技术难题后，会和同伴握手、击掌或甚至手舞足蹈。每个人在生命中都会碰到“顿悟”。如果一个程序员高兴地跑来叫你去看他的非凡代码，也许你已经看过这样的代码100遍了，但你也应该为了这个家伙而庆祝第101次。（编者注：《庆祝成功的九种方式》。）</p>
+
+<p><strong>13.经常检查代码</strong></p>
+
+<p>在公司，你的代码要经常检查（包括自查和其他同事检查）。不要把别人的检查，看成是对代码风格的苛求。应该把它们看作是有建设性的批评。对个人来说，经常检查你的代码并且自问，“我怎样才能写得更好呢？” 这会让你加速你的成长，让你成为一个更优秀的程序员。</p>
+
+<p><strong>14.回顾你的代码</strong></p>
+
+<p>在看到自己以前的代码时，通常会有两种方式：“难以至信，这代码是我写的”和“难以至信，这代码是我写的”。第一种往往是厌恶的语气，并在想如何改进它。你也许会惊叹，旧代码也能复活成为一种更好的程序，甚至是一个完整的产品。第二种通常带着惊奇和成 就感。开发人员应该一到两个自己完成的项目成果，能让众人不禁而立并注目而观的项目。同样，基于你优越的编程能力，你可以把过去的程序或项目拿出来，把它们更新为更加优秀的产品或想法。</p>
+
+<p><strong>15.幽默是不可缺的</strong></p>
+
+<p>在我20年的开发生涯中，我还没有碰到哪位程序员是没有幽默感的。实际上，干我们这行，幽默是一项必备品。</p>
+
+<p><strong>16.谨防那些无所不知的程序员，不愿分享的程序员，还有经验不足的程序员</strong></p>
+
+<p>当你遇到这几种程序员时，你自己要谦虚。无所不知的程序员，更想当一个英雄而不是团队成员；保守的程序员则是在编写着他们独享的代码；而经验不足的程序员则会每十分钟就来问你一下，当代码完成后，代码已经是你的，而不是他们。</p>
+
+<p><strong>17.任何项目都不会那么简单</strong></p>
+
+<p>朋友、家人和同事曾请求我仓促做一些事情，仓促做一个程序或者网站。对于这样的事，应该 从双方做计划，才能做出令两方都会满意的东西。如果某人起初只是需要一个使用Microsoft Access的、只有有3个页面的网站，但来就很可能变成一个有15个页面的网站，并使用SQL Server，有一个论坛，还有一个定制的CMS（内容管理系统）。</p>
+
+<p><strong>18.任何时候不要想当然</strong></p>
+
+<p>假如你承接一个简单的项目，你可能会认为某个部分可以轻松完成。千万别这样想！除非你有一个类、组件、或者一段已经写好的代码，并且在现有的项目已经测试通过。不要认为这将是很容易的。</p>
+
+<p><strong>19.没有已经完成的软件</strong></p>
+
+<p>曾经有一位程序员告诉我，没有软件是已经完成的，它只是“暂时完成了”。这是明智的忠告。如果客户还在使用你写的程序，并经受了时间的考验。如果有机会，你仍在更新它，这并不是什么坏事，这让你不断地前行。</p>
+
+<p><strong>20.耐心是一种美德</strong></p>
+
+<p>当客户、朋友或家庭成员用电脑的时候，他们也许会受挫，进而想砸电脑，或气冲冲地离开。我一直在告诉他们，“是你掌控电脑，不是电脑掌控你。”对于用作编程的电脑，你要有一定的耐心。一旦程序员知道问题所在后，他们就会站在电脑的角度看问题，并且说 “哦，这就是为什么它是这样做。”</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[快速排序复习笔记]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/17/quicksort-note/"/>
+    <updated>2011-12-17T14:27:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/17/quicksort-note</id>
+    <content type="html"><![CDATA[<p>最近晚上躺在床上没事就拿着手机看了几节MIT的公开课《Introduction to Algorithms》，看着看着就觉得自己关于排序算法的原理基本上都忘光了。顿感非常失落，所以特意又对算法复习了一遍，特别是快速排序，这篇博客就是复习笔记，毕竟发表是最好的记忆嘛。</p>
+
+<p>这门课是由两位老师来上的的，一位是<a href="http://people.csail.mit.edu/cel/" title="Charles E.Leiserson">Charles E.Leiserson</a>教授，光听这个名字可能有点陌生，但是如果提到他参与编写的《算法导论》这本书，对于学计算机的人来说那是无人不知无人不晓的经典著作；另一位是80后的Erik Demaine<a href="http://www.csail.mit.edu/user/666" title="Erik Demaine">Erik Demaine</a>，据说此人在20岁时就当上了MIT的教授，真是牛人啊，而且大多数的课也都是由他来讲的。还有一点我比较在意的是一节课的时间大约是1个小时20分钟左右，这跟中国大学的45分钟一节课很不一样，个人觉得这样的时间安排可以使一节课更加连贯，学习效率也会更好。</p>
+
+<!-- more -->
+
+<p>好了，回到正题快速排序上。话说快速排序是被广泛实际应用的排序算法，究其原因就是优秀的时间复杂度，平均为O(n*log(n))和O(n)的空间负责度，但是快速排序不是稳定排序，因为不能保证相同的元素在排序后还是原来的顺序。</p>
+
+<p>快速排序有三个步骤：</p>
+
+<ol>
+  <li>从元素列表中选择一个元素，这个元素被称为pivot。</li>
+  <li>把所有小于pivot的元素都放到pivot的左边，所有大于pivot的元素都放到pivot的右边，这个过程称为partition。</li>
+  <li>在左右两个子列表中迭代步骤2。</li>
+</ol>
+
+<p>下面举个例子来说明快速排序的排序过程，假如我们有这样一组数：<code>6 10 13 5 8 3 2 11</code>，并且选取左端点元素<code>6</code>作为初始pivot，那么上面步骤2的过程应该是下面这个样子：</p>
+
+<pre><code>6  5  13  10  8   3   2  11  
+6  5   3  10  8  13   2  11  
+6  5   3   2  8  13  10  11  
+2  5   3   6  8  13  10  11
+</code></pre>
+
+<p>因为要把小于pivot的数都放到pivot的左边，而大于等于pivot的数都放到pivot的右边，所以在保证空间复杂度O(n)的前提下，采用一个变量<code>j</code>，初始为pivot的后一个位置，当循环这个数组发现有小于pivot的数时就和<code>j</code>这个位置上的数交换，然后<code>j + 1</code>，等到循环结束后再交换pivot和<code>j</code>位置上的数。当然如果空间够多的话，直接创建两个新数组往里塞更容易一点。到了上面最后一步后，pivot就变成了<code>6</code>，然后再在它的左右子数组中迭代步骤2。</p>
+
+<p>好了，现在我们可以来写代码了，根据上面的思想不难得出下面的代码：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Quicksort1.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">quickSort1</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">array</span><span class="o">,</span> <span class="kt">int</span> <span class="n">p</span><span class="o">,</span> <span class="kt">int</span> <span class="n">q</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="n">q</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">return</span><span class="o">;</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// 选取左端点为pivot</span>
+</span><span class="line">  <span class="kt">int</span> <span class="n">pivot</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="n">p</span><span class="o">];</span>
+</span><span class="line">  <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">q</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">array</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">pivot</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="c1">// 如果小于pivot则与j+1位置上数交换</span>
+</span><span class="line">      <span class="n">swap</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="o">++</span><span class="n">j</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// 交换pivot与j位置上的数</span>
+</span><span class="line">  <span class="n">swap</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">j</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1">// 迭代左右子数组</span>
+</span><span class="line">  <span class="n">quickSort1</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="o">);</span>
+</span><span class="line">  <span class="n">quickSort1</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">q</span><span class="o">);</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">swap</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">array</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="kt">int</span> <span class="n">j</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">  <span class="kt">int</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+</span><span class="line">  <span class="n">array</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="n">j</span><span class="o">];</span>
+</span><span class="line">  <span class="n">array</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">=</span> <span class="n">temp</span><span class="o">;</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>但是这个算法有个缺陷，在已经排序好的数组上性能非常差。所以人们就对原始快速排序算法进行了改进，改进的地方就是pivot的选取，用随机数或者中间位置的数取代最左端的数；还有就是初始化两个指针，分别从数组的两端向pivot扫描，小于pivot的数和大于等于pivot的数直接交换等，具体可以参看这篇文章：<a href="http://www.blogjava.net/killme2008/archive/2010/09/08/quicksort_optimized.html" title="快速排序及优化">快速排序及优化</a>。</p>
+
+<p>我们来看一下经过上述两个方法优化过的快速排序算法：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Quicksort2.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">quickSort2</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">array</span><span class="o">,</span> <span class="kt">int</span> <span class="n">p</span><span class="o">,</span> <span class="kt">int</span> <span class="n">q</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">q</span><span class="o">;</span>
+</span><span class="line">		
+</span><span class="line">  <span class="c1">// 选中间数为pivot</span>
+</span><span class="line">  <span class="kt">int</span> <span class="n">pivot</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="n">i</span> <span class="o">+</span> <span class="o">(</span><span class="n">q</span> <span class="o">-</span> <span class="n">p</span><span class="o">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">];</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="n">j</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">			
+</span><span class="line">    <span class="k">while</span> <span class="o">(</span><span class="n">array</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">pivot</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">i</span><span class="o">++;</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">			
+</span><span class="line">    <span class="k">while</span> <span class="o">(</span><span class="n">array</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">pivot</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">j</span><span class="o">--;</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="c1">// 交换小于pivot的数和大于pivot的数</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="n">j</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">swap</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">j</span><span class="o">);</span>
+</span><span class="line">      <span class="n">i</span><span class="o">++;</span>
+</span><span class="line">      <span class="n">j</span><span class="o">--;</span>
+</span><span class="line">	 <span class="o">}</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">		
+</span><span class="line">  <span class="c1">// 迭代</span>
+</span><span class="line">  <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="n">j</span><span class="o">)</span>
+</span><span class="line">    <span class="n">quickSort2</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">j</span><span class="o">);</span>
+</span><span class="line">  <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">q</span><span class="o">)</span>
+</span><span class="line">    <span class="n">quickSort2</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">q</span><span class="o">);</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>就是这样，快速排序其实蛮简单的，它和冒泡排序的区别就是：在冒泡排序中，数组中的数需要和其他多个数比较，越前面的数比较的次数越多；而快速排序在一次排序中比较的是一个固定的pivot，所以效率要比冒泡排序高很多。</p>
+
+<p>下面是排序算法的比较：</p>
+
+<table class="datalist">
+  <thead>
+    <tr>
+      <th>Sort</th>
+      <th>Average</th>
+      <th>Best</th>
+      <th>Worst</th>
+      <th>Space</th>
+      <th>Stability</th>
+      <th>Remarks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Bubble sort</td>
+      <td>O(n^2)</td>
+      <td>O(n^2)</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>Always use a modified bubble sort</td>
+    </tr>
+    <tr>
+      <td>Modified Bubble sort</td>
+      <td>O(n^2)</td>
+      <td>O(n)</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>Stops after reaching a sorted array</td>
+    </tr>
+    <tr>
+      <td>Selection Sort</td>
+      <td>O(n^2)</td>
+      <td>O(n^2)</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>Even a perfectly sorted input requires scanning the entire array</td>
+    </tr>
+    <tr>
+      <td>Insertion Sort</td>
+      <td>O(n^2)</td>
+      <td>O(n)</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>In the best case (already sorted), every insert requires constant time</td>
+    </tr>
+    <tr>
+      <td>Heap Sort</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>Constant</td>
+      <td>Instable</td>
+      <td>By using input array as storage for the heap, it is possible to achieve constant space</td>
+    </tr>
+    <tr>
+      <td>Merge Sort</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>Depends</td>
+      <td>Stable</td>
+      <td>On arrays, merge sort requires O(n) space; on linked lists, merge sort requires constant space</td>
+    </tr>
+    <tr>
+      <td>Quicksort</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>Randomly picking a pivot value (or shuffling the array prior to sorting) can help avoid worst case scenarios such as a perfectly sorted array</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>参考文章</p>
+
+<ol>
+  <li><a href="http://www.blogjava.net/killme2008/archive/2010/09/08/quicksort_optimized.html" title="快速排序及优化">快速排序及优化</a>  </li>
+  <li><a href="http://www.vogella.de/articles/JavaAlgorithmsQuicksort/article.html" title="Quicksort in Java">Quicksort in Java</a>  </li>
+  <li><a href="http://www.cprogramming.com/tutorial/computersciencetheory/sortcomp.html" title="Sorting Algorithm Comparison">Sorting Algorithm Comparison</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(十)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/14/how-browsers-work-ten/"/>
+    <updated>2011-12-14T00:26:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/14/how-browsers-work-ten</id>
+    <content type="html"><![CDATA[<p><strong>6 绘制</strong></p>
+
+<p>在绘制阶段会遍历渲染树和调用renderer的<code>paint</code>方法来把他们的内容显示在屏幕上。绘制使用的是UI基础组件。</p>
+
+<p><strong>6.1 全局和增量</strong></p>
+
+<p>像布局一样，可以全局绘(绘制整个渲染树)，也可以是增量绘制。在增量绘制中，一部分renderer的变化不会影响这棵渲染树。变化过的renderer会使它在屏幕上的矩形区域无效，这就会造成OS把它当作“脏区域”(dirty region)并且生成<code>paint</code>事件。OS会聪明地把多个脏区域合并成一个。在Chrome中则更复杂一点，因为renderer不是在主进程中，而是在其他进程中。Chrome模拟OS行为并且扩展它们，表现层监听这些事件而且把消息代理给渲染树的根元素。遍历渲染树直到遇见相关的renderer，渲染树重新绘制自己(经常连同它的孩子节点)。</p>
+
+<p><strong>6.2 绘制顺序</strong></p>
+
+<p>CSS2的规范中规定了绘制的顺序。这个顺序实际上就是元素在上下文中堆积的顺序。因为是从后往前绘制的，所以这个顺序会影响绘制。renderer的堆积顺序是：</p>
+
+<ol>
+  <li>background color</li>
+  <li>background image</li>
+  <li>border</li>
+  <li>children</li>
+  <li>outline</li>
+</ol>
+
+<p><strong>6.3 Firefox的显示列表</strong></p>
+
+<p>Firefox会再次遍历渲染树，然后构造一个已经绘制的矩形区域的显示列表。其中包含矩形区域相关的renderer，从右往左的绘制顺序(背景，边框等)。这种方式只需要遍历一次渲染树就可以重新绘制(所有背景，再所有图片，再所有边框等)。</p>
+
+<p>Firefox通过不把hidden的元素加入到列表中来优化这个过程。</p>
+
+<p><strong>6.4 Webkit的矩形存储</strong></p>
+
+<p>在重新绘制之前，webkit把旧的矩形保存为一个<code>bitmap</code>，然后只重新绘制新旧矩形的不同之处。</p>
+
+<!-- more -->
+
+<p><strong>7 动态变化</strong></p>
+
+<p>对应一个修改，浏览器会做尽可能少的动作，所以改变元素的颜色只会重新绘制这个元素。元素位置的改变会使元素重新布局和绘制，包括它的孩子和同辈元素。添加一个DOM节点会导致重新布局和绘制这个节点，主要的变化，比如改变<code>html</code>元素的字体大小，会导致缓存失效，重新布局和绘制整棵渲染树。</p>
+
+<p><strong>8 渲染引擎的线程</strong></p>
+
+<p>渲染引擎是单线程的，除了网络操作，大多数情况下是单线程的。在Firefox和Safari里，渲染线程是浏览器的主线程，但是在Chrome里它则是标签页进程的主线程。</p>
+
+<p>网络操作可以被多个线程并行执行，并行连接的数量是限定的(一般是2到6个连接，例如Firefox 3采用的是6个连接)。</p>
+
+<p><strong>8.1 事件循环</strong></p>
+
+<p>浏览器的主线程是一个事件循环，而且这个循环是无限的来保持进程能一直存活下去。它等待事件(比如布局和绘制事件)的到来，然后处理他们。下面是Firefox的主事件循环代码：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">mExiting</span><span class="p">)</span>
+</span><span class="line">    <span class="n">NS_ProcessNextEvent</span><span class="p">(</span><span class="kr">thread</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>9 CSS2的视觉模型</strong></p>
+
+<p><strong>9.1 画布(canvas)</strong></p>
+
+<p>根据CSS2的规范，画布是指：格式化结构被渲染的空间，也就是浏览器绘制内容的地方。画布在空间的任意维度上都是无限的，但是浏览器会在<code>viewport</code>的维度上选择一个初始宽度。</p>
+
+<p>根据<a href="www.w3.org/TR/CSS2/zindex.html" title="z-index">z-index</a>上所说，如果一个画布内包含了另一个画布的话，那么它内部的画布就会边透明；而如果没有包含其他画布的话，浏览器会给它一个浏览器定义的颜色。</p>
+
+<p><strong>9.2 CSS的盒子模型(box model)</strong></p>
+
+<p>CSS的盒子模型描述的是在文档树中为元素生成的矩形盒子，并且根据视觉格式模型被展现出来。</p>
+
+<p>每个盒子有一个内容区域(比如：文字，图片等)和可选的<code>padding</code>，<code>border</code>以及<code>margin</code>区域。</p>
+
+<p><img src="http://farm8.staticflickr.com/7005/6505395185_30710fe726.jpg&quot; width=&quot;500&quot; height=&quot;342&quot;" alt="box model" /></p>
+
+<p>每个节点都会生成0到n个这样的盒子。所有的元素都有一个<code>display</code>属性，这个属性决定了要生成盒子的类型。例如：</p>
+
+<p>block  - generates a block box.
+inline - generates one or more inline boxes.
+none - no box is generated.</p>
+
+<p>默认的盒子是<code>inline</code>类型的，但是浏览器自带的样式标会设置成其他默认值。例如：<code>div</code>元素的<code>display</code>默认值是<code>block</code>。你可以在<a href="www.w3.org/TR/CSS2/sample.html">这里</a>找到默认样式表的例子。</p>
+
+<p><strong>9.3 确定scheme的位置</strong></p>
+
+<p>有三种类型的scheme：</p>
+
+<ol>
+  <li>普通： 对象是根据它在文档中的位置来确定位置的，也就是说它在渲染树中的位置就好像它在DOM树中的位置，然后根据它的盒子类型和维度展现出来。</li>
+  <li>浮动： 对象一开始是普通类型，然后尽可能地往左边或右边移动。</li>
+  <li>绝对： 对象在渲染树中的位置和它在DOM树中的位置不同。</li>
+</ol>
+
+<p>scheme的位置是通过设置<code>position</code>属性和<code>float</code>属性来确定的。</p>
+
+<ul>
+  <li>静态和相对的值生成普通流</li>
+  <li>绝对和固定的值生成绝对的位置</li>
+</ul>
+
+<p>在静态位置确定过程中，<code>position</code>没有被定义，而且使用默认值，在其他scheme里，开发者指定了<code>position</code>(top,bottom,left,right)。</p>
+
+<p>盒子展现的方式是由以下条件决定的：</p>
+
+<ul>
+  <li>盒子的类型</li>
+  <li>盒子的维度</li>
+  <li>scheme的位置</li>
+  <li>外部信息(比如：图片大小和屏幕尺寸)</li>
+</ul>
+
+<p><strong>9.4 盒子的类型</strong></p>
+
+<p>Block：在浏览器窗口中有自己的矩形区域</p>
+
+<p><img src="http://farm8.staticflickr.com/7018/6505506095_ba7907c252_m.jpg&quot; width=&quot;150&quot; height=&quot;127&quot;" alt="block box" /></p>
+
+<p>Inline：没有自己的block，但是被其他block包含</p>
+
+<p><img src="http://farm8.staticflickr.com/7029/6505521245_8a3aee3173_m.jpg&quot; width=&quot;240&quot; height=&quot;186&quot;" alt="inline box" /></p>
+
+<p>Block垂直方向上一个排列，Inline在水平方向上排列</p>
+
+<p><img src="http://farm8.staticflickr.com/7003/6505539833_92df259ca6_m.jpg&quot; width=&quot;240&quot; height=&quot;222&quot;" alt="block and inline formatting" /></p>
+
+<p>Inline盒子被放在一行行中，所以又叫”line boxes”。行的高度至少要和最高的盒子一样，但是可以更高。当盒子和基准行(baseline)对齐时，意味着元素的底部和其他盒子不是底部的某个点对齐。为了防止容器的宽度不够，inline的盒子会被放在多行中，这一般发生在有段落的情况下。</p>
+
+<p><img src="http://farm8.staticflickr.com/7160/6505571567_7834c0cae3_m.jpg&quot; width=&quot;240&quot; height=&quot;166&quot;" alt="lines" /></p>
+
+<p><strong>9.5 确定位置</strong></p>
+
+<p><strong>9.5.1 相对盒子</strong></p>
+
+<p>相对位置是：先像通常一样放置，然后根据差异移动。</p>
+
+<p><img src="http://farm8.staticflickr.com/7010/6505597613_10dab9cd61_m.jpg&quot; width=&quot;240&quot; height=&quot;125&quot;" alt="relative positioning" /></p>
+
+<p><strong>9.5.2 漂浮盒子</strong></p>
+
+<p>漂浮盒子是偏移到一行左边或右边，有趣的特性是其他盒子环绕在它的旁边。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;p&gt;</span>
+</span><span class="line">  <span class="nt">&lt;img</span> <span class="na">style=</span><span class="s">&quot;float:right&quot;</span> <span class="na">src=</span><span class="s">&quot;images/image.gif&quot;</span> <span class="na">width=</span><span class="s">&quot;100&quot;</span> <span class="na">height=</span><span class="s">&quot;100&quot;</span><span class="nt">&gt;</span>
+</span><span class="line">  Lorem ipsum dolor sit amet, consectetuer...
+</span><span class="line"><span class="nt">&lt;/p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>的结果会是下面这个样子：</p>
+
+<p><img src="http://farm8.staticflickr.com/7160/6505635961_734095bce0_m.jpg&quot; width=&quot;240&quot; height=&quot;110&quot;" alt="float" /></p>
+
+<p><strong>9.5.3 绝对和固定盒子</strong></p>
+
+<p>绝对和固定盒子的定义独立于普通流，元素也不参与普通流，它的维度是相对于容器的。固定盒子的容器是viewport。</p>
+
+<p><img src="http://farm8.staticflickr.com/7164/6505656271_8a14ca32f2_m.jpg&quot; width=&quot;240&quot; height=&quot;165&quot;" alt="fixed positioning" /></p>
+
+<p>注意：固定盒子不会移动，即使下拉窗口！</p>
+
+<p><strong>9.6 基于层次的表现形式</strong></p>
+
+<p>它是用CSS中的<code>z-index</code>来指定的，它代表了盒子的第三维度，它的位置是沿着Z轴的。盒子被分成很多堆(称为堆积上下文)，在每个堆里最后一个元素首先被绘制，然后是前面的元素，所以前面的元素更靠近用户。为了防止重叠，先绘制的元素将被隐藏。</p>
+
+<p>堆是根据<code>z-index</code>属性来排序的，盒子是和<code>z-index</code>属性一起存放在本地堆中，viewport则有外部堆。</p>
+
+<p>例如：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;style </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
+</span><span class="line">      <span class="nt">div</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class="line">        <span class="k">left</span><span class="o">:</span> <span class="m">2in</span><span class="p">;</span>
+</span><span class="line">        <span class="k">top</span><span class="o">:</span> <span class="m">2in</span><span class="p">;</span>
+</span><span class="line">      <span class="p">}</span>
+</span><span class="line"><span class="nt">&lt;/style&gt;</span>
+</span><span class="line">
+</span><span class="line"><span class="nt">&lt;p&gt;</span>
+</span><span class="line">    <span class="nt">&lt;div</span>
+</span><span class="line">         <span class="na">style=</span><span class="s">&quot;z-index: 3;background-color:red; width: 1in; height: 1in; &quot;</span><span class="nt">&gt;</span>
+</span><span class="line">    <span class="nt">&lt;/div&gt;</span>
+</span><span class="line">    <span class="nt">&lt;div</span>
+</span><span class="line">         <span class="na">style=</span><span class="s">&quot;z-index: 1;background-color:green;width: 2in; height: 2in;&quot;</span><span class="nt">&gt;</span>
+</span><span class="line">    <span class="nt">&lt;/div&gt;</span>
+</span><span class="line"> <span class="nt">&lt;/p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>结果会是下面这个样子：</p>
+
+<p><img src="http://farm8.staticflickr.com/7021/6505743937_a87c962997_m.jpg&quot; width=&quot;240&quot; height=&quot;214&quot;" alt="fixed positioning" /></p>
+
+<p>尽管红色div声明在绿色之前而且会被首先绘制，但是它<code>z-index</code>属性值更大，所以它在根盒子持有的堆中位置更靠前。</p>
+
+<p>==========全文完==========</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(九)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/12/how-browsers-work-nine/"/>
+    <updated>2011-12-12T22:19:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/12/how-browsers-work-nine</id>
+    <content type="html"><![CDATA[<p><strong>5 布局</strong></p>
+
+<p>当renderer被创建和加入到树中时，它是没有位置和大小的，计算这两个值称为布局或回流(reflow)。</p>
+
+<p>HTML使用的是基于布局模型的流，这意味着大多数时间内，单一路径下计算几何值是可能的。后进入流的元素不会影响比它先进入流的元素的几何属性值，所以布局文档可以被从左到右，从上到下处理。但是也有例外：比如，HTML的table元素可能需要多条路径。</p>
+
+<p>坐标系统是和根框架相关的，而且使用的是上坐标和左坐标。</p>
+
+<p>布局是一个迭代的过程，它从根renderer(对应于HTML文档的<code>&lt;html&gt;</code>元素)开始。布局迭代部分或整个框架，计算每个renderer的几何信息。</p>
+
+<p>根renderer的位置是<code>0,0</code>，它的范围是viewport(浏览器窗口的可视区域)。所有的renderer都有<code>layout</code>或<code>reflow</code>方法，每个renderer调用需要生成布局的孩子的<code>layout</code>方法。</p>
+
+<!-- more -->
+
+<p><strong>5.1 脏位系统</strong></p>
+
+<p>为了在细小的改动是不重新生成整个布局，浏览器使用一个叫脏位(dirty bit)的系统。一个被修改或添加的renderer，它和它的孩子都会被标记为”dirty”，意思是说需要重新布局。</p>
+
+<p>浏览器有2个标志位：“dirty”和”children are dirty”。后者的意思是也许这个renderer本身不需要重新布局，但是它的孩子中至少有一个需要重新布局。</p>
+
+<p><strong>5.2 全局和增量布局</strong></p>
+
+<p>布局可以在整个渲染树上被触发，这就叫做全局(global)布局。全局布局的触发条件为：</p>
+
+<ol>
+  <li>全局样式的改变影响了所有的renderer，例如修改字体大小。</li>
+  <li>窗口大小的改变。</li>
+</ol>
+
+<p>布局可以是增量式的，只有脏renderer会被设置布局(这样会造成需要做额外布局的危害)。</p>
+
+<p>当renderer被标记为脏时，增量布局被异步触发。例如在从网络上获取内容后，新renderer被附加到渲染树，并且被加入到DOM树中。</p>
+
+<p><img src="http://farm8.staticflickr.com/7167/6498973627_ca37c1cac5.jpg&quot; width=&quot;326&quot; height=&quot;341&quot;" alt="reflow" /></p>
+
+<p><strong>5.3 异步和同步布局</strong></p>
+
+<p>增量布局的过程是异步的，Firefox把reflow命令放入队列，然后用一个调度器批量的执行这些命令。Webkit也有一个计时器来实现增量布局，遍历渲染树把脏renderer重新布局。</p>
+
+<p>脚本请求样式信息，比如<code>offsetHeight</code>，会触发同步的增量布局。全部布局一般都是同步触发的，有些时候因为一些属性的原因，布局在初始后被作为回调函数触发，比如下拉位置的改变。</p>
+
+<p><strong>5.4 优化</strong></p>
+
+<p>当布局是因为大小改变或者renderer的位置改变而触发，那么renderer的大小将从cache从读取，不会重新计算。</p>
+
+<p>在一些情况下，比如只有子树被修改和布局不是从根开始，这是由于修改是在本地而且没有影响到周围元素，比如文本插入到文本区域。</p>
+
+<p><strong>5.5 布局过程</strong></p>
+
+<p>布局总是有下面的模式：</p>
+
+<ol>
+  <li>双亲renderer决定自己的宽度。</li>
+  <li>双亲转为孩子并且：
+    <ol>
+      <li>设置孩子renderer的<code>x</code>和<code>y</code></li>
+      <li>如果被标记为脏或者在全局布局中等原因，则调用孩子的<code>layout</code>方法，这会导致计算孩子的高度。</li>
+    </ol>
+  </li>
+  <li>双亲使用孩子累积的<code>height</code>，<code>margin</code>和<code>padding</code>来设置自己的对应值。</li>
+  <li>设置脏位为false。</li>
+</ol>
+
+<p>Firefox使用一个状态对象(nsHTMLReflowState)作为布局的一个参数，在其他状态中包括了双亲的宽度。Firefox布局的输出是一个<code>metrics</code>对象(nsHTMLReflowMetrics)，它包含了renderer的高度。</p>
+
+<p><strong>5.6 宽度计算</strong></p>
+
+<p>renderer的宽度是用容器宽度来计算的，renderer的<code>width</code>样式属性，<code>margin</code>和<code>border</code>属性。</p>
+
+<p>例如计算下面<code>div</code>的宽度：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">&quot;width:30%&quot;</span><span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Webkit是这样计算的(RenderBox类的calcWidth方法)</p>
+
+<ul>
+  <li>容器的宽度取容器可以达到的最大宽度与0两者之间较大的那个，可以达到的最大宽度就是内容宽度，它的计算方式是：<code>clientWidth() - paddingLeft() - paddingRight()</code>，clientWidth和clientHeight表示的是除了border和scrollbar之外的内部对象。</li>
+  <li>元素的宽度是有样式属性<code>width</code>决定的，它是计算容器宽度的百分比得出的一个绝对数值。</li>
+  <li>然后加入水平边框和缩进</li>
+</ul>
+
+<p>到目前为止是偏好宽度(preferred width)的计算，然后最小和最大宽度值会被计算。如果偏好宽度比最大宽度大，那么就会使用最大宽度，同样如果小于最小宽度，那么就会使用最小宽度。</p>
+
+<p>以防万一宽度没有改变的情况下需要重新布局，所以宽度的值都会被缓存。</p>
+
+<p><strong>5.7 换行</strong></p>
+
+<p>当一个renderer在布局的中间时就需要被分开，这时它会停止布局并告诉双亲它需要被分开，然后双亲就会创建额外的renderer和在他们身上调用<code>layout</code>方法。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(八)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/11/how-browsers-work-eight/"/>
+    <updated>2011-12-11T21:32:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/11/how-browsers-work-eight</id>
+    <content type="html"><![CDATA[<p>4.3.3 简单规则匹配的例子</p>
+
+<p>样式规则有下面几种：</p>
+
+<ul>
+  <li>
+    <p>CSS规则，外部表单或style元素</p>
+
+    <p>p {color:blue}</p>
+  </li>
+  <li>
+    <p>内联style属性</p>
+
+    <p style="color:blue" />
+  </li>
+  <li>
+    <p>HTML的视觉属性(会被映射到相关的样式规则)</p>
+
+    <p bgcolor="blue" />
+  </li>
+</ul>
+
+<!-- more -->
+
+<p>后两种很容易和元素匹配，因为元素有style属性和HTML属性，他们可以用元素作为key来映射。</p>
+
+<p>前面提到过的问题#2，CSS规则匹配可以是很复杂的。为了解决这个难题，所以对规则做一些处理，让获取规则更容易。</p>
+
+<p>在解析样式表后，根据选择器规则会被加入到一个或多个hashmap中。这些map有以id为key的，有以class名key的，有以tag名为key的，还有一个通用map，它的key可以是任何类型。如果选择器是id选择器，那么规则会被加入到以id为key的map中，以此类推。</p>
+
+<p>这个处理会使匹配规则变得更加容易。现在就没有必要查看每个定义，我们可以从map中得到相关的规则。这个优化消除了超过95%的规则，所以他们甚至在匹配过程中都不需要被考虑。</p>
+
+<p>让我们看下面一个样式规则的例子：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">p.error {color:red}
+</span><span class="line">#messageDiv {height:50px}
+</span><span class="line">div {margin:5px}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>上面第一个规则会被插入到以class为key的map中，第二个规则会被插入到以id为key的map中，第三个规则会被插入到以tag名为key的map中。</p>
+
+<p>对于下面的HTML片段：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;</span>an error occurred <span class="nt">&lt;/p&gt;</span>
+</span><span class="line"><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot; messageDiv&quot;</span><span class="nt">&gt;</span>this is a message<span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>首先尝试寻找对应<code>p</code>元素的规则，在以class为key的map里找到一个以<code>error</code>为key的规则<code>p.error</code>。div元素在id的map和tag名的map中都有相关规则，所以剩下要做的只是找到哪个规则是真正匹配的规则。</p>
+
+<p>例如下面的div样式规则：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">table div {margin:5px}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>更好匹配的是tag名的map，因为tag名是最右端的选择器，但是如果div元素没有table锚点的话就不会匹配。</p>
+
+<p>Webkit和Firefox都会做这个处理。</p>
+
+<p>4.3.4 在正确的层级顺序中应用规则</p>
+
+<p>style对象有对应于视觉属性的属性，如果属性没有对应的规则，那么一些属性可以继承双亲元素的style对象，其他的属性有默认值。</p>
+
+<p>当有多个定义的时候问题就来了，解决这个问题靠的是层级顺序。</p>
+
+<p>样式表的层级顺序</p>
+
+<p>style属性的声明可以在多个样式表中被声明，有时在一个样式表中，这意味着应用规则的顺序变得非常重要。这被称为层级顺序，根据CSS2的规范说明，层级顺序是(从低到高)：</p>
+
+<ol>
+  <li>浏览器定义</li>
+  <li>用户普通定义</li>
+  <li>开发者普通定义</li>
+  <li>开发者重要定义</li>
+  <li>用户重要定义</li>
+</ol>
+
+<p>浏览器定义是最不重要的，用户定义的样式如果被标记为重要的就可以覆盖开发者定义的样式。如果是相同顺序的定义会被<a href="http://www.html5rocks.com/en/tutorials/internals/howbrowserswork/#Specificity" title="specificity">特征(specificity)</a>排序，经过排序后的顺序是特征化的。HTML视觉属性被翻译成匹配的CSS声明，他们是以低优先级的开发者规则被对待的。</p>
+
+<p>特征(Specificity)</p>
+
+<p>选择器的特征在<a href="http://www.w3.org/TR/CSS2/cascade.html#specificity" title="CSS2">CSS2规范</a>中被定义为：</p>
+
+<ul>
+  <li>如果样式声明是从style属性中来，而不是一个选择器的规则，那么特征就为1，否则就为0(= a)</li>
+  <li>计算选择器的ID属性的数量(= b)</li>
+  <li>计算选择器中其他属性和pseudo-class的数量(= c)</li>
+  <li>计算选择器中元素名和pseudo-element的数量(= d)</li>
+</ul>
+
+<p>最后特征值就是把上面四个数字连起来：a-b-c-d</p>
+
+<p>数的进制是上面四个数的最大值决定的。例如，如果<code>a = 14</code>，那么就可以使用16进制；而如果<code>a = 17</code>的话，就需要使用18或更高进制。后一种情况在选择器类似于<code>html body div div p ... </code>的情况下会发生。</p>
+
+<p>一些例子：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">*             {}  /* a=0 b=0 c=0 d=0 -&gt; specificity = 0,0,0,0 */
+</span><span class="line"> li            {}  /* a=0 b=0 c=0 d=1 -&gt; specificity = 0,0,0,1 */
+</span><span class="line"> li:first-line {}  /* a=0 b=0 c=0 d=2 -&gt; specificity = 0,0,0,2 */
+</span><span class="line"> ul li         {}  /* a=0 b=0 c=0 d=2 -&gt; specificity = 0,0,0,2 */
+</span><span class="line"> ul ol+li      {}  /* a=0 b=0 c=0 d=3 -&gt; specificity = 0,0,0,3 */
+</span><span class="line"> h1 + *[rel=up]{}  /* a=0 b=0 c=1 d=1 -&gt; specificity = 0,0,1,1 */
+</span><span class="line"> ul ol li.red  {}  /* a=0 b=0 c=1 d=3 -&gt; specificity = 0,0,1,3 */
+</span><span class="line"> li.red.level  {}  /* a=0 b=0 c=2 d=1 -&gt; specificity = 0,0,2,1 */
+</span><span class="line"> #x34y         {}  /* a=0 b=1 c=0 d=0 -&gt; specificity = 0,1,0,0 */
+</span><span class="line"> style=""          /* a=1 b=0 c=0 d=0 -&gt; specificity = 1,0,0,0 */</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>规则排序</p>
+
+<p>在所有的规则匹配之后，他们会根据层级规则被排序。Webkit使用冒泡排序法对小的集合排序，用归并排序法对大的集合排序。Webkit依靠重写<code>&gt;</code>操作符来实现排序：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="k">static</span> <span class="n">bool</span> <span class="n">operator</span> <span class="o">&gt;</span><span class="p">(</span><span class="n">CSSRuleData</span><span class="o">&amp;</span> <span class="n">r1</span><span class="p">,</span> <span class="n">CSSRuleData</span><span class="o">&amp;</span> <span class="n">r2</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">int</span> <span class="n">spec1</span> <span class="o">=</span> <span class="n">r1</span><span class="p">.</span><span class="n">selector</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">specificity</span><span class="p">();</span>
+</span><span class="line">    <span class="kt">int</span> <span class="n">spec2</span> <span class="o">=</span> <span class="n">r2</span><span class="p">.</span><span class="n">selector</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">specificity</span><span class="p">();</span>
+</span><span class="line">    <span class="k">return</span> <span class="p">(</span><span class="n">spec1</span> <span class="o">==</span> <span class="n">spec2</span><span class="p">)</span> <span class="o">:</span> <span class="n">r1</span><span class="p">.</span><span class="n">position</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">r2</span><span class="p">.</span><span class="n">position</span><span class="p">()</span> <span class="o">:</span> <span class="n">spec1</span> <span class="o">&gt;</span> <span class="n">spec2</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>4.4 渐进的过程</p>
+
+<p>Webkit使用一个标志来标记所有顶层样式表(包括<code>@imports</code>)被加载完成。如果在样式没有完全被加载时就去访问它，那么站位符就会被使并且在文档中被标记，在样式表被加载完成后重新计算。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(七)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/11/how-browsers-work-seven/"/>
+    <updated>2011-12-11T15:13:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/11/how-browsers-work-seven</id>
+    <content type="html"><![CDATA[<p>4.1 渲染树和DOM树的关系</p>
+
+<p>renderer对应于DOM的元素，但并不是一对一的关系。非视觉DOM元素不会被插入渲染树，比如”head”元素。元素的视觉属性是”none”的元素不会出现在树中(视觉属性是”hidden”话会出现在树中)。</p>
+
+<p>DOM元素对应多个视觉对象。一般情况下，复杂结构的元素不能在单个矩形中被描述清楚。比如，<code>select</code>元素有3个renderer：一个是显示区域；一个是下拉框；还有一个是按钮。当文字被分成多行的时候(在一行里显示的宽度不够)，新的行会被作为附加renderer加入到树中。</p>
+
+<p>另一个有许多renderer的例子例子是不完整的HTML。根据CSS规范，内联元素必须包含块元素或着只包含内联元素。为了防止混合的内容，匿名块renderer会被创建来包裹内敛元素。</p>
+
+<p>有些渲染对象对应于DOM节点，但不是在树中的相同位置。浮动元素和绝对固定位置的元素会被放置在树中的不同的位置，而且映射到实际的frame中去，所以它应该是有站位符的frame。</p>
+
+<!-- more -->
+
+<p><img src="http://farm8.staticflickr.com/7156/6486727487_c447bed064.jpg&quot; width=&quot;500&quot; height=&quot;271&quot;" alt="render tree corresponding dom tree" /></p>
+
+<p>4.2 构造树的流程</p>
+
+<p>在Firefox中，展示层为了DOM更新而注册成了一个监听器。展示层把frame的创建代理给了<code>FrameConstructor</code>，而且构造器处理样式和创建frame。</p>
+
+<p>在Webkit中，处理样式和创建renderer被称为“attachment”。每个DOM节点都有一个”attach”方法。“attachment”是同步的，节点被添加到DOM树中被称为新节点”attach”方法。</p>
+
+<p>处理html和body标签会造成渲染树根节点的构造。根渲染对象对应于在CSS规范中的containing block(最上端包含其他所有block的block)。跟节点的大小就是viewport(浏览器窗口显示的区域大小)，Firefox把它称作<code>ViewPortFrame</code>，而Webkit把它称为<code>RenderView</code>。这就是文档指向的渲染对象，树的其余部分是通过插入DOM节点来构造的。</p>
+
+<p>4.3 样式的计算</p>
+
+<p>构建渲染树的时候需要计算渲染对象的视觉属性，这是通过计算每个元素的style属性完成的。</p>
+
+<p>样式包括各种样式表源，内联样式元素和HTML里的视觉属性(比如”bgcolor”属性)，然后再被转换匹配CSS里的属性。</p>
+
+<p>样式表源是浏览器的默认样式表，样式表由开发者和用户样式表提供。用户样式表是由浏览器使用者提供(浏览器允许自定义样式，比如在Firefox中，可以通过在”Firefox Profile”文件夹下放置样式表来实现)。</p>
+
+<p>样式的计算有一些难点：</p>
+
+<ol>
+  <li>样式数据结构非常庞大，持有大量的样式属性会有内存问题。</li>
+  <li>
+    <p>为每个元素找到对应的规则在没有优化的情况下会有性能问题。为每个元素遍历整个规则表是一个非常繁重的工作。选择器的结构有的非常负责，这会造成匹配过程从一个看上去有希望的路径开始，但最后证明是无效的，然后尝试另一个路径。</p>
+
+    <p>例如下面这个组合选择器：</p>
+
+    <pre><code>div div div div{
+...
+}
+</code></pre>
+
+    <p>上面例子的样式意味着要应用到一个被3个div包含的<code>&lt;div&gt;</code>上去。假如你想检查这个规则被应用到了一个给定的div元素上，你需要选择某个路径向上查找。你可能会向上遍历节点树，发现只有2个div元素，然后尝试另一条路径。</p>
+  </li>
+  <li>应用规则包括非常复杂的层级规则，它定义了规则的继承关系。</li>
+</ol>
+
+<p>让我们来看一下浏览器是怎么处理这些问题的：</p>
+
+<p>4.3.1 共享样式数据</p>
+
+<p>Webkit的节点引用样式对象(RenderStyle)，这些对象可以在某些条件下被节点共享。这些节点是兄弟或同辈节点，而且：</p>
+
+<ol>
+  <li>元素必须在相同的鼠标状态下(比如，一个有<code>:hover</code>而另一个没有)</li>
+  <li>两个元素都不应该有id</li>
+  <li>标签名要匹配</li>
+  <li><code>class</code>属性要匹配</li>
+  <li>映射过的属性要一致</li>
+  <li><code>link</code>要匹配</li>
+  <li><code>focus</code>要匹配</li>
+  <li>两个元素都不能被属性选择器影响，影响的是定义为拥有任何选择器匹配使用一个属性的选择器。</li>
+  <li>元素没有内联样式属性</li>
+  <li>必须有兄弟选择器，当遇到任何的兄弟选择器，WebCore简单的抛出一个全局switch，当他们出现时对整个文档禁用样式共享。这包括<code>+</code>选择器和<code>:first-child</code>，<code>:last-child</code>选择器。</li>
+</ol>
+
+<p>4.3.2 Firefox规则树</p>
+
+<p>为了更简单地计算样式，Firefox有两个额外的树：规则树和样式上下文树。Webkit也有样式对象，不过他们都不保存在树中，只有DOM节点指向与它相关的样式。</p>
+
+<p><img src="http://farm8.staticflickr.com/7031/6490768261_6bb541748b.jpg&quot; width=&quot;500&quot; height=&quot;318&quot;" alt="style context tree" /></p>
+
+<p>样式上下文树包含最终值。这个值是通过应用在正确顺序上的所有匹配的规则和把逻辑值转换成具体的值。比如，如果逻辑值是屏幕的百分比，那它会被计算和转换成绝对值。规则树的想法真的是非常聪明，它使得在节点间共享这些值，避免了再次的计算，也节省了空间。</p>
+
+<p>所有匹配的规则被保存在一个树中，叶子节点在路径上有更高的优先级。这棵树包含所有已经找到并且匹配的路径。规则是延迟保存的，这棵树不会在一开始为每个节点计算，只是当一个节点的样式需要被计算时，计算路径才会被加入到树中。</p>
+
+<p>这个查找路径的想法就像在字典中查单词一样，让我看一下已经计算好的规则树：</p>
+
+<p><img src="http://farm8.staticflickr.com/7152/6490816137_053bb01868.jpg&quot; width=&quot;400&quot; height=&quot;261&quot;" alt="rule tree" /></p>
+
+<p>假设我们需要为一个上下文树中的元素匹配规则，并且找到了匹配的规则是B - E - I。我们已经在树中有这个路径，因为我们已经计算了路径A - B - E - I - L，所以现在剩下的工作变得轻松很多。</p>
+
+<p>让我看一下这棵树是怎么减轻我们的工作量的。</p>
+
+<p>分配成为结构(Division into structs)</p>
+
+<p>样式上下文被分配成为结构。这些结构包含了某个种类的样式信息，比如<code>border</code>或<code>color</code>。所有的属性在结构中要么被继承，要么没有被继承。继承的属性除非是被元素定义，否则继承自他的父亲。没有继承的属性(被称为”reset”属性)在某有定义的情况下使用默认值。</p>
+
+<p>这棵树的作用是缓存树中的整个结构(包含计算完成的最终值)。这个想法就是，如果底端的节点不能满足一个结构的定义，那么就可以使用缓存结构中更上层的节点。</p>
+
+<p>用规则树计算样式上下文</p>
+
+<p>当为某个元素计算样式上下文时，我们首先计算规则树中的一个路径，或者使用现有的一个路径。然后开始应用路径上的规则来填充新样式上下文的结构。我们从路径的底部节点开始(最高的优先级，通常是最具体的选择器)向上遍历整棵树直到结构被填充满。如果在规则节点中没有结构的规范，我们就可以做巨大的优化(向上遍历树直到找到一个完全匹配的节点，然后简单地指向它，这是最优优化，因为整个结构被共享了，节省计算最终值的工作量和内存）。</p>
+
+<p>如果只找到部分定义就向上查找知道结构被填满。</p>
+
+<p>如果没有找到对结构的任何定义，为了防止结构是一个继承类型，就把它指向上下文树的双亲结构，在这种情况下我们也能共享结构，如果是一个reset结构，那么将会使用默认值。</p>
+
+<p>如果大多数特定的节点加入了值，我们需要做一些额外的计算把它转换成实际值，然后在缓存结果在树节点中，然后就可以被子节点使用。</p>
+
+<p>为了防止一个元素有兄弟，把它指向同一个节点，这样的话整个样式上下文可以被他们共享。</p>
+
+<p>让我看个例子，假设有下面的HTML</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;html&gt;</span>
+</span><span class="line">  <span class="nt">&lt;body&gt;</span>
+</span><span class="line">    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;err&quot;</span> <span class="na">id=</span><span class="s">&quot;div1&quot;</span><span class="nt">&gt;</span>
+</span><span class="line">      <span class="nt">&lt;p&gt;</span>
+</span><span class="line">        this is a <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;big&quot;</span><span class="nt">&gt;</span> big error <span class="nt">&lt;/span&gt;</span>
+</span><span class="line">        this is also a
+</span><span class="line">        <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;big&quot;</span><span class="nt">&gt;</span> very  big  error<span class="nt">&lt;/span&gt;</span> error
+</span><span class="line">      <span class="nt">&lt;/p&gt;</span>
+</span><span class="line">    <span class="nt">&lt;/div&gt;</span>
+</span><span class="line">    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;err&quot;</span> <span class="na">id=</span><span class="s">&quot;div2&quot;</span><span class="nt">&gt;</span>another error<span class="nt">&lt;/div&gt;</span>
+</span><span class="line">  <span class="nt">&lt;/body&gt;</span>
+</span><span class="line"><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>和下面的规则：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">1. div {margin:5px;color:black}
+</span><span class="line">2. .err {color:red}
+</span><span class="line">3. .big {margin-top:3px}
+</span><span class="line">4. div span {margin-bottom:4px}
+</span><span class="line">5. #div1 {color:blue}
+</span><span class="line">6. #div2 {color:green}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>为了简便，我们之需要填充两个结构：<code>color</code>和<code>margin</code>结构。<code>color</code>结构只包含一个成员<code>color</code>；<code>margin</code>结构包含四个方面。</p>
+
+<p>规则树的结果大致是下面的样子(节点用节点名标记，#号后的数字是它指向的规则)：</p>
+
+<p><img src="http://farm8.staticflickr.com/7163/6490941481_7c897aeef6.jpg&quot; width=&quot;500&quot; height=&quot;294&quot;" alt="rule tree" /></p>
+
+<p>上下文树则是下面的的样子(冒号后的是它指向的规则节点)：</p>
+
+<p><img src="http://farm8.staticflickr.com/7172/6490949269_a4116c1fd5.jpg&quot; width=&quot;400&quot; height=&quot;305&quot;" alt="context tree" /></p>
+
+<p>假设解析HTML而且要得到第二个<code>div</code>标签，我们需要为这个节点创建一个样式上下文，然后填充它的样式结构。</p>
+
+<p>匹配规则后发现与这个<code>div</code>匹配的规则是1，2和6。这意味着在树中已经有一个存在的路径供我们的元素使用，只要加入另一个节点6到规则树中(规则树的节点F)。</p>
+
+<p>我们将会创建一个样式上下文，并把它加入到上下文树中，新的样式上下文将指向规则树的节点F。</p>
+
+<p>现在需要填充样式结构了。我们从填充<code>margin</code>结构开始，因为最后的规则节点F没有加入到<code>margin</code>结构，我们向上查找节点直到找到在上一次节点插入是已经缓存的计算完成的结构，然后使用这个结构。这个节点就是B，它是<code>margin</code>规则的最上层节点。</p>
+
+<p>我们有一个<code>color</code>结构的定义，所以我们不能使用缓存的结构。因为<code>color</code>有一个属性，所以不需要向上查找节点填充其他属性。我们只要计算最终值(把字符串转换成RGB等)，并且缓存这个节点的结构。</p>
+
+<p>第二个<code>span</code>元素的工作更容易。匹配规则的结果是像前一个<code>span</code>一样指向G。因为我们有兄弟节点指向相同节点，我们可以共享整个样式上下文，只需要指向上一个<code>span</code>的上下文。</p>
+
+<p>对于包含继承它双亲的规则的结构来说，缓存是在上下文树中完成的。(<code>coloor</code>属性是被继承的，但是Firefox把它当作reset，缓存在规则树上)。</p>
+
+<p>例如，如果我们在一个段落里加入字体规则：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">p {font-family:Verdana;font size:10px;font-weight:bold}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>段落元素是上下文树中<code>div</code>节点的孩子节点，所以如果段落没有定义字体规则的情况下，可以共享它双亲相同的字体结构。</p>
+
+<p>Webkit没有规则树，所以匹配的定义要遍历4次。首先是非重要高优先级属性先于高优先级重要属性(被其他的属性依赖的属性先要被生成节点，比如<code>display</code>)被生成节点。然后一般优先级非重要属性，再是一般优先级重要属性。这意味着出现多次的属性会被处理多次，但是结果由最后一次决定。</p>
+
+<p>所以总结来说：共享样式对象(全部或者部分结构)可以解决问题1和3。Firefox的规则树则会帮助在正确的顺序下应用属性。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(六)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/10/how-browsers-work-six/"/>
+    <updated>2011-12-10T20:57:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/10/how-browsers-work-six</id>
+    <content type="html"><![CDATA[<p>3.3 CSS解析</p>
+
+<p>和HTML不同，CSS是内容无关的语法，所以可以被一般解析器解析。CSS规范定义了词法和语法。</p>
+
+<p>让我们来看一些例子：</p>
+
+<p>CSS的文法(词汇)是用正则表达式定义的</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">comment   \/\*[^*]*\*+([^/*][^*]*\*+)*\/
+</span><span class="line">num   [0-9]+|[0-9]*"."[0-9]+
+</span><span class="line">nonascii  [\200-\377]
+</span><span class="line">nmstart   [_a-z]|{nonascii}|{escape}
+</span><span class="line">nmchar    [_a-z0-9-]|{nonascii}|{escape}
+</span><span class="line">name    {nmchar}+
+</span><span class="line">ident   {nmstart}{nmchar}*</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>ident是identifier的缩写，比如class的名字；name是元素id(#号引用)。</p>
+
+<!-- more -->
+
+<p>而语法使用BNF描述的：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">ruleset
+</span><span class="line">  : selector [ ',' S* selector ]*
+</span><span class="line">    '{' S* declaration [ ';' S* declaration ]* '}' S*
+</span><span class="line">  ;
+</span><span class="line">selector
+</span><span class="line">  : simple_selector [ combinator selector | S+ [ combinator? selector ]? ]? 
+</span><span class="line">  ;
+</span><span class="line">simple_selector
+</span><span class="line">  : element_name [ HASH | class | attrib | pseudo ]*
+</span><span class="line">  | [ HASH | class | attrib | pseudo ]+
+</span><span class="line">  ;
+</span><span class="line">class
+</span><span class="line">  : '.' IDENT
+</span><span class="line">  ;
+</span><span class="line">element_name
+</span><span class="line">  : IDENT | '*'
+</span><span class="line">  ;
+</span><span class="line">attrib
+</span><span class="line">  : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S*
+</span><span class="line">    [ IDENT | STRING ] S* ] ']'
+</span><span class="line">  ;
+</span><span class="line">pseudo
+</span><span class="line">  : ':' [ IDENT | FUNCTION S* [IDENT S*] ')' ]
+</span><span class="line">  ;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>比如下面的CSS：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">div.error , a.error {
+</span><span class="line">  color:red;
+</span><span class="line">  font-weight:bold;
+</span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>div.error</code>和<code>a.error</code>是选择器，大括号里包含的就是ruleset里定义的规则，它适用于下面的定义：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">ruleset
+</span><span class="line">  : selector [ ',' S* selector ]*
+</span><span class="line">    '{' S* declaration [ ';' S* declaration ]* '}' S*
+</span><span class="line">  ;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>也就是说，ruleset是一个或多个选择器，他们由逗号隔开，S代表空格。ruleset包括大括号和其中的一个或多个，由分号隔开的声明。”声明”和”选择器“会在下面的BNF定义中介绍。</p>
+
+<p>3.3.1 Webkit的CSS解析器</p>
+
+<p>Webkit使用Flex和Bison解析器生成器，从CSS语法文件自动创建解析器，而Bison创建的是自下而上的shift-reduce解析器。Firefox使用手动写的自上而下的解析器。两种情况下，每个CSS文件都会被解析成为StyleSheet对象，每个对象都包含CSS规则。CSS规则对象包含选择器和声明对象，还有其他CSS语法中对应的对象。</p>
+
+<p><img src="http://farm8.staticflickr.com/7145/6486240717_22094df7b7.jpg&quot; width=&quot;500&quot; height=&quot;393&quot;" alt="parsing css" /></p>
+
+<p>3.4 处理scripts和style sheets的顺序</p>
+
+<p>3.4.1 Scripts</p>
+
+<p>web的模型是异步的。开发者希望当遇到<code>&lt;script&gt;</code>标签后，脚本能够立即被解析和执行。文档的解析会被挂起，知道脚本执行完毕。如果脚本是从外部引用的，那么必须先从网络上把拿到这个脚本，这个过程是同步的，直到脚本被抓取到本地后才会开始解析。这个模型已经存在了很多年，而且在HTML4和5规范中也有定义。开发者可以把脚本标记为”differ”，这样的话就不会挂起文档解析，脚本解析完后就会执行。HTML5加入了一个可以标记脚本为异步的选项，所以它会被另一个线程解析和执行。</p>
+
+<p>3.4.2 Speculative parsing</p>
+
+<p>Webkit和Firefox都会做这种优化。当脚本在执行时，另一个线程解析剩下的文档和找出其他需要从网络上加载的资源，并且加载他们。在这种方式下，资源可以在并行连接的情况下加载，而且总的速度会更好。注意，speculative parser不会修改DOM树，然后把它交给主解析器，它只解析外部资源的引用，比如外部脚本，样式表和图片。</p>
+
+<p>3.4.3 Style sheets</p>
+
+<p>没有理由等待DOM树和停止文档解析。有个脚本的问题就是在文档解析阶段脚本请求样式的信息。如果样式还没有被加载和解析，脚本会获得错误的结果，这样明显会产生许多问题。这看上去是一个边界条件，但又是非常普遍。Firefox在CSS加载和解析的时候会阻塞所有的脚本。Webkit只在尝试获取某个特定的CSS属性，而这个属性会被未加载的CSS影响到时阻塞脚本。</p>
+
+<p>4 渲染构造树</p>
+
+<p>当DOM树被构造完成后，浏览器会构造另一棵树，即渲染树。这棵树是按顺序的视觉元素构成的，而且他们会被显示。它是文档的视觉展现。渲染树的目的是使内容在正确的顺序上绘制。</p>
+
+<p>Firefox把渲染树里的元素称为”frames”，Webkt则是render或render object。
+Webkit的RenderObject类是renderer的基本类，它的定义如下：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="n">class</span> <span class="n">RenderObject</span><span class="p">{</span>
+</span><span class="line">  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">layout</span><span class="p">();</span>
+</span><span class="line">  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">paint</span><span class="p">(</span><span class="n">PaintInfo</span><span class="p">);</span>
+</span><span class="line">  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">rect</span> <span class="n">repaintRect</span><span class="p">();</span>
+</span><span class="line">  <span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">;</span>  <span class="c1">//the DOM node</span>
+</span><span class="line">  <span class="n">RenderStyle</span><span class="o">*</span> <span class="n">style</span><span class="p">;</span>  <span class="c1">// the computed style</span>
+</span><span class="line">  <span class="n">RenderLayer</span><span class="o">*</span> <span class="n">containgLayer</span><span class="p">;</span> <span class="c1">//the containing z-index layer</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>每个renderer代表了一个矩形区域，类似于节点的CSS盒子模型。它包括了几何信息，比如宽度，高度和位置。</p>
+
+<p>盒子的类型会被”display”样式的属性影响(参看style computation部分)。下面的Webkit代码是决定的是，根据显示属性，什么类型的renderer应该被创建为DOM节点。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="n">RenderObject</span><span class="o">*</span> <span class="n">RenderObject</span><span class="o">::</span><span class="n">createObject</span><span class="p">(</span><span class="n">Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="n">RenderStyle</span><span class="o">*</span> <span class="n">style</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="n">Document</span><span class="o">*</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">document</span><span class="p">();</span>
+</span><span class="line">    <span class="n">RenderArena</span><span class="o">*</span> <span class="n">arena</span> <span class="o">=</span> <span class="n">doc</span><span class="o">-&gt;</span><span class="n">renderArena</span><span class="p">();</span>
+</span><span class="line">    <span class="p">...</span>
+</span><span class="line">    <span class="n">RenderObject</span><span class="o">*</span> <span class="n">o</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">switch</span> <span class="p">(</span><span class="n">style</span><span class="o">-&gt;</span><span class="n">display</span><span class="p">())</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">NONE</span>:
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">INLINE</span>:
+</span><span class="line">            <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderInline</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">BLOCK</span>:
+</span><span class="line">            <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderBlock</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">INLINE_BLOCK</span>:
+</span><span class="line">            <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderBlock</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">        <span class="k">case</span> <span class="n">LIST_ITEM</span>:
+</span><span class="line">            <span class="n">o</span> <span class="o">=</span> <span class="n">new</span> <span class="p">(</span><span class="n">arena</span><span class="p">)</span> <span class="n">RenderListItem</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</span><span class="line">            <span class="k">break</span><span class="p">;</span>
+</span><span class="line">       <span class="p">...</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">o</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>元素类型也是会被考虑的，例如，form控制和table有特殊的框架。在Webkit中，如果元素想要创建特殊的renderer，它会覆盖<code>createRenderer</code>方法。renderer指向包含非几何信息的style object。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(五)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/10/how-browsers-work-five/"/>
+    <updated>2011-12-10T17:14:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/10/how-browsers-work-five</id>
+    <content type="html"><![CDATA[<p>3.2.6 标记算法</p>
+
+<p>这个算法的输出是一个HTML标记，它可以用状态机来表示。每个状态消费输入流的一个或多个字符，然后根据这些字符更新下一个状态。状态的更新是由当前标记状态和树构造状态决定的。这意味着根据当前状态，同样的字符会对下一个正确的状态产生不同的结果。这个算法太复杂，所以不能完全描述清楚，所以让我来看一个简单的例子，这个例子会帮助我们理解这个算法。</p>
+
+<p>标记下面的HTML：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;html&gt;
+</span><span class="line">  &lt;body&gt;
+</span><span class="line">    Hello world
+</span><span class="line">  &lt;/body&gt;
+</span><span class="line">&lt;/html&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<!-- more -->
+
+<p>初始状态是”<strong>Data state</strong>”。当遇到字符<code>&lt;</code>后，状态被改变成”<strong>Tag open state</strong>”。消费一个<code>a</code>到<code>z</code>的字符会创建”<strong>Start tag token</strong>”，而状态会变成”<strong>Tag name state</strong>”。然后状态一直保持到遇到<code>&gt;</code>字符。每个字符被加在了新标记名称之后，在这个例子中，被创建的标记是<code>html</code>。</p>
+
+<p>当遇到<code>&gt;</code>字符后，当前状态被改回成”<strong>Data state</strong>”。下面的<code>&lt;body&gt;</code>标签是同样的处理步骤。到目前为止，<code>&lt;html&gt;</code>和<code>&lt;body&gt;</code>标签处理完成了，回到了”<strong>Data state</strong>”状态。然后碰到的是<code>Hello world</code>中的<code>H</code>字符，这会导致标记的创建直到遇到<code>&lt;/body&gt;</code>标签的<code>&lt;</code>字符，然后为<code>Hello world</code>的每个字符释放字符标记。</p>
+
+<p>我们现在回到了”<strong>Tag open state</strong>”状态。下面一个遇到的字符是<code>/</code>，这会导致创建<code>end tag token</code>并且状态改变为”<strong>Tag name state</strong>”。同样，这个状态持续到遇到<code>&gt;</code>字符。然后新的标签会被释放，回到”<strong>Data state</strong>”状态。<code>&lt;/html&gt;</code>标签是同样的处理流程。</p>
+
+<p><img src="http://farm8.staticflickr.com/7145/6485458369_9f574b3101.jpg&quot; width=&quot;500&quot; height=&quot;309&quot;" alt="tokenizing state machine" /></p>
+
+<p>3.2.7 树的构造算法</p>
+
+<p>当解析器被创建的时候，文档对象就被创建了。在整个构造树的过程中，DOM树的根结点会被修改或者添加元素。每个节点的释放由树构造器处理。对于每个标记，规范定义了与之相对应的DOM元素，所以会创建相对应的DOM元素。除了向DOM树中添加元素外，还会向开放元素的栈中添加。这个栈是被用来纠正嵌套错误和未关闭的标签。这个算法也被描述为一个状态机，那些状态被称为<strong>插入模式</strong>(insertion modes)。</p>
+
+<p>让我们来看一下树的构造过程，比如下面的输入：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;html&gt;</span>
+</span><span class="line">  <span class="nt">&lt;body&gt;</span>
+</span><span class="line">    Hello world
+</span><span class="line">  <span class="nt">&lt;/body&gt;</span>
+</span><span class="line"><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>输入对于构造树的阶段来说，是一个初始模式是”<strong>initial mode</strong>”的标记序列。获取HTML标记会引发向”<strong>before html</strong>”模式的移动，并且在那个模式下的再次处理。这会造成<code>HTMLHtmlElement</code>元素的创建，然后被附加到对象模型的根结点上去。</p>
+
+<p>然后状态会变成”<strong>before head</strong>”。尽管没有<code>head</code>标记，当得到<code>body</code>标记，<code>HTMLHeadElement</code>元素会被隐式地创建，然后加入到树中。</p>
+
+<p>现在模式移动，从”<strong>in head</strong>”模式再到”<strong>after head</strong>”模式。<code>body</code>标记被再次处理，<code>HTMLBodyElement</code>元素被创建，并且模式被转移到了”<strong>in body</strong>”。</p>
+
+<p>现在碰到的是<code>Hello world</code>字符串的字符标记。首先会创建和插入<code>Text</code>节点，其他字符会附加到这个节点上去。</p>
+
+<p>如果碰到<code>body</code>的关闭标记的话会使模式转入”<strong>after body</strong>”。然后碰到<code>html</code>关闭标签，模式转换成”<strong>after after body</strong>“。碰到文件结束标记后，解析结束。</p>
+
+<p><img src="http://farm8.staticflickr.com/7156/6485575299_706ab0d663.jpg&quot; width=&quot;346&quot; height=&quot;500&quot;" alt="tree construction" /></p>
+
+<p>3.2.8 解析结束后</p>
+
+<p>解析结束后会标记文档为interactive，然后开始解析应该在文档解析完成后执行的脚本。这个文档状态会被设置成”complete”，而且”load”事件会被触发。</p>
+
+<p>3.2.9 浏览器的容错性</p>
+
+<p>你永远不会在HTML页面上得到一个”Invalid Syntax”错误。浏览器会修复任何一个非法的文档，使它能够正常运行。</p>
+
+<p>拿下面这个例子来说：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;html&gt;</span>
+</span><span class="line">  <span class="nt">&lt;mytag&gt;</span>
+</span><span class="line">  <span class="nt">&lt;/mytag&gt;</span>
+</span><span class="line">  <span class="nt">&lt;div&gt;</span>
+</span><span class="line">  <span class="nt">&lt;p&gt;</span>
+</span><span class="line">  <span class="nt">&lt;/div&gt;</span>
+</span><span class="line">    Really lousy HTML
+</span><span class="line">  <span class="nt">&lt;/p&gt;</span>
+</span><span class="line"><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>在这个例子中我犯了许多错误：<code>mytag</code>不是标准标签，<code>p</code>和<code>div</code>元素都嵌套错误。但即使这样，浏览器也能正确执行这段HTML，所以这些错误都被浏览器给纠正了。</p>
+
+<p>错误处理在各个浏览器中是非常一致的，但是令人惊奇的是这并不是HTML当前规范的一部分。就像书签和前进/后退按钮一样，这是在浏览器多年进化的结果。</p>
+
+<p>HTML5规范定义了一些上述的需求。Webkit在它的HTML解析类的开头美妙地总结如下：
+&gt; The parser parses tokenized input into the document, building up the document tree. If the document is well-formed, parsing it is straightforward.  </p>
+
+<blockquote>
+  <p>Unfortunately, we have to handle many HTML documents that are not well-formed, so the parser has to be tolerant about errors.  </p>
+</blockquote>
+
+<blockquote>
+  <p>We have to take care of at least the following error conditions:  </p>
+</blockquote>
+
+<blockquote>
+  <ol>
+    <li>The element being added is explicitly forbidden inside some outer tag. In this case we should close all tags up to the one, which forbids the element, and add it afterwards.</li>
+    <li>We are not allowed to add the element directly. It could be that the person writing the document forgot some tag in between (or that the tag in between is optional). This could be the case with the following tags: HTML HEAD BODY TBODY TR TD LI (did I forget any?).</li>
+    <li>We want to add a block element inside to an inline element. Close all inline elements up to the next higher block element.</li>
+    <li>If this doesn’t help, close elements until we are allowed to add the element or ignore the tag.</li>
+  </ol>
+</blockquote>
+
+<p>让我们来看一些Webkit的容错例子:</p>
+
+<p><strong><code>&lt;/br&gt;</code>代替<code>&lt;br&gt;</code></strong></p>
+
+<p>有些站点使用<code>&lt;/br&gt;</code>代替<code>&lt;br&gt;</code>，为了跟IE和Firefox兼容，Webkit会把<code>&lt;/br&gt;</code>处理成<code>&lt;br&gt;</code>。</p>
+
+<p>Webkit代码：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="k">if</span> <span class="p">(</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">isCloseTag</span><span class="p">(</span><span class="n">brTag</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">m_document</span><span class="o">-&gt;</span><span class="n">inCompatMode</span><span class="p">())</span> <span class="p">{</span>
+</span><span class="line">     <span class="n">reportError</span><span class="p">(</span><span class="n">MalformedBRError</span><span class="p">);</span>
+</span><span class="line">     <span class="n">t</span><span class="o">-&gt;</span><span class="n">beginTag</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>注意：错误处理只在内部执行，不会展现给用户。</p>
+
+<p><strong>A stray table</strong></p>
+
+<p>stras table指的是一个table元素里直接里包含了另一个table元素，就像下面的例子：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;table&gt;</span>
+</span><span class="line">    <span class="nt">&lt;table&gt;</span>
+</span><span class="line">        <span class="nt">&lt;tr&gt;&lt;td&gt;</span>inner table<span class="nt">&lt;/td&gt;&lt;/tr&gt;</span>
+</span><span class="line">    <span class="nt">&lt;/table&gt;</span>
+</span><span class="line">    <span class="nt">&lt;tr&gt;&lt;td&gt;</span>outer table<span class="nt">&lt;/td&gt;&lt;/tr&gt;</span>
+</span><span class="line"><span class="nt">&lt;/table&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Webkit会改变它的继承结构为两个同级别的table：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;table&gt;</span>
+</span><span class="line">    <span class="nt">&lt;tr&gt;&lt;td&gt;</span>outer table<span class="nt">&lt;/td&gt;&lt;/tr&gt;</span>
+</span><span class="line"><span class="nt">&lt;/table&gt;</span>
+</span><span class="line"><span class="nt">&lt;table&gt;</span>
+</span><span class="line">    <span class="nt">&lt;tr&gt;&lt;td&gt;</span>inner table<span class="nt">&lt;/td&gt;&lt;/tr&gt;</span>
+</span><span class="line"><span class="nt">&lt;/table&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>处理这部分的代码为：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="k">if</span> <span class="p">(</span><span class="n">m_inStrayTableContent</span> <span class="o">&amp;&amp;</span> <span class="n">localName</span> <span class="o">==</span> <span class="n">tableTag</span><span class="p">)</span>
+</span><span class="line">        <span class="n">popBlock</span><span class="p">(</span><span class="n">tableTag</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Webkit利用栈来保存当前内容，它会弹出内部的table，这样的话这两个table就是同级别的了。</p>
+
+<p><strong>从元素嵌套</strong></p>
+
+<p>为了防止用户把一个form放到另一个form内，内部的form将被丢弃，代码为：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_currentFormElement</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">m_currentFormElement</span> <span class="o">=</span> <span class="n">new</span> <span class="n">HTMLFormElement</span><span class="p">(</span><span class="n">formTag</span><span class="p">,</span>    <span class="n">m_document</span><span class="p">);</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>过深的标签嵌套</strong></p>
+
+<p>注释说明的非常清楚：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="c1">// www.liceo.edu.mx is an example of a site that achieves a level of nesting of about </span>
+</span><span class="line"><span class="c1">// 1500 tags, all from a bunch of &lt;b&gt;s. We will only allow at most 20 nested tags   </span>
+</span><span class="line"><span class="c1">// of the same type before just ignoring them all together.</span>
+</span><span class="line"><span class="n">bool</span> <span class="n">HTMLParser</span><span class="o">::</span><span class="n">allowNestedRedundantTag</span><span class="p">(</span><span class="k">const</span> <span class="n">AtomicString</span><span class="o">&amp;</span> <span class="n">tagName</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">
+</span><span class="line"><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="line"><span class="k">for</span> <span class="p">(</span><span class="n">HTMLStackElem</span><span class="o">*</span> <span class="n">curr</span> <span class="o">=</span> <span class="n">m_blockStack</span><span class="p">;</span>
+</span><span class="line">         <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cMaxRedundantTagDepth</span> <span class="o">&amp;&amp;</span> <span class="n">curr</span> <span class="o">&amp;&amp;</span> <span class="n">curr</span><span class="o">-&gt;</span><span class="n">tagName</span> <span class="o">==</span> <span class="n">tagName</span><span class="p">;</span>
+</span><span class="line">     <span class="n">curr</span> <span class="o">=</span> <span class="n">curr</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">,</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+</span><span class="line"><span class="k">return</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">cMaxRedundantTagDepth</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>html或者body的关闭标签位置错误</strong></p>
+
+<p>同样，注释说明的非常清楚：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="c1">// Support for really broken html. We never close the body tag, since some stupid web pages </span>
+</span><span class="line"><span class="c1">// close it before the actual end of the doc. Let&#39;s rely on th//e end() call to close things.</span>
+</span><span class="line"><span class="k">if</span> <span class="p">(</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">tagName</span> <span class="o">==</span> <span class="n">htmlTag</span> <span class="o">||</span> <span class="n">t</span><span class="o">-&gt;</span><span class="n">tagName</span> <span class="o">==</span> <span class="n">bodyTag</span> <span class="p">)</span>
+</span><span class="line">        <span class="k">return</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>所以web开发人员要注意，除非你想作为Webkit的容错代码片段的例子出现，否则要写格式良好的HTML。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(四)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/10/how-browsers-work-four/"/>
+    <updated>2011-12-10T14:18:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/10/how-browsers-work-four</id>
+    <content type="html"><![CDATA[<p>3.2 HTML解析器</p>
+
+<p>HTML解析器的工作是把HTML标记语言解析成为解析树。</p>
+
+<p>3.2.1 HTML语法定义</p>
+
+<p>HTML的词汇和语法是由W3C组织制定的。当前的版本是HTML4，HTML5还在制定当中。</p>
+
+<p>3.2.2 不是内容无关语法的HTML</p>
+
+<p>我们在介绍解析的时候知道了，语法可以被定义为正式使用的格式，比如BNF。</p>
+
+<p>不过不幸的是，所有约定的解析器都不适用于HTML。HTML不能简单的定义一个解析器需要的内容无关语法。</p>
+
+<p>有一个定义HTML的正式格式 - DTD，但它也不是内容无关语法。</p>
+
+<p>所以第一眼看上去就很奇怪，HTML更接近于XML。而XML的解析器却有很多，而且有一个HTML的XML版本 - XHTML，那么有什么不同呢？</p>
+
+<p>不同之处在于，HTML的方式更加宽松，它允许你省略特定的标签，然后会隐式的为你加上去。总的来看，相对于XML来说，HTML是“软”语法。</p>
+
+<p>显然，这个细小的差别让两者大不一样。一方面这是HTML流行的主要原因 - 允许你犯错，而且对于开发人员来说非常容易。另一方面，它有使的写一个正式语法变得非常困难。所以总结来看 - HTML不能被简单的解析，不能被约定的解析器解析，因为它不是内容无关语法，也不能被XML解析器解析。</p>
+
+<!-- more -->
+
+<p>3.2.3 HTML DTD</p>
+
+<p>HTML的定义是一个DTD的格式。这个格式被用来定义<a href="http://en.wikipedia.org/wiki/Standard_Generalized_Markup_Language" title="SGML">SGML</a>家族语言。它包含了对所以允许元素的定义，他们的属性和继承关系。我们已经知道，HTML DTD不能形成一个内容无关语法。</p>
+
+<p>还有一些类型的DTD。像严格的类型会紧密遵守规范，但其他类型包含对以前浏览器使用的标签的支持，这个目的就是向后兼容旧内容。当前的严格版DTD在<a href="http://www.w3.org/TR/html4/strict.dtd" title="strict dtd">这里</a>。</p>
+
+<p>3.2.4 DOM</p>
+
+<p>输出树(也就是解析树)，它包含了DOM元素和属性节点。像JavaScript一样，它是HTML文档和元素借口对外界的对象表示。</p>
+
+<p>这棵树的根节点是<a href="http://www.w3.org/TR/1998/REC-DOM-Level-1-19981001/level-one-core.html#i-Document" title="Document">Document</a>对象。</p>
+
+<p>DOM是大多数情况下是一对一关系的标记。比如：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="html"><span class="line"><span class="nt">&lt;html&gt;</span>
+</span><span class="line">  <span class="nt">&lt;body&gt;</span>
+</span><span class="line">    <span class="nt">&lt;p&gt;</span>
+</span><span class="line">      Hello World
+</span><span class="line">    <span class="nt">&lt;/p&gt;</span>
+</span><span class="line">    <span class="nt">&lt;div&gt;</span> <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;example.png&quot;</span><span class="nt">/&gt;&lt;/div&gt;</span>
+</span><span class="line">  <span class="nt">&lt;/body&gt;</span>
+</span><span class="line"><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>会被解析成下面这棵树：</p>
+
+<p><img src="http://farm8.staticflickr.com/7155/6485284597_9b1d73e56d.jpg&quot; width=&quot;400&quot; height=&quot;219&quot;" alt="dom tree" /></p>
+
+<p>像HTML一样，DOM是由W3C组织定义的，参考<a href="http://www.w3.org/DOM/DOMTR" title="DOM">这里</a>。这是一个处理文档的通用的规范。特殊的模块解释特殊的HTML元素。HTML的定义可以参考<a href="http://www.w3.org/TR/2003/REC-DOM-Level-2-HTML-20030109/idl-definitions.html" title="html">这里</a></p>
+
+<p>我所说的解析树包含DOM节点的意思是，这棵树是由实现某个DOM接口的元素组成的，而浏览器在内部有包含其他属性的具体实现。</p>
+
+<p>3.2.5 解析算法</p>
+
+<p>在上一节里我们看到，HTML不能被自上而下或者自下而上的解析器解析。其中的原因是：</p>
+
+<ol>
+  <li>HTML的容错特性</li>
+  <li>浏览器有传统的错误来支持为人熟知的非法HTML</li>
+  <li>解析过程是重复进出的，一般情况下源代码不会改变，但是在HTML中，包含<code>document.write</code>的标签会另外加入标记，所以解析过程实际上会改变输入。</li>
+</ol>
+
+<p>因为不能使用一般的解析技术，所以浏览器就为HTML开发了专用的解析器。</p>
+
+<p>解析算法详细的定义在<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html">HTML5规范</a>里，算法是由二阶段标记和构建树组成。标记是在词法分析阶段处理，把输入解析成标记。HTML标记有开始标签，结束标签，属性名和属性值。</p>
+
+<p>标记器可以识别标记，并且把他们传给树构造器，然后再处理下一个标记直到输入结束。</p>
+
+<p><img src="http://farm8.staticflickr.com/7150/6485330329_01565f62ab.jpg&quot; width=&quot;308&quot; height=&quot;400&quot;" alt="parsing flow" /></p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(三)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/09/how-browsers-work-three/"/>
+    <updated>2011-12-09T23:54:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/09/how-browsers-work-three</id>
+    <content type="html"><![CDATA[<p>3.1 解析</p>
+
+<p>从渲染引擎解析开始是非常重要的阶段，我们会对它作更深入的研究。首先还是简略的介绍一下什么是解析。</p>
+
+<p>解析一个文档(document)的含义是：把这个文档转换成一些有意义的结构或可以被理解和使用的代码。解析的结果通常是一棵，它的节点代表文档的结构。这棵树被称为解析树或语法树。</p>
+
+<p>实例 - <code>2 + 3 - 1</code>这个表达式的解析结果会返回下面的树：</p>
+
+<p><img src="http://farm8.staticflickr.com/7158/6481798259_420d333218.jpg&quot; width=&quot;400&quot; height=&quot;155&quot;" alt="paring tree" /></p>
+
+<!-- more -->
+
+<p>3.1.1 语法</p>
+
+<p>解析是建立在文档遵守的语法规(语言和格式)则上的。每个可以被解析的格式必须有词汇和语法规则。这被称为与内容无关的语法。人类语言不是这种语言，因此不能被约定的解析技术而解析。</p>
+
+<p>3.1.2 解析器</p>
+
+<p>整个解析过程可以被分成两个子过程 - 词法分析和语法分析</p>
+
+<p>词法分析是把输入分解成标记(token)的过程。标记是语言的词汇，在人类语言中，它是由字典里的所有单词组成的。</p>
+
+<p>语法分析就是应用语言的语法规则。</p>
+
+<p>分析器一般由它的两个组件承担不同的工作。一个是lexer(有时也会被称为tokenizer)，它主要是把输入分解成合法的标记。另一个是parser，它主要是根据语言的语法规则，分析文档构建解析树。lexer知道怎么消除不相关的字符，像空格符和还行符。</p>
+
+<p><img src="http://farm8.staticflickr.com/7011/6481889667_2fe7dd07cb.jpg&quot; width=&quot;101&quot; height=&quot;300&quot;" alt="paring tree" /></p>
+
+<p>解析的过程是迭代式的。parser一般会向lexer请求一个新的标记，然后尝试用语法规则来匹配这个标记。如果匹配一个规则，跟这个标记对应的节点会被加入到解析树，然后请求另一个标记。</p>
+
+<p>如果没有规则匹配，parser会把标记保存在内部，直到所有与保存在内部的标记相匹配的规则被找到之前，它会一直请求新的标记。如果没有找到相应的规则，parser会抛出一个异常。这意味着这个文档是不合法的，并且有语法错误。</p>
+
+<p>3.1.3 翻译</p>
+
+<p>大多数情况下，解析树不是最终的成品。解析在翻译中经常被用到，把输入文档转换成另一种格式。一个例子就是编译。编译器是把源代码编译成为机器代码，首先解析为解析树，然后把解析树翻译成为机器代码稳定。</p>
+
+<p><img src="http://farm8.staticflickr.com/7026/6481955767_7abc1f157b.jpg&quot; width=&quot;104&quot; height=&quot;400&quot;" alt="compilation flow" /></p>
+
+<p>3.1.4 解析实例</p>
+
+<p>让我们试着定义一个简单的数学语言，然后分析表达式<code>2 + 3 - 1</code>解析结果。</p>
+
+<p>词汇：可以有整数，加号和减号。</p>
+
+<p>语法：</p>
+
+<ol>
+  <li>代码块是表达式，数据项和操作符。</li>
+  <li>可以包括任何数字的表达式。</li>
+  <li>一个表达式是被定义为两个数据项之间有一个操作符。</li>
+  <li>操作符是加号或减号的其中之一。</li>
+  <li>数据项是一个整数或表达式。</li>
+</ol>
+
+<p>现在来分析输入：<code>2 + 3 - 1</code></p>
+
+<p>第一次匹配规则的是<strong>2</strong>，然后根据规则#5，它是一个数据项。第二次匹配的是<code>2 + 3</code>，根据规则#3。下一次匹配就是整个表达式。<code>2 + 3 - 1</code>之所以是一个表达式是因为我们已经知道，<code>2 + 3</code>是一个数据项，而且它后面跟着操作符，操作符后面跟着数据项。<code>2 + +</code>不会匹配任何规则，因此这是个非法的输入。</p>
+
+<p>3.1.5 词汇和语法的正式定义</p>
+
+<p>词汇一般用正则表达式来表示。比如，我们上面的例子可以被定义成：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">INTEGER :0|[1-9][0-9]*
+</span><span class="line">PLUS : +
+</span><span class="line">MINUS: -</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>语法一般会被定义成一种叫做<strong>BNF</strong>的格式，我们的语言会被定义成：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">expression :=  term  operation  term
+</span><span class="line">operation :=  PLUS | MINUS
+</span><span class="line">term := INTEGER | expression</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>我们知道一个语言如果是内容无关的语言，那么这个语言是可以被一般解析器解析的。内容无关语法的粗略定义是它可以用BNF表示。正式的定义可以参考<a href="http://en.wikipedia.org/wiki/Context-free_grammar" title="Wikipedia's article on Context-free grammar">Wikipedia’s article on Context-free grammar</a>。</p>
+
+<p>3.1.6 解释器的种类</p>
+
+<p>解释器有两种：<strong>自上而下</strong>和<strong>自下而上</strong>的解析器。一个简单的解释是：自上而下的解析器在更高层次上关注语法，然后尝试匹配他们。自下而上的解析器是从输入开始，渐进的把他们转换进入语法规则，从低级规则到高级规则变化。</p>
+
+<p>让我们来看一下两种类型的解析器是如何解析我们的例子的：</p>
+
+<p>自上而下的解析器从更高层次的规则开始：它会先确定<code>2 + 3</code>是一个表达式，然后再确定<code>2 + 3 + 1</code>是一个表达式(确定表达式的过程涉及其他的规则匹配，但是起点是最高层次的规则)。</p>
+
+<p>而自下而上的表达式会扫描输入，直到有一个规则匹配。然后把匹配的输入换成规则，这个过程会持续到输入的结尾。部分匹配的表达式会被放在解析栈中。</p>
+
+<table id="stack">
+  <tbody><tr><th>Stack</th>                <th>Input</th></tr>
+  <tr><td>&nbsp;</td><td><samp>2 + 3 - 1</samp></td></tr>  
+  <tr><td>term</td><td><samp>+ 3 - 1</samp></td></tr> 
+  <tr><td>term operation</td><td><samp>3 - 1</samp></td></tr>
+  <tr><td>expression</td><td><samp>- 1</samp></td></tr> 
+  <tr><td>expression operation</td><td><samp>1         </samp></td></tr> 
+  <tr><td>expression</td>           <td><samp>&nbsp;</samp></td></tr>                                             
+</tbody></table>
+
+<p>这种类型的自下而上的解析器被称为移位消除解析器(shift-reduce parser)，因为输入被移到了右边(想象有个指针指向输入头，然后往右边移动)，并且根据规则递减。</p>
+
+<p>3.1.7 自动生成解析器</p>
+
+<p>有很多工具可以为你生成解析器。他们被称为解析器生成器。你把语言的语法输入其中，他们就会自动生成解析器。创建一个解析器需要对解析有很深的理解，并且手工创建一个优化过的解析器是比较困难的。</p>
+
+<p>Webkit使用的是两个有名的解析器生成器：<a href="http://en.wikipedia.org/wiki/Flex_lexical_analyser" title="Flex">Flex</a>用来生成词法分析器，<a href="http://www.gnu.org/software/bison/" title="Bison">Bison</a>用来生成语法分析器。Flex的输入是一个包含正则表达式定义的标记的文件；Bison的输入是BNF格式的语法规则。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Code Rush]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/06/code-rush/"/>
+    <updated>2011-12-06T22:38:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/06/code-rush</id>
+    <content type="html"><![CDATA[<p>在<a href="http://www.ruanyifeng.com/blog/2009/09/code_rush.html" title="纪录片《Code Rush》">阮一峰的博客</a>看到了这个纪录片，不过年代有些久远了，记录了Netscape公司从1998年到1999年这一年之间的事，在其中还看到了Jamie Zawinski这位牛人，果真是那样特立独行啊。总之强力推荐，看完后也许你会像我一样找到一些共鸣。</p>
+
+<embed src="http://player.youku.com/player.php/sid/XMTc5OTc5Njcy/v.swf" allowfullscreen="true" quality="high" width="480" height="400" align="middle" allowscriptaccess="always" type="application/x-shockwave-flash" />
+<p>&lt;/embed&gt;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(二)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/06/how-browsers-work-two/"/>
+    <updated>2011-12-06T22:18:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/06/how-browsers-work-two</id>
+    <content type="html"><![CDATA[<p>2 渲染引擎</p>
+
+<p>渲染引擎要做的就是渲染，也就是在浏览器的窗体里显示请求的内容。</p>
+
+<p>一般情况下，渲染引擎可以显示HTML,XML和图片。它也可以通过插件的方式显示其他类型类型的文件，比如PDF。但是，在这章中我们将把焦点放在主要的用例上：显示由CSS格式化过的HTML和图片。</p>
+
+<!-- more -->
+
+<p>2.1 多种渲染引擎</p>
+
+<p>我们作为参考的浏览器：Firefox, Chrome和Safari是构建在不同的两个渲染引擎之上的。Firefox使用的是Gecko，而Chrome和Safari使用的都是Webkit。</p>
+
+<p>Webkit是开源的渲染引擎，它开始时只是针对Linux平台，后来由苹果公司修改后以兼容Mac和Windows平台。<a href="http://webkit.org" title="webkit.org">webkit.org</a>上有更详细的介绍。</p>
+
+<p>2.2 渲染的主要流程</p>
+
+<p>渲染引擎是从网络层中获取请求的内容。然后是渲染的基本流程：</p>
+
+<p><img src="http://farm8.staticflickr.com/7012/6465898245_abf04a9566.jpg&quot; width=&quot;500&quot; height=&quot;55&quot;" alt="flow" /></p>
+
+<p>渲染引擎会开始解析HTML文档，并且把HTML标签转换成为被称作“内容树(content tree)”的DOM节点。还会解析不管是外部引用的还是内联的CSS。样式和可视指令(visual instructions)一起会被创建成为另一棵树-渲染树(render tree)。</p>
+
+<p>在渲染树构造完毕后，浏览器就会开始处理布局。也就是说会分配给每个节点一个屏幕上准确位置的坐标。下一步就是绘制了，即使用UI后端(UI backend)来绘制渲染树每个节点。</p>
+
+<p>理解这是个渐进的过程是非常重要的。为了更好的用户体验，渲染引擎会尽可能快的把内容显示在屏幕上。直到所有的HTML已经解析完毕，并且开始构造和布局渲染树之前，渲染引擎是不会停下等待的。部分的内容会被解析和显示，而在这个时候渲染引擎会继续处理从网络上返回的内容。</p>
+
+<p>2.3 主要流程实例</p>
+
+<p><img src="http://farm8.staticflickr.com/7151/6465898595_b573cc3861.jpg&quot; width=&quot;500&quot; height=&quot;232&quot;" alt="webkitflow" /></p>
+
+<p><img src="http://farm8.staticflickr.com/7018/6465898835_b5e5658f50.jpg&quot; width=&quot;500&quot; height=&quot;232&quot;" alt="geckoflow" /></p>
+
+<p>从上两张图山可以看到，尽管Webkit和Gecko使用不同的术语，但是整个流程是基本一样的。</p>
+
+<p>在Gecko里，把已经经过视觉格式化过的元素树称为框架树(frame tree)。每个元素是一个框架。Webkit则用了另外一个术语：由渲染对象(render object)组成的渲染树(render tree)。</p>
+
+<p>Webkit把元素的放置称为布局(layout)，而Gecko则称之为回流(reflow)。附件(attachment)是Webkit用来表示连接DOM节点和视觉信息来创建渲染树的过程。一个细小的，非语意上的区别是，Gecko在HTML和DOM之间又另外多出来一层。它被称为内容下沉层(content sink)，并且它是制造DOM元素的工厂。下面将会说明整个流程的各个部分。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[浏览器是如何工作的(一)]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/05/how-browsers-work-one/"/>
+    <updated>2011-12-05T23:03:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/05/how-browsers-work-one</id>
+    <content type="html"><![CDATA[<p>浏览器可能是目前使用的人最多的软件，对于软件开发人员来说更是如此。我对浏览器的认识差不多是这样的：</p>
+
+<ul>
+  <li>发送请求到服务器(get/post)</li>
+  <li>解析从服务器返回的response(HTML,CSS)</li>
+  <li>执行JavaScript代码</li>
+</ul>
+
+<p>基本上就是上面这些，但是至于细节就不了解了。直到我看到了这篇长长的文章：<a href="http://www.html5rocks.com/en/tutorials/internals/howbrowserswork/" title="How Browsers Work:Behind the Scenes of Modern Web Browsers">How Browsers Work:Behind the Scenes of Modern Web Browsers</a>,才第一次窥探到了浏览器的处理细节。这个主题一共分成了10章来讲，对于学习和参考浏览器的工作原理都非常有用。所以，我就决定把它翻译成中文，供以后参考用。值得一提的是，这篇文章的作者是一个有着10年以上经验的女程序员，让我们像她致敬！</p>
+
+<p>由于原文较长，所以我也会分成几篇博客来翻，而这篇博客是这个系列的第一篇翻译。</p>
+
+<!-- more -->
+
+<p>=================正文开始====================</p>
+
+<p>1 引子</p>
+
+<p>浏览器可能是目前使用最广的软件。在这个系列的文章中，我将解释浏览器是如何工作的。我们将会看到在浏览器的地址栏中敲入google.com到你看到google的页面这段时间内到底发生了什么。</p>
+
+<p>1.1 我们将会讨论的浏览器</p>
+
+<p>现在有5个主流的浏览器，他们是：IE,Firefox,Safari, Chrome和Opera。我会从开源浏览器Firefox,Chrome以及部分开源的Safari中举例。根据<a href="http://gs.statcounter.com/" title="StatCounter browser statistics">StatCounter browser statistics</a>上的统计，到2011年8月为止，Firefox,Chrome和Safari三者加起来的占有率已经到达将近60%。所以开源浏览器是浏览器领域的重要组成部分。</p>
+
+<p>1.2 浏览器的主要功能</p>
+
+<p>浏览器的主要功能是展现用户选择的网络资源，这是通过发送请求给服务器并且在浏览器中显示返回结果。而这个网络资源一般是一个HTML文档，但也有可能是PDF，图片或者其他类型的资源。资源的地址是通过URI来描述的。</p>
+
+<p>浏览器解释和显示HTML文件的方式是在HTML和CSS规范里面规定的。这些规范是由<a href="http://www.w3.org/" title="W3C">W3C</a>维护的。</p>
+
+<p>多年以来，那些浏览器只遵守了一部分的规范，并且开发他们自己的扩展。但是这就给开发人员带来了严重的兼容性问题。目前大多数浏览器或多或少遵守着规范。</p>
+
+<p>浏览器的用户接口基本上差不多，他们有：</p>
+
+<ul>
+  <li>地址栏</li>
+  <li>后退和前进按钮</li>
+  <li>书签选项</li>
+  <li>刷新和停止按钮</li>
+  <li>主页按钮</li>
+</ul>
+
+<p>奇怪的是，浏览器的用户接口并有在任何正式的规范里规定过，而是来自于多年经验形成的最佳实践，还有浏览器之间的相互模仿。HTML5规范并没有规定浏览器必须具有的UI元素，但是它列出了一些共有的元素。在他们之中有地址栏，状态栏和工具栏。当然，浏览器也可以有自己独特的特性，比如Firefox的Download Manager。</p>
+
+<p>1.3 浏览器的结构概览</p>
+
+<ol>
+  <li>用户接口 - 前面已经提到过</li>
+  <li>浏览器引擎 - 处理UI和渲染引擎之间的行为</li>
+  <li>渲染引擎 - 负责显示请求的内容。比如解析HTML和CSS后显示出来。</li>
+  <li>网络 - 用来网络调用，比如HTTP请求。它是不依赖于平台并且实现隐藏于平台之下。</li>
+  <li>UI后端 - 用来画基本的组合框和窗口。它暴露一个不依赖平台的通用接口，在它之下使用的是操作系统的用户接口方法。</li>
+  <li>JavaScript解释器 - 解析和执行JavaScript代码</li>
+  <li>数据存储 - 这是一个持久层，浏览器需要保存所有类型的数据到硬盘上，比如cookie。而HTML5规定了浏览器的数据库web database。</li>
+</ol>
+
+<p><img src="http://farm8.staticflickr.com/7172/6459942245_401c8ce2ac.jpg&quot; width=&quot;500&quot; height=&quot;339&quot;" alt="layers" /></p>
+
+<p>需要注意的是，Chrome跟大多数浏览器不一样的是，它会有多个渲染引擎的实例，每个标签页都有一个渲染引擎，每个标签页是个独立的进程。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JIT到底做了些什么事]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot/"/>
+    <updated>2011-12-03T15:15:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot</id>
+    <content type="html"><![CDATA[<p>最近在网上看到一篇关JIT(Just in Time)的文章<a href="http://java.dzone.com/articles/just-time-compiler-jit-hotspot?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+javalobby%2Ffrontpage+%28Javalobby+%2F+Java+Zone%29&amp;utm_content=Google+Reader" title="Just in Time Compiler (JIT) in Hotspot">Just in Time Compiler (JIT) in Hotspot</a>,这篇文章很短，但是对JIT的作用基本上说的比较清楚的，可以作为JIT的学习参考，所以我就决定把这篇文章翻译成中文，供以后复习参考用。</p>
+
+<!--more-->
+
+<p>================正文开始==================</p>
+
+<p>什么是JIT编译器</p>
+
+<p>JIT和更普便的自适应优化概念是在包括Java在内的许多编程语言，例如.Net, Lua, JRuby中所为人熟知的概念。</p>
+
+<p>为了解释什么是JIT编译器，我想从编译器的定义开始。根据维基百科上对于编译器的定义：
+&gt; 一个计算机程序是把源程序语言转换成目标语言。</p>
+
+<p>我们对静态Java编译器(javac)都很熟悉，它的作用是将人类能够阅读的.java文件编译成为能够被JVM解释的.class文件。现在问题来了，那么JIT用来编译什么东西呢？答案将在解释完什么是Just in Time后给出。</p>
+
+<p>根据许多研究得出的结果，20%的代码的执行时间要占到全部时间的80%。如果这时候有一种方法决定那些20%的代码并且优化他们，那将是令人兴奋的事。这就是JIT做的事：在运行时收集统计数据，找出那些经常执行的代码，把他们从字节码转换成操作系统能够直接执行的本地代码，并且重度优化他们。最小的编译单元是单个方法。编译和统计数据收集是靠特殊线程并行处理的。在统计数据收集期间，编译器会推测代码功能，并且通过时间的推移来验证这个推测。如果这个推测是错误的话，优化过的代码会被还原并且重新编译。</p>
+
+<p>Hotspot JVM这个名字的由来就是因为这个JVM的作用就是找到代码中的“hot spot(热点)”。</p>
+
+<p>JIT会做哪些优化？</p>
+
+<ul>
+  <li>内敛方法 - 方法不是直接在对象的实例上调用，而是拷贝到调用代码里去。为了防止产生任何开销，热门方法应该尽可能靠近调用着</li>
+  <li>如果监视器从别的线程是不可到达的，那就消除锁</li>
+  <li>用直接的方法调用代替接口以消除调用虚函数的开销</li>
+  <li>合并临近的在同一对象上的锁</li>
+  <li>消除不会被执行的代码(dead code)</li>
+  <li>对非volatile变量，忽略内存写</li>
+  <li>删除预先检查的NullPointerException和IndexOutOfBoundsException</li>
+  <li>等等</li>
+</ul>
+
+<p>当JVM调用一个Java方法，它会使用在已经加载类的方法块中的定义的调用方法。虚拟机有好几个调用方法，比如，如果方法是同步的，或者是本地方法的话，不同的调用者会被使用。JIT编译器使用的是它自己的调用者。虚拟机会检查ACC_MACHINE_COMPILED这个值，来通知解释器这个值对应的方法已经编译并且保持在已加载的类中。JIT编译器把方法块编译成本地代码，并且把它保存在那个方法的代码块中。一旦ACC_MACHINE_COMPILED位被设置，那么这个代码就被编译完成了。那我们怎么知道JIT在我们的程序中正在做什么，怎么样才能控制它？</p>
+
+<p>首先就是取消JIT的功能：Djava.compiler=NONE</p>
+
+<p>Hotspot中有2种JI编译器，一种是为客户端程序使用，另一种是服务器端程序。运行在服务器上的程序通常来说需要更多的资源，并且程序的吞吐量是非常重要的。因此，服务器版的JIT会消耗更多的资源，并且为了统计数据的准确，要花更多的时间来收集统计数据。而客户端版的JIT为一个方法收集统计数据会持续1500次方法调用，服务器版JIT则是15000次。这些默认值可以通过JVM参数:-XX:CompileThreshold=XXX来修改。</p>
+
+<p>JIT的不足</p>
+
+<p>JIT增加了Java程序的不可预测性和复杂性。它增加了一层程序员不是正真理解的另外一层。</p>
+
+<p>一个可能bug的例子：并发中的”happens before relations”。JIT会简单的记录在单线程中代码的改变是否安全。解决这个问题的方法是加上<strong>synchronized</strong>或着显式的加锁。</p>
+
+<p>JIT的优势</p>
+
+<ul>
+  <li>对于GC来说，程序必须到达安全点。为了这个目的，JIT通过在本地代码的相同间隔内注入<strong>yieldpoints</strong>。</li>
+  <li>除了扫描堆栈来找出根引用，寄存器也必须被扫描，因为他们可能会持有JIT创建的对象。</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: architecture | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/architecture/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Quora使用的技术]]></title>
+    <link href="http://liuxuan.info/blog/2011/07/16/quora-technology-examined/"/>
+    <updated>2011-07-16T15:43:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/07/16/quora-technology-examined</id>
+    <content type="html"><![CDATA[<p>如果提起<a href="http://www.quora.com" title="Quora">Quora</a>,国人首先想到的可能会是它在国内的山寨版<a href="http://www.zhihu.com" title="知乎">知乎</a>。想当初知乎还因为它的条款问题引来网络上的一片骂声，这个事件倒是给我提了个醒，因为我以前基本上不看网站的条款声明，现在看来以后要看明白了再用啊（特别是山寨货），不然怎么死的都不知道。当然我关注的不是山寨货，而是它的本源Quora。 <!--more--></p>
+
+<p><a href="http://www.flickr.com/photos/60110479@N08/5943445558/" title="Flickr 上 Foredoomed 的 quora_stackoverflow_zhihu"><img src="http://farm7.static.flickr.com/6001/5943445558_12a1fc3061.jpg" width="500" height="375" alt="quora_stackoverflow_zhihu" /></a></p>
+
+<p>Quora由Facebook前CTO亚当·德安杰洛（Adam D’Angelo）以及Facebook工程技术经理查理·切沃（Charlie Cheever）于2008年创立。2010年初开始内部测试的Quora在3月获得风险投资公司Benchmark Capital的1400万美元投资。据《华尔街日报》报道，估值为8750万美元。但是Quora目前还是执行着邀请制度，这导致它的PV相对于同类型的社交问答网站<a href="http://stackoverflow.com" title="Stack Overflow">Stack Overflow</a>要少了很多。但这并不能阻止Quora的火爆，其高质量的回答和优秀的用户体验都是它的优势所在。</p>
+
+<p>作为我自己来讲，更多的还是关心Quora使用到的技术。它的性能为什么这么棒，它的架构是怎样的，它使用的是哪种语言和框架，它的搜索性能为什么这么好等。那就让我们来看看Quora到底用到了哪些技术。</p>
+
+<p><strong>The Search-Box</strong></p>
+
+<p>Quora只能搜索问题，主题标签，用户名，和主题标题。没有全文搜索，所以，你无法搜索问题和答案的内容。而搜索中使用前缀搜索方式，比如你输入mi，则Microsoft会马上出来。其搜索还会有一些非常简单的模糊匹配的算法。另外，如果有重复的问题，其中一个问题会自动跳转到另一个问题，但是在搜索中还是会出现。搜索中没有拼写检查。</p>
+
+<p>一开始，他们使用的是一个开源的搜索服务器，叫<a href="http://sphinxsearch.com/">Sphinx</a>，其支持上述的那些功能。现在他们不用这个服务器了，因为<a href="http://www.quora.com/What-is-the-best-open-source-solution-for-implementing-fast-auto-complete">受到了一些限制</a>。他们做了一个新的解决方案，这个算法由Python实现。</p>
+
+<blockquote>
+  <p><a href="http://www.quora.com/What-libraries-does-Quora-use-for-search"><img width="16" height="16" style="padding-right: 10px;" src="http://www.quora.com/favicon.ico" />What libraries does Quora use for search?</a><br />
+<small>Adam D’Angelo, Quora Founder (Nov 13, 2010)</small><br />
+Our search is custom-written. It doesn’t use any libraries aside from Thrift, and Python’s unicode library, which we use for unicode normalization.</p>
+</blockquote>
+
+<p><strong>Speedy Queries</strong></p>
+
+<p>Quora的查询是非常高速的，其查询请求是通过AJAX的GET请求发送的，结果返回用的是JSON数据格式，但他们解析JSON是在服务器端，而不是通过浏览器的javascript。这么做的原因可能是他们想高亮搜索关键词，似乎使用Client端的Javascript非常不好做。</p>
+
+<p>Quora的即时搜索好像比较暴力，如果你输入Microsoft（一共9个字符），你会看到其会像后端发送9次查询——每按一个键一次，无论你敲这个单词的速底有多快，每输入一个字符都会发一个请求给后台。对于这样的看上去没有效率的对后台的请求，后台的服务器端会来控制相关的前台请求，所以，就算是前台这样做，也不会增加服务器端的负载，因为后台会做相关的处理。</p>
+
+<p>Quora的搜索使用HTTP长连接，当你开始敲查询的时候，连接就建立了，这个连接会持续在那里，你下次搜索的时候会继续使用这个连接，除非你60秒没有动作了。</p>
+
+<blockquote>
+  <p><a href="http://www.quora.com/Quora-product/Is-Quora-going-to-implement-full-text-search"><img width="16" height="16" style="padding-right: 10px;" src="http://www.quora.com/favicon.ico" />Is Quora going to implement full-text search?</a><br />
+<small>Adam D’Angelo, I made a lot of the early Quora … (Sep 1, 2010)</small><br />
+Yes, eventually. We haven’t implemented this yet because we’ve prioritized other things, but we will definitely do it in the future.</p>
+</blockquote>
+
+<p><strong>Webnode2 And LiveNode</strong></p>
+
+<p>Webnode2 和 LiveNode 是 Quora 内部的系统，其用来管理内容。Webnode2 生成 HTML, CSS 和 JavaScript 并且和 LiveNode 紧紧地耦合在一起，Webnode2主要是用来管理内容在网页上显示的，LiveNode主要是用来做动态网页内容更新的。Charlie Cheever 说，如果他可以从新开始，他<a href="http://www.quora.com/What-limitations-has-Quora-encountered-due-to-LiveNode-WebNode#answers">第一件事要做的就是重写整个LiveNode</a>。</p>
+
+<p>Quora的工程师看上去对他们搞的这些东西非常的满意，并且<a href="http://www.quora.com/What-limitations-has-Quora-encountered-due-to-LiveNode-WebNode#answers">他们也在努力地找到这些东西的弱点</a>。有一个有意思的关于LiveNode的问题是，如果A和B同时正在看相当的一个问题，那么用户A的一些交互动作会影响B的页面。例如，如果A顶了一下某个答案，那么这个答案可能会往上移动。这样的一个显示变化会通过AJAX更新B的浏览器。如果B此时展开了评论，可能会受到影响。</p>
+
+<p><a href="http://www.quora.com/What-is-LiveNode-written-in">LiveNode 由这些东西写成：</a>Python, C++, 和 JavaScript。<a href="http://jquery.com/">jQuery</a> ，<a href="http://cython.org/">Cython</a>也用到了。
+因为Quora<a href="http://www.quora.com/Is-Quora-planning-on-open-sourcing-LiveNode">想要对他们的LiveNode开源</a> 并准备把他们的代码分开，做这个事可能需要太多的工作和时间。
+Charlie Cheever 指出 WebNode2 和<a href="http://www.quora.com/Quora-Infrastructure/What-is-webnode2">有一个叫做 “free and easy website builder” 的 Webnode 的 webnode.com</a> 没有任何的关系。</p>
+
+<p><strong>Amazon Web Services</strong></p>
+
+<p>Quora全部托管在Amazon的EC2和S3上，因为这样就不像在相当长的时间内自己运营服务器那样成本高昂，他们就是为像Quora这样快速增长的公司量身定做的。</p>
+
+<p><strong>Ubuntu Linux&lt;</strong></p>
+
+<p>Quora使用Ubuntu Linux作为操作系统。没有什么大惊喜。在Amazon EC2上部署和管理都非常容易。Adam D’Angelo <a href="http://www.quora.com/Quora-Infrastructure/Which-Linux-flavor-does-Quora-use-Why">指出</a>他在高中时就使用Debian Linux，并且一直坚持到大学时还在用。原因就是<a href="http://www.quora.com/Quora-Infrastructure/Which-Linux-flavor-does-Quora-use-Why">“它工作的很好，而且没有令人信服的理由用别的操作系统去替代它”</a>。</p>
+
+<p><strong>Static Content</strong></p>
+
+<p>你只需要看一下Quora任何一个HTML的源代码，就可以看到他们在使用Amozon的分布式CDN, <a href="http://aws.amazon.com/cloudfront/">Cloudfront</a>。URLs在form里：
+&lt;pre lang="html"&gt;http://d2o7bfz2il9cb7.cloudfront.net/main-thumb-670336-25-7kmigSSkkdusoE6gHRkdQsXfjuTCaxQs.jpeg&lt;/pre&gt;
+CloudFront用来处理所有的静态页面,CSS和JavaScript (除了Google的 Analytics JavaScript,这是被Google托管)。<a href="http://www.quora.com/How-is-Quora-doing-image-uploads-to-Amazon-S3">图片被上传到EC2服务器,然后调整大小后上传到S3服务器</a>。这些都是用<a href="http://aws.amazon.com/code/134">Python S3 API</a>来管理的。</p>
+
+<p><strong>HAProxy Load-Balancing</strong></p>
+
+<p>Quora把<a href="http://haproxy.1wt.eu/">HAProxy</a>放在最前端，作为在它后面的分布式Nginx服务器的负载均衡服务器。</p>
+
+<p><strong>Nginx</strong></p>
+
+<p>反向代理服务器是Nginx，如果要了解更多这种设置方式，我推荐阅读<a href="http://kovyrin.net/2006/05/18/nginx-as-reverse-proxy/">Using Nginx As Reverse-Proxy Server On High-Loaded Sites</a>。</p>
+
+<p><strong>Pylons And Paste</strong></p>
+
+<p><a href="http://pylonshq.com/">Pylons</a>是一个轻量级的Web框架，通常都是在Nginx之后作为主要的web服务器。他们使用默认的<a href="http://spacepants.org/blog/pylons-paste-stack">Pylon + Paste stack</a>方式。选择Pylons就像在万圣节选择南瓜一样。他们把Pylons中的template和ORM用他们自己的用Python写成的技术替换掉，这就是<a href="http://www.quora.com/What-languages-and-frameworks-were-used-to-code-Quora">LiveNode和WebNode2所在的地方</a>。
+<a href="http://www.mochimedia.com/">MochiMedia</a>也是使用Pylons的启发中的一个，因为他们自己正在用它。</p>
+
+<p><strong>Python</strong></p>
+
+<p>从Facebook出来的Charlie 和 Adam选用了Python而不是PHP。正如Adam指出的 “<a href="http://www.quora.com/Why-did-Quora-choose-Python-for-its-development">Facebook is stuck on that for legacy reasons, not because it is the best choice right now</a>”（Facebook使用PHP并不是因为其好，而是因为历史原因的问题），当然他们也不会使用C#，因为那样一来就会引入一堆微软的东西。当然，也不会是Java，因为Python要比Java更容易写出代码，Scala太年轻了，还需要考验。Ruby看上来很像Python，但是他们对Ruby没有过多的经验。最终还是Python胜出。当然，他们知道Python的弱点是性能和速度，所以，他们在需要速度和性能的地方使用了C/C++。 他们使用Python的版本是2.6。</p>
+
+<p>使用Python的另一个原因是Python的数据结构和JSON可以很好的映射起来。代码易读性很高。而且有很多的库，调试器和重载器。Quora的B/S结构几乎完全通过JSON进行数据交互。</p>
+
+<p>他们<a href="http://www.quora.com/Adam-DAngelo/What-version-of-Python-are-you-programming-in-and-what-IDE-do-you-use">没有使用IDE</a>，他们使用得最多的是Emacs，一看就知道这是一个个人的选择，随着他们开发团队的扩大，这种情况会得到改变的。</p>
+
+<p>另外，他们提到了<a href="http://pypy.org/">PyPy</a>，一个让Python更快更灵活的项目。</p>
+
+<p><strong>Thrift</strong></p>
+
+<p><a href="http://incubator.apache.org/thrift/">Thrift</a> 用于后端服务器间的通讯。Thrift  服务由 C++开发。<a href="http://coolshell.cn/articles/4549.html">Facebook同样使用了这个技术</a>。</p>
+
+<blockquote>
+  <p><a href="http://www.quora.com/Why-would-you-write-a-Thrift-service-in-C"><img width="16" height="16" style="padding-right: 10px;" src="http://www.quora.com/favicon.ico" />Why would you write a Thrift service in C++?</a><br />
+<small>Adam D’Angelo, I’ve written a lot of Python, in… (Sep 4, 2010)</small><br />
+Mainly if you want to keep data in memory between requests, and want to keep your Python code stateless. Writing a Python wrapper around a C library involves some memory management with reference counting that requires some understanding of the Python internals, but writing a thrift interface is simple. You also isolate failures this way – if the service goes down it won’t take the Python code down with it.</p>
+</blockquote>
+
+<p><strong>Tornado</strong></p>
+
+<p><a href="http://www.tornadoweb.org/">Tornado</a> web 框架用于实时更新，其运行在Comet服务器上，其用来处理大量的需要长时间poll和push更新的网络连接。</p>
+
+<p><strong>Long Polling (Comet)</strong></p>
+
+<p>Quora的网页并不是简单的显示，每一个页面都需要更新，或是创建问题，答案和评论。所以，他们使用了Long Polling而不是传统的Polling，传统的Polling需要浏览器一端不停地重复地向服务器询问——“有更新吗？”，服务器说没有，于是过一会浏览大再问，现在呢？服务器说，还是没有，浏览器过一会又问，现在呢？服务器说，还没好。这样一来，就好像让我们的客户端放到了驾驶室里，这显然是有问题的，因为只有服务器知道什么时候会有更新。而且浏览器这么干，很快会让服务器的负载加上去。</p>
+
+<p>Long polling也就是我们熟知的<a href="http://en.wikipedia.org/wiki/Comet_(programming)">Comet</a>，其让服务器来控制这些事，让客服端等在那里听服务器的响应。在client和server的会话对于两者是是相同的，而不是client需要等着然后向服务器查询。服务器端可以把一个连接打开很长时间（比如：60秒），在这段时间里，服务器会查看是否有相应的东西需要更新，如果有的话，就发给浏览器。如果没有的话，就等下一次的client询问。可见，这种服务器等一会再响应的方法可以让浏览器少发几次查询。</p>
+
+<p>对于long-polling的最好的地方是，可以降低浏览器和客户端间来来回回的次数。让服务器端来控制时间，所以，内容更新可能会只是几个毫秒，或是几十秒。 服务器端也可以积攒一堆更新后，一次发给浏览器。这样做会更有效率。</p>
+
+<p>但是，这个方法的黑暗面是——这会让服务器端出现大量的TCP链接，想一想，Quora也是百万级用户的应用了，只需要10%的在线用户，你就需要一个可以处理10万并发量的架构。注意，如果一个用户在其浏览器里打开了多个Quora网页的话，那么，这个链接器会是非常致命的。</p>
+
+<p>当然，好的消息是已经有一些技术专门为Long Polling设计，这些技术可以让你在那些等待的连接中只会消耗非常非常少的内存（因为那些等待连接并不需要所有的资源）。例如：Nginx是一个单线程的事件驱动的小型服务器，每一个链接只花非常小的内存。每一个Nginx的进程只会在一个时候处理一个连接。这意味着其很容易扩展成一个可以处理成千上的并发量的服务架构。</p>
+
+<blockquote>
+  <p><a onclick="javascript:_gaq.push(['_trackEvent','outbound-article','www.quora.com/How-do-you-push-messages-back-to-a-web-browser-client-through-AJAX-Is-there-any-way-to-do-this-without-having-the-client-constantly-polling-the-server-for-updates']);" href="http://www.quora.com/How-do-you-push-messages-back-to-a-web-browser-client-through-AJAX-Is-there-any-way-to-do-this-without-having-the-client-constantly-polling-the-server-for-updates"><img width="16" height="16" style="padding-right: 10px;" src="http://www.quora.com/favicon.ico" />How do you push messages back to a web-browser client through AJAX?  Is there any way to do this without having the client constantly polling the server for updates?</a><br />
+<small>Adam D’Angelo, Quora (Sep 29, 2010)</small><br />
+There is no reliable way to do this without having the client polling the server. However, you can make the server stall its responses (50 seconds is a safe bet) and then complete them when a message is ready for the client. This is called “long polling” and it’s how Quora, Gmail, Meebo, etc all handle the problem.
+If you have a specialized server that uses epoll or kqueue, you should be able to hold on the order of 100k users per server (depending on how many messages are going). This is called the “c10k” problem. http://www.kegel.com/c10k.html</p>
+</blockquote>
+
+<p><strong>MySQL</strong></p>
+
+<p>就像Adam D’Angelo的老东家Facebook一样，Quora同样重度使用MySQL。在回答Quora的问题“<a href="http://www.quora.com/When-Adam-DAngelo-says-partition-your-data-at-the-application-level-what-exactly-does-he-mean">When Adam D’Angelo says “partition your data at the application level”, what exactly does he mean?</a>“, D’Angelo详细描述了怎样使用MySQL(或者一般的关系型数据库）来做分布式数据存储。</p>
+
+<p>基本建议是，如果需要的话把数据库里的数据分区。尽可能的把数据放在一台机器上，使用hash主键对多数据库中的大规模的数据进行分区。必须避免使用表连接（join）。Adam参考了FriendFeed的一篇文章<a href="http://bret.appspot.com/entry/how-friendfeed-uses-mysql">How FriendFeed uses MySQL to store schema-less data</a>，他<a href="http://www.quora.com/NoSQL/In-what-parts-of-a-social-site-with-concert-listings-should-one-use-a-NoSQL-DB-versus-a-SQL-DB">还说</a>在还没有100万用户之前，不要使用NoSQL。</p>
+
+<p>并不只是Quora和FriendFeed重度使用MySQL，Google也在一些与搜索无关的应用上使用MySQL。Google已经为MySQL的复制，同步，监控和更快的速度提升发布了<a href="http://code.google.com/p/google-mysql-tools/wiki/Mysql4Patches">补丁</a>。</p>
+
+<blockquote>
+  <p><a onclick="javascript:_gaq.push(['_trackEvent','outbound-article','www.quora.com/How-does-one-evaluate-if-a-database-is-efficient-enough-to-not-crash-as-its-put-under-increasing-load']);" href="http://www.quora.com/How-does-one-evaluate-if-a-database-is-efficient-enough-to-not-crash-as-its-put-under-increasing-load"><img width="16" height="16" style="padding-right: 10px;" src="http://www.quora.com/favicon.ico" />How does one evaluate if a database is efficient enough to not crash as it’s put under increasing load?</a><br />
+<small>Adam D’Angelo, Quora (Oct 10, 2010)</small><br />
+One option is to simulate some load. Write a script that mimics the kinds of queries your application will be doing, and make sure it can handle the amount of load you want it to be ready for (especially as the size of the dataset changes).</p>
+</blockquote>
+
+<p><strong>Memcached</strong></p>
+
+<p><a href="http://memcached.org/">Memcached</a>作为MySQL的前端缓存。</p>
+
+<p><strong>Git</strong></p>
+
+<p>用<a href="http://git-scm.com/">Git</a>作为<a href="http://www.quora.com/What-languages-and-frameworks-were-used-to-code-Quora">版本控制工具</a>。</p>
+
+<p><strong>JavaScript Placement</strong></p>
+
+<p>如果你看一下Quora的网页源码，你会看到其JavaScript总是在页面的最后。 Charlie Cheever<a href="http://www.quora.com/Why-is-the-Quora-website-so-fast">建议</a>这样做会让页面加载变快，因为会先渲染网页内容，然后再加载JavaScript。</p>
+
+<p><strong>Charlie Cheever Follows “14 Rules for Faster-Loading Web Sites”</strong></p>
+
+<p>Steve Souders,《High Performance Web Sites》和《Even Faster Web Sites》的作者，列出了<a href="http://stevesouders.com/hpws/rules.php">让你网页更快的原则</a>。Charlie Cheever提到过这个列表，这是Quora的速度快的原因之一。</p>
+
+<p><strong>Steve Souders的14条规则是：</strong></p>
+<ul>
+<li>尽可能少的HTTP请求</li>
+<li>使用CDN</li>
+<li>添加过期头</li>
+<li>用Gzip压缩组件</li>
+<li>把CSS放在页面的顶部</li>
+<li>把JavaScript放在页面的底部</li>
+<li>避免CSS表达式</li>
+<li>JavaScript,CSS和HTML分离</li>
+<li>减少DNS查询</li>
+<li>最小化JavaScript</li>
+<li>避免重定向</li>
+<li>减少重复的脚本</li>
+<li>定义ETags</li>
+<li>使AJAX可缓存化</li>
+</ul>
+
+<p>参考资料</p>
+
+<p>[1] <a href="http://www.philwhln.com/quoras-technology-examined" title="quoras technology examined">quoras technology examined</a><br />
+[2] <a href="http://coolshell.cn/articles/4936.html" title="http:coolshell.cn/articles/4936.html">http://coolshell.cn/articles/4936.html</a></p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Stack Overflow的系统架构]]></title>
+    <link href="http://liuxuan.info/blog/2011/07/14/stack-overflow-architecture/"/>
+    <updated>2011-07-14T15:31:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/07/14/stack-overflow-architecture</id>
+    <content type="html"><![CDATA[<p><a href="http://stackoverflow.com" title="Stack Overflow">Stack Overflow</a>是我最喜欢的网站之一，无论是他的问题和回答的质量，内容相关度还是用户体验都是非常优秀的。就我自己而言，如果在编程中遇到问题，我会第一时间上去搜索。如果没有搜到相关的问题，我就会自己提问让老外来回答。一般来说，只要是主流技术，或者不是太小众的，都会很快得到回答。最主要的是，老外会非常认真详细地回答你的问题，由于国内没有与之完全对应的网站，就这点来说可以把国内具有类似功能的网站（例如CSDN，ItEye等）暴出屎来。<!--more--></p>
+
+<p>今天无意中看到一篇介绍Stack Overflow架构的文章后觉得非常有价值，所以决定翻译成中文，供以后参考。</p>
+
+<p><a href="http://www.flickr.com/photos/60110479@N08/5940332610/" title="Flickr 上 Foredoomed 的 stackoverflow"><img src="http://farm7.static.flickr.com/6128/5940332610_b983b2c9a6.jpg" width="368" height="104" alt="stackoverflow" /></a></p>
+
+<p>Stack Overflow目前已经有超过1600万用户，并且每月有将近9500万PV。Stack Overflow已经发展并扩大成为了<a href="http://stackexchange.com" title="Stack Exchange Network">Stack Exchange Network</a>。Stack Exchange Network现在包括<strong>Stack Overflow</strong>, <strong>Server Fault</strong>, 和 <strong>Super User</strong>，旗下拥有43个网站,并且还在以成倍的速度增长。</p>
+
+<p>Stack Overflow不变的是对他们做的事保有开放的态度，这也是写这篇的原因。最近有一系列关于其成长的文章：</p>
+<ul>
+    <li><a href="http://blog.serverfault.com/post/stack-exchanges-architecture-in-bullet-points/">Stack Exchange’s Architecture in Bullet Points</a>
+    </li>
+    <li><a href="http://blog.serverfault.com/post/1432571770/">Stack Overflow’s New York Data Center</a></li>
+    <li><a href="http://blog.serverfault.com/post/1097492931/">Designing For Scalability of Management and Fault Tolerance</a></li>
+    <li><a href="http://blog.stackoverflow.com/2011/01/stack-overflow-search-now-81-less-crappy/">Stack Overflow Search &mdash; Now 81% Less</a></li>
+    <li><a href="http://blog.stackoverflow.com/2010/01/stack-overflow-network-configuration/">Stack Overflow Network Configuration</a></li>
+    <li><a href="http://meta.stackoverflow.com/questions/69164/does-stackoverflow-use-caching-and-if-so-how">Does StackOverflow use caching and if so, how?</a></li>
+    <li><a href="http://meta.stackoverflow.com/questions/10369/which-tools-and-technologies-build-the-stack-exchange-network">Which tools and technologies build the Stack Exchange Network?</a></li>
+</ul>
+
+<p>StackOverflow在这段时间里一些明显的变化有：</p>
+
+<ul>
+    <li>快速增长. 更多的用户，更多的PV，更多的数据中心，更多的网站，更多的开发人员，更多的操作系统，更多的数据库，更多的服务器。很多的<a href="http://blog.stackoverflow.com/2011/01/state-of-the-stack-2010-a-message-from-your-ceo/">更多</a>。
+    </li>
+    <li>Linux. Stack Overflow被人熟知的是它大量使用部署了Windows的服务器, 但是他们现在使用很多部署了Linux的服务器来跑 HAProxy, Redis, Bacula, Nagios, 日志和路由。 所有需要<a href="http://blog.serverfault.com/post/1097492931/">并行处理</a>的功能都会交给Linux处理。</li>
+    <li>容错. Stack Overflow现在<a href="http://blog.stackoverflow.com/2010/01/stack-overflow-network-configuration/">使用两个不同网络线路接入的交换机</a> 他们增加了冗余的服务器，一些功能也被转移到了第二个数据中心。</li>
+    <li>NoSQL. Redis现在作为整站的<a href="http://meta.stackoverflow.com/questions/69164/does-stackoverflow-use-caching-and-if-so-how">缓存层</a>在使用。以前并没有一个单独的缓存层，平且在Linux服务器上使用NoSQL，所以这是一个很大的变化。</li>
+</ul>
+
+<p>遗憾的是，我没有找到我所关心的问题的答案，比如他们是怎么在这么多不同的特性中处理<a href="http://en.wikipedia.org/wiki/Multitenancy">Multitenancy（多租户）</a>的问题的，但是还是有很多东西可以学习。下面是一些数据汇总：</p>
+
+<p><strong>统计信息</strong></p>
+<ul>
+    <li>每月9500万次浏览量</li>
+    <li>每秒800个HTTP请求</li>
+    <li>每秒180个DNS请求</li>
+    <li>每秒55M流量</li>
+    <li>1600万个用户（Stack Overflow的流量在2010年增长了131%，全球每月不重复访客增至1660万人）。</li>
+</ul>
+
+<p><strong>数据中心</strong></p>
+<ul>
+    <li>1个机架放在俄勒冈州的Peak Internet（用于放置chat和Data Explorer）</li>
+    <li>2个机架放在纽约州的Peer 1（用于放置Stack Exchange Network的其余部分）</li>
+</ul>
+
+<p><strong>硬件设备</strong></p>
+<ul>
+    <li>10台戴尔R610 IIS Web服务器（3台专门用于Stack Overflow）：1个英特尔至强处理器E5640，2.66 GHz四核，8线程；16 GB内存；Windows Server 2008 R2</li>
+    <li>2台戴尔R710数据库服务器：2个英特尔至强处理器X5680，3.33 GHz；64 GB内存；8个硬盘；SQL Server 2008 R2</li>
+    <li>2台戴尔R610 HAProxy服务器：1个英特尔至强处理器E5640，2.66 GHz；4 GB内存；Ubuntu Server</li>
+    <li>2台戴尔R610 Redis服务器：2个英特尔至强处理器E5640，2.66 GHz；16 GB内存；CentOS</li>
+    <li>1台戴尔R610 Linux备份服务器，运行Bacula：1个英特尔至强处理器E5640，2.66 GHz；32 GB内存</li>
+    <li>1台戴尔R610 Linux管理服务器，用于Nagios和日志：1个英特尔至强处理器E5640，2.66 GHz；32 GB内存</li>
+    <li>2个戴尔R610 VMWare ESXi域控制器：1个英特尔至强处理器E5640，2.66 GHz；16 GB内存；2只Linux路由器；5台戴尔Power Connect交换机</li>
+</ul>
+
+<p><strong>开发工具</strong></p>
+<ul>
+    <li>编程语言：C#（ASP.NET）</li>
+    <li>开发环境：Visual Studio 2010 Team Suite</li>
+    <li>开发框架：Microsoft ASP.NET Framework 4.0</li>
+    <li>Web框架：ASP.NET MVC 3</li>
+    <li>视图引擎：Razor</li>
+    <li>Ajax框架：jQuery 1.4.2</li>
+    <li>数据访问：LINQ to SQL，一些原生SQL</li>
+    <li>版本控制：Mercurial和Kiln</li>
+    <li>代码比较：Beyond Compare 3</li>
+</ul>
+
+<p><strong>软件与技术</strong></p>
+<ul>
+    <li>堆栈技术：<a href="http://blog.stackoverflow.com/2009/03/stack-overflow-and-bizspark/">BizSpark</a> 的 <a href="http://stackoverflow.com/questions/177901/what-does-wisc-stack-mean">WISC</a></li>
+    <li>操作系统：<a href="http://www.microsoft.com/windowsserver2008/en/us/default.aspx">Windows Server 2008 R2 x64</a>，<a href="http://www.ubuntu.com/server">Ubuntu Server</a>，<a href="http://www.centos.org/">CentOS</a></li>
+    <li>数据库：运行于Microsoft Windows Server 2008 Enterprise Edition x64 的<a href="http://www.microsoft.com/sqlserver/en/us/default.aspx">SQL Server 2008 R2</a></li>
+    <li>WEB服务器：IIS7.0</li>
+    <li>负载均衡：<a href="http://haproxy.1wt.eu/">HAProxy</a></li>
+    <li>缓存：&nbsp;<a href="http://redis.io/">Redis</a>（分布式缓存）</li>
+    <li>代码部署：<a href="http://sourceforge.net/projects/ccnet/">CruiseControl.NET</a></li>
+    <li>搜索系统：<a href="http://incubator.apache.org/lucene.net/">Lucene.NET</a></li>
+    <li>备份系统：<a href="http://www.bacula.org/en/">Bacula</a></li>
+    <li>监控系统：<a href="http://www.nagios.org/">Nagios</a>&nbsp;(使用 n2rrd 和 drraw 插件)</li>
+    <li>日志分析：<a href="http://www.splunk.com/">Splunk</a></li>
+    <li>SQL Server监控：<a href="http://www.red-gate.com/products/dba/sql-monitor/">SQL Monitor from Red Gate</a></li>
+    <li>DNS解析：<a href="http://www.isc.org/software/bind">Bind</a></li>
+    <li>远程控制：<a href="http://www.wowwee.com/en/products/tech/telepresence/rovio/rovio">Rovio</a></li>
+    <li>外部监控：<a href="http://tools.pingdom.com/">Pingdom</a></li>
+</ul>
+
+<p><strong>外部组件</strong>（作为一部分开发工具并没有包含在代码中）</p>
+<ul>
+    <li>reCAPTCHA</li>
+    <li>DotNetOpenId</li>
+    <li>WMD - Now developed as open source. See github network graph</li>
+    <li>Prettify</li>
+    <li>Google Analytics</li>
+    <li>Cruise Control .NET</li>
+    <li>HAProxy</li>
+    <li>Cacti</li>
+    <li>MarkdownSharp</li>
+    <li>Flot</li>
+    <li>Nginx</li>
+    <li>Kiln</li>
+    <li>CDN: 没有使用CDN，所有静态内容由<a href="http://sstatic.net">sstatic.net</a>提供。sstatic.net是一个快速的、无cookie的域，用于将静态内容分发到Stack Exchange系列网站。</li>
+</ul>
+
+<p><strong>开发人员和系统管理员</strong></p>
+<ul>
+    <li>14名开发人员</li>
+    <li>2名系统管理员</li>
+</ul>
+
+<p><strong>内容</strong></p>
+<ul>
+    <li>协议: Creative Commons Attribution-Share Alike 2.5 Generic</li>
+    <li>标准: OpenSearch, Atom</li>
+    <li>托管: PEAK Internet</li>
+</ul>
+
+<p><strong>每个站点有三种不同的缓存：本地缓存、站点缓存和全局缓存。</strong></p>
+<ul>本地缓存：只能被一对服务器或站点访问。</ul>
+<ul>
+    
+        <li>为了限制网络等待时间，他们使用本地“L1”缓存。基本上是在一台服务器上用HttpRuntime.Cache缓存最近设置或读取的数据。这样就可以使在网络上的缓存查找开销减少到0字节。
+        </li>
+        <li>本地缓存包含用户session和待定的查看计数更新。</li>
+        <li>本地缓存只在内存中，没有网络或数据库的访问。</li>
+</ul>
+
+<ul>站点缓存：可以被单个站点的任何一个服务器上的实例访问。</ul>
+<ul>
+        <li>绝大多数的数据被缓存在这里，比如热门问题的id列表和用户的回答被接受的百分比是很好的例子。</li>
+        <li>站点缓存使用的是Redis（在一个不同的数据库里，为了更方便调试）。</li>
+        <li>Redis非常快，导致缓存查找中最慢的部分变成了从网络读字节或写字节到网络中去。
+        </li>
+        <li>
+        数据是被压缩过后再发送到Redis的。有很多的CPU，并且大多数数据是字符串类型的，所以他们可以得到很好的压缩比率。
+        </li>
+        <li>
+        Redis所在服务器的CPU使用率是0%。
+        </li>
+    </ul>
+
+<ul>全局缓存：所有站点和服务器共享。</ul>
+
+<ul>
+        <li>包括收件箱，API使用的引用和一些其他全局数据。</li>
+        <li>全局缓存使用Redis（在DB 0，同样为了调试方便）。</li>
+</ul>
+
+<p><strong>更多的架构和经验</strong></p>
+
+<ul>
+    <li>使用HAProxy替代Windows NLB 的原因是：HAProxy不仅使用简单而且还是免费的，通过Hyper-V可以成为优秀的网络上的一个512M虚拟机“设备”。它运行在服务器的前端，所以对服务器来说完全透明，而且作为一个不同的网络层，比起和windows的配置混在一起，更容易故障检测，</li>
+    <li>没有使用CDN，因为就连亚马逊这样“便宜的”CDN，如果考虑捆绑到现有主机方案中的带宽，其费用都相当昂贵的。根据亚马逊的CDN费用和Stack Overflow使用的带宽，每月至少要支付1000美元。</li>
+    <li>为了快速恢复，把数据备份到磁盘上。为了历史归档，把数据备份到磁带（tape）上。</li>
+    <li>SQL Server对的全文搜索的集成相当差，bug多，功能少，所以改用了Lucene。</li>
+    <li>最让人感兴趣的是他们能够确保可以处理的HTTP请求峰值。</li>
+    <li>所有特性都运行在Stack Exchange平台上。Stack Overflow、Super User、Server Fault、Meta、WebApps和Meta Web Apps都运行同一软件上。</li>
+    <li>对StackExchange的用户进行区分是因为拥有不同专业技能的人不应该在不同主题的站点之间穿梭。<a href="http://meta.stackoverflow.com/questions/69422/why-separate-stack-exchange-accounts">你可以是世界上最出色的大厨，但这并不能说明修复服务器的能力</a>。</li>
+    <li>尽可能缓存所有数据。</li>
+    <li>所有匿名用户访问的页面都由<a href="http://learn.iis.net/page.aspx/154/walkthrough-iis-70-output-caching/">Output Caching</a>缓存。</li>
+    
+    <li>
+    大多数数据会在超时时间段后过期（通常是几分钟），并且他们不会被显示地删除。
+    当需要特定的缓存失效时，使用<a href="http://code.google.com/p/redis/wiki/PublishSubscribe">Redis messaging</a>向“L1”缓存发送删除通知。
+    </li>
+    <li>
+    Joel Spolsky并不是微软的忠实用户，他并不对Stack Overflow做技术决策，他认为微软许可发放是个错误。认为你自己是正确的<a href="http://news.ycombinator.com/item?id=2284900">Hacker News commentor</a>。
+    </li>
+    <li>
+    他们在<a href="http://www.intel.com/design/flash/nand/extreme/index.htm">Intel X25 solid state drives</a>上做RAID 10来作为IO系统。RAID解决了可靠性的顾虑，并且对比FusionIO，SSD性能更好，价格更便宜。
+    </li>
+    <li>
+    全部的微软许可<a href="http://news.ycombinator.com/item?id=2285931">费用</a>大约是$242K，因为Stack Overflow使用的是Bizspark，所以并没有支付全价，但这已经是他们可能支付的最大费用。
+    </li>
+    <li>
+    <a href="http://blog.serverfault.com/post/broadcom-die-mutha/">Intel NICs are replacing Broadcom NICs</a>和他们主要的生产环境服务器。这样就解决了连接丢失，包丢失和ARP表冲突。
+    </li>
+
+</ul>
+
+<p><strong>相关文章</strong></p>
+
+<ul>
+    <li><a href="http://news.ycombinator.com/item?id=2284900">Hacker News Thread on this Post</a> / <a href="http://www.reddit.com/r/programming/comments/fwpik/stackoverflow_scales_using_a_mixture_of_linux_and/">Reddit Thread</a></li>
+    <li><a href="http://blog.serverfault.com/post/stack-exchanges-architecture-in-bullet-points/">Stack Exchange’s Architecture in Bullet Points</a> / <a href="http://news.ycombinator.com/item?id=2207789">HackerNews Thread</a></li>
+    <li><a href="http://blog.serverfault.com/post/1432571770/">Stack Overflow’s New York Data Center</a> - <span style="font-family: 'Trebuchet MS',Arial,'Bitstream Vera Sans',sans-serif; line-height: 17px; color: rgb(0, 0, 0);">hardware of the various machines?</span></li>
+    <li><a href="http://blog.serverfault.com/post/1097492931/">Designing For Scalability of Management and Fault Tolerance</a></li>
+    <li><a href="http://blog.stackoverflow.com/">Stack Overflow Blog</a></li>
+    <li><a href="http://blog.stackoverflow.com/2011/01/stack-overflow-search-now-81-less-crappy/">Stack Overflow Search &mdash; Now 81% Less Crappy</a>&nbsp;- Lucene is now running on an underused cluster.</li>
+    <li><a href="http://blog.stackoverflow.com/2011/01/state-of-the-stack-2010-a-message-from-your-ceo/">State of the Stack 2010 (a message from your CEO)</a></li>
+    <li><a href="http://blog.stackoverflow.com/2010/01/stack-overflow-network-configuration/">Stack Overflow Network Configuration</a></li>
+    <li><a href="http://meta.stackoverflow.com/questions/69164/does-stackoverflow-use-caching-and-if-so-how">Does StackOverflow use caching and if so, how?</a></li>
+    <li><a href="http://meta.stackoverflow.com/">Meta StackOverflow</a></li>
+    <li><a href="http://meta.stackoverflow.com/questions/6435/how-does-stackoverflow-handle-cache-invalidation">How does StackOverflow handle cache invalidation?</a></li>
+    <li><a href="http://meta.stackoverflow.com/questions/10369/which-tools-and-technologies-build-the-stack-exchange-network">Which tools and technologies build the Stack Exchange Network?</a></li>
+    <li><a href="http://meta.stackoverflow.com/questions/2765/how-does-stack-overflow-handle-spam">How does Stack Overflow handle spam?</a></li>
+    <li><a href="http://blog.serverfault.com/post/our-storage-decision/">Our Storage Decision</a></li>
+    <li><a href="http://meta.stackoverflow.com/questions/4766/how-are-hot-questions-selected">How are “Hot” Questions Selected?</a>&nbsp;</li>
+    <li><a href="http://meta.stackoverflow.com/questions/20473/how-are-related-questions-selected">How are “related” questions selected?</a>&nbsp;- the title, the question body, and the tags.&nbsp;</li>
+    <li><a href="http://blog.stackoverflow.com/2010/04/stack-overflow-and-dvcs/">Stack Overflow and DVCS</a>&nbsp;- Stack Overflow selects Mercurial for source code control.</li>
+    <li><a href="http://chat.stackexchange.com/rooms/127/the-comms-room">Server Fault Chat Room</a>&nbsp;</li>
+    <li><a href="https://github.com/ServiceStack/ServiceStack.Redis">C# Redis Client</a></li>
+    <li><a href="http://blog.serverfault.com/post/broadcom-die-mutha/">Broadcom, Die Mutha</a></li>
+</ul>
+
+<p>英文原文地址：</p>
+
+<p><a href="http://highscalability.com/blog/2011/3/3/stack-overflow-architecture-update-now-at-95-million-page-vi.html" title="stack-overflow-architecture-update-now-at-95-million-page-vi">stack-overflow-architecture-update-now-at-95-million-page-vi</a></p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[常用磁盘阵列比较]]></title>
+    <link href="http://liuxuan.info/blog/2011/06/10/comparison-of-raid/"/>
+    <updated>2011-06-10T14:34:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/06/10/comparison-of-raid</id>
+    <content type="html"><![CDATA[<p><strong>一.RAID-0 (交错模式-stripe)</strong></p>
+
+<p>这种模式主要是利用容量相同的磁盘来达成,效能会比较好。 所谓的交错 (stripe) 是因为数据是同步写到不同的磁盘上头去的意思，也就是说，假设我有两颗磁盘设定成 RAID-0，那么当我有 100MB 数据要写入时, 则 100MB 会被拆成两个 50MB 分别写入不同的磁盘上头去。所以，因为每一个磁盘写入的数据量只有一半。因此，读写的效能都会大大的增加；而且越多颗磁盘所组成的 RAID-0 在理论上，性能增加的越明显。 但是这种模式有个最大的问题，那就是，因为一笔数据被拆成几个部分分布在不同的磁盘上面, 因此『任何一颗磁盘的损毁,都会让你的数据救不回来』。另外,如果使用不同容量的磁盘来达成 RAID-0 时，则在储存数据长大到一定程度时， RAID-0 的性能会变差。假设我用了一颗 20GB 两颗 16GB 的硬盘好了，那么当总数据量少于 48GB (16x3) 时,性能是很不错的。 但是当超过 48GB 时,则数据仅能储存在 20GB 那一颗了 (可用容量剩下 4GB )，所以性能就会变差。 <!--more--></p>
+
+<p><strong>二.RAID-1 (镜像模式-mirror)</strong></p>
+
+<p>这种模式也是需要相同的磁盘容量的，最好是一模一样的磁盘。 如果是不同容量的磁盘组成 RAID-1 时，那么总容量将以最小的那一颗磁盘为主。 这种模式主要是『让同一份数据,完整的保存在两颗磁盘上头』。也就是说，如果我有一个 100MB 的文件,且我仅有两颗磁盘组成 RAID-1 时, 那么这两颗磁盘将会同步写入 100MB 到他们的储存空间去，因此,整体容量几乎少了 50%。由于两颗硬盘内容一模一样，好像镜子映照出来一样，所以我们也称他为 mirror 模式。这种模式最大的优点大概就是在进行备份吧，因为所有的数据都被存放在两个磁盘上面，所以任何一颗磁盘损毁时，所有的数据可都还是保存的好好的。至于性能上面,由于要写入的数据变多了(需要同步写入两颗硬盘嘛)。所以，性能会比单颗磁盘还要差一些。没办法，因为我们都是透过同一个总线在进行数据的通行。 不过，读取的效能还不错,因为数据有两份,如果多进程在读取同一笔数据时，RAID 会自行取得最佳的读取平衡。事实上，为了保有 RAID-1 的储存优点，又想要具有类似 RAID-0 的效能增强。所以，后来也有所谓的 RAID-0+1，亦即同时具有 RAID-0 与 RAID-1 的功能。但是，这样的功能至少需要四颗以上的相同容量的磁盘才行。而且总可用容量会减少一半 (因为 RAID-1)。</p>
+
+<p><strong>三.RAID-5</strong></p>
+
+<p>这个类型最有趣，也是目前最常见的一种类型了。 RAID-5 会整合多个磁盘 (通常需要三个以上),然后每个磁盘驱动器上面都会记录少许的其它部磁盘驱动器的信息 ，由于这个动作，因此,实际上可以使用的容量其实是 (N-1)*S ,那个 N 为全部的磁盘驱动器总数,S 则是最小的那个磁盘的容量。 少掉的空间就是用来作为信息记录用的。
+由于这个机制的存在,因此,当那 N 部磁盘驱动器有任何一部出问题时, 他的数据都会被平均记录到其它 N-1 部磁盘驱动器内,所以,只要你将坏掉的那一颗拿掉, 换一颗好的磁盘后,该磁盘原本的内容就会被恢复，这个作用非常重要。除此之外，因应目前所谓的热拔插 RAID 架构,因此,很多的硬件 RAID 在制作这个 RAID-5 的类型时，他会使用 N+1 颗磁盘,其中 N 颗用来作为 RAID-5 之用, 另外那一颗则做为磁盘损坏时的实时处理之用。 所以，假设有10颗磁盘在这样的架构下时，则事实上只有9颗在进行 RAID-5 的存取，一颗作为错误处理。所以总容量应该是 8xS 。而当有任何一颗磁盘出问题时，留作磁盘损坏时错误处理使用的磁盘就派上用场了,他会立刻被重建。因此，您只要将有问题的磁盘拔掉，换上一颗新的就行了。不过需要注意的是，因为 RAID-5 仅能处理一颗硬盘坏掉时的情况，如果同时有两颗以上的磁盘损毁，那么所有的数据还是还是会完蛋的。 所以，特别重要的信息还是得要复制出来才行。至于存取性能，读取的性能几乎可以媲美 RAID-0，但是写入的性能就无法像 RAID-0 那样明显。因为还得要计算分别写入到所有磁盘当中的奇偶校验信息和相对应的数据，所以写入的性能虽然是会增加不少。</p>
+
+<p><strong>四.RAID-10/01</strong>
+RAID-10/01分为：RAID-1+0或RAID-0+1（都至少需要4块以上的磁盘）。</p>
+
+<p>RAID-1+0是先镜像再分区数据。是将所有硬盘分为两组，视为是RAID-0的最低组合，然后将这两组各自视为RAID-1运作。RAID-1+0有着不错的读取速度，而且拥有比RAID-0更高的数据保护性。</p>
+
+<p>RAID-0+1则是跟RAID-1+0的程序相反，是先分区再将数据镜射到两组硬盘。它将所有的硬盘分为两组，变成RAID-1的最低组合，而将两组硬盘各自视为RAID-0运作。RAID-0+1比起RAID 1+0有着更快的读写速度，不过也多了一些会让整个硬盘组停止运转的机率；因为只要同一组的硬盘全部损毁，RAID-0+1就会停止运作，而RAID- 1+0则可以在牺牲RAID-0的优势下正常运作。</p>
+
+<p>RAID-10巧妙的利用了RAID-0的速度以及RAID-1的保护两种特性，不过它的缺点是需要的硬盘数较多，因为至少必须拥有四个以上的偶数硬盘才能使用。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Facebook的系统架构]]></title>
+    <link href="http://liuxuan.info/blog/2011/05/10/facebook-architecture/"/>
+    <updated>2011-05-10T22:46:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/05/10/facebook-architecture</id>
+    <content type="html"><![CDATA[<p>原文地址：<a href="http://www.quora.com/What-is-Facebooks-architecture" title="What is Facebooks architecture">What is Facebooks architecture</a> </p>
+
+<ul>
+  <li>Web前端用PHP写的。然后，Facebook的HipHop[1]把它转换成C++,用g++编译, 这样做可以提供高性能模板和Web逻辑执行层。</li>
+  <li>业务逻辑用Thrift[2]作为服务暴露处理。这其中的一些服务是用PHP实现的，C++或Java要看服务的需求（也可能使用其他一些语言…)。</li>
+  <li>用Java实现的服务不使用任何一个普通的企业级应用服务器，而是用Facebook为自己定制开发的应用服务器。一开始这样做是被看作重复造轮子，但是当这些服务只（或绝大多数）使用Thrift暴露和消费，Tomcat甚至Jetty的开销可能会非常大，而且还没有加入他们需要的重要的作用。</li>
+  <li>持久化使用MySQL, Memcached[3], Facebook’s Cassandra[4], Hadoop’s HBase[5]。Memcached被用作MySQL的缓存和一般目的的缓存。Facebook的工程师们承认他们目前对于Cassandra的使用正在减少，他们更喜欢使用HBase,因为HBase有简单的一致性模型和MapReduce功能。</li>
+  <li>线下处理使用Hadoop和Hive处理。</li>
+  <li>像日志，点击和feeds等数据用Scribe[6]处理，这些数据被聚集和储存在Hadoop分布式文件系统Scribe-HDFS[7]中, 这样可以让MapReduce做扩展分析。</li>
+  <li>BigPipe[8]是他们定制的技术，这个技术使用流水线逻辑可以加速网页渲染速度。</li>
+  <li>Varnish Cache[9]被用作HTTP代理。他们更喜欢使用Varnish，因为它的高性能表现[10]。</li>
+  <li>使用Haystack处理数10亿的照片的存储，Facebook自己开发的点对点存储解决方案带来的是低等级的优化和只能增加的写操作[11]。</li>
+  <li>Facebook Messages使用的是他们自己的架构，这个架构是构建在基础设施分区和动态集群管理。业务逻辑和持久化被包装在所谓的’单元’（cell）里。每个单元处理一部分用户；随着用户的增长新的单元能够被增加[12]。持久化数据用HBase归档[13]。</li>
+  <li>Facebook Messages的搜索引擎是用存储在HBase里倒转的索引构建的[14]。</li>
+  <li>Facebook搜索引擎的实现细节还不清楚，自动完成搜索使用一个自定义的存储和检索逻辑[15]。</li>
+  <li>聊天功能是在用Erlang开发的Epoll服务器上，而且可以被Thrift访问[16]。</li>
+</ul>
+
+<p>关于为这些组件中的每个提供的资源，一些信息和数据:</p>
+
+<ul>
+  <li>Facebook被估计拥有超过60,000台服务器[17]。他们最近新的在普赖恩维尔和俄勒冈州的数据中心的硬件都是自己他们自己设计的[18]，而且最近作为Open Compute Project[19]公诸于众。</li>
+  <li>300TB的数据被存储在memcached processes[20]里。</li>
+  <li>Hadoop和Hive集群是用3000台8核，32G内存，12TB硬盘的服务器里[20]。</li>
+  <li>每天1亿的点击量，500亿的照片，缓存着3兆的对象，到2010年7月为止，每天有130TB的日志[21]。</li>
+</ul>
+
+<p>[1] <em>HipHop for PHP</em>: <a href="http://developers.facebook.com/blog/post/358" title="http://developers.facebook.com/b...">http://developers.facebook.com/b…</a><br />
+[2] <em>Thrift</em>: <a href="http://thrift.apache.org/" title="http://thrift.apache.org">http://thrift.apache.org</a><br />
+[3] <em>Memcached</em>: <a href="http://memcached.org/" title="http://memcached.org">http://memcached.org</a><br />
+[4] <em>Cassandra</em>: <a href="http://cassandra.apache.org/" title="http://cassandra.apache.org">http://cassandra.apache.org</a><br />
+[5] <em>HBase</em>: <a href="http://hbase.apache.org/" title="http://hbase.apache.org">http://hbase.apache.org</a><br />
+[6] <em>Scribe</em>: <a href="https://github.com/facebook/scribe" title="https://github.com/facebook/scribe">https://github.com/facebook/scribe</a><br />
+[7] <em>Scribe-HDFS</em>: <a href="http://hadoopblog.blogspot.com/2009/06/hdfs-scribe-integration.html" title="http://hadoopblog.blogspot.com/2...">http://hadoopblog.blogspot.com/2…</a><br />
+[8] <em>BigPipe</em>: <a href="http://www.facebook.com/notes/facebook-engineering/bigpipe-pipelining-web-pages-for-high-performance/389414033919" title="http://www.facebook.com/notes/fa...">http://www.facebook.com/notes/fa…</a><br />
+[9] <em>Varnish Cache</em>: <a href="http://www.varnish-cache.org/" title="http://www.varnish-cache.org">http://www.varnish-cache.org</a><br />
+[10] <em>Facebook goes for Varnish</em>: <a href="http://www.varnish-software.com/customers/facebook" title="http://www.varnish-software.com/...">http://www.varnish-software.com/…</a><br />
+[11] <em>Needle in a haystack</em>: efficient storage of billions of photos: <a href="http://www.facebook.com/note.php?note_id=76191543919" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a><br />
+[12] <em>Scaling the Messages Application Back End</em>: <a href="http://www.facebook.com/note.php?note_id=10150148835363920" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a><br />
+[13] <em>The Underlying Technology of Messages</em>: <a href="https://www.facebook.com/note.php?note_id=454991608919" title="https://www.facebook.com/note.ph...">https://www.facebook.com/note.ph…</a><br />
+[14] <em>The Underlying Technology of Messages Tech Talk</em>: <a href="http://www.facebook.com/video/video.php?v=690851516105" title="http://www.facebook.com/video/vi...">http://www.facebook.com/video/vi…</a><br />
+[15] <em>Facebook’s typeahead search architecture</em>: <a href="http://www.facebook.com/video/video.php?v=432864835468" title="http://www.facebook.com/video/vi...">http://www.facebook.com/video/vi…</a><br />
+[16] <em>Facebook Chat</em>: <a href="http://www.facebook.com/note.php?note_id=14218138919" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a><br />
+[17] <em>Who has the most Web Servers?</em>: <a href="http://www.datacenterknowledge.com/archives/2009/05/14/whos-got-the-most-web-servers/" title="http://www.datacenterknowledge.c...">http://www.datacenterknowledge.c…</a><br />
+[18] <em>Building Efficient Data Centers with the Open Compute Project</em>: <a href="http://www.facebook.com/note.php?note_id=10150144039563920" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a><br />
+[19] <em>Open Compute Project</em>: <a href="http://opencompute.org/" title="http://opencompute.org">http://opencompute.org</a><br />
+[20] <em>Facebook’s architecture presentation at Devoxx 2010</em>: <a href="http://www.devoxx.com" title="http://www.devoxx.com">http://www.devoxx.com</a><br />
+[21] <em>Scaling Facebook to 500 millions users and beyond</em>: <a href="http://www.facebook.com/note.php?note_id=409881258919" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a>  </p>
+
+]]></content>
+  </entry>
+  
+</feed>

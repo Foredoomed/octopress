@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Ubuntu下编译安装Vim - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="一.编译安装最新版本Vim 我们都知道在Ubuntu下如果直接在终端中用命令安装Vim，那么安装的都不是最新版本。如果要想安装最新版本只有下载最新版源代码包，然后再编译安装。 首先，Vim最新版源代码包可以在 官网 下载，下载源代码包到本地Ubuntu主机后，解压缩，进入该目录，进行配置， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/06/25/compile-and-install-vim-on-ubuntu/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Ubuntu下编译安装Vim</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-25T14:56:00+08:00" pubdate data-updated="true">Jun 25<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>一.编译安装最新版本Vim</strong></p>
+
+<p>我们都知道在Ubuntu下如果直接在终端中用命令安装Vim，那么安装的都不是最新版本。如果要想安装最新版本只有下载最新版源代码包，然后再编译安装。</p>
+
+<p>首先，Vim最新版源代码包可以在 <a href="http://www.vim.org/" title="官网">官网</a> 下载，下载源代码包到本地Ubuntu主机后，解压缩，进入该目录，进行配置，编译和安装：
+Liquid error: ClassNotFound: no lexer for alias ‘shell’ found
+<!--more--></p>
+
+<p>如果安装出现错误则有可能是目录的权限问题，试试下面的命令吧：
+Liquid error: ClassNotFound: no lexer for alias ‘shell’ found</p>
+
+<p>好了，如果不出什么意外的话，Vim应该已经安装好了，接下来就是要安装和配置插件了。首先，要在主目录里新建<strong>.vimrc</strong>文件，然后在这个文件里配置Vim。
+配置可以参考<a href="https://github.com/panweizeng/env" title="这里">这里</a></p>
+
+<p>如果运行出现下面的错误：<br />
+    (gvim:6667): Gtk-WARNING **: Invalid input string</p>
+
+<p>解决办法是在主目录里<code>CTRL+H</code>显示<code>.bashrc</code>文件，然后在这里文件里添加如下代码：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nb">export  </span><span class="nv">LANG</span><span class="o">=</span>zh_CN.UTF-8;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_CTYPE</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_NUMERIC</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_TIME</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_COLLATE</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_MONETARY</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_MESSAGES</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_PAPER</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_NAME</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_ADDRESS</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_TELEPHONE</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_MEASUREMENT</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span><span class="line"><span class="nb">export  </span><span class="nv">LC_IDENTIFICATION</span><span class="o">=</span><span class="s2">&quot;zh_CN.UTF-8&quot;</span>;
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>二.配置Vim对Ruby的支持</strong></p>
+
+<p>我主要用Vim来写Ruby代码，所以比如代码高亮，自动补全等都是必须的:</p>
+
+<p>1.安装Ruby也可以去<a href="http://www.ruby-lang.org/" title="官网">官网</a>上下载最新版本，然后编译安装。<br />
+2.设置环境变量。在<code>.bashrc</code>文件里添加如下代码：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span>/usr/local/ruby/bin:<span class="nv">$PATH</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>3.下载<a href="http://rubyforge.org/projects/vim-ruby/" title="vim-ruby">vim-ruby</a>插件，解压后复制道Vim安装目录里。现在开始写Ruby代码吧，然后按F5看下运行结果是不是出来了呢。</p>
+
+<p>最后Show一下我的Vim：</p>
+
+<p><a href="http://www.flickr.com/photos/60110479@N08/5868623217/" title="Flickr 上 Foredoomed 的 vim_screenshot"><img src="http://farm6.static.flickr.com/5067/5868623217_70b3bcae76_z.jpg" width="640" height="480" alt="vim_screenshot" /></a></p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-25T14:56:00+08:00" pubdate data-updated="true">Jun 25<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/vim/'>vim</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/06/25/compile-and-install-vim-on-ubuntu/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/06/25/compile-and-install-vim-on-ubuntu/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

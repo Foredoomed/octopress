@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>常用磁盘阵列比较 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="一.RAID-0 (交错模式-stripe) 这种模式主要是利用容量相同的磁盘来达成,效能会比较好。 所谓的交错 (stripe) 是因为数据是同步写到不同的磁盘上头去的意思，也就是说，假设我有两颗磁盘设定成 RAID-0，那么当我有 100MB 数据要写入时, 则 100MB 会被拆成两个 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/06/10/comparison-of-raid/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">常用磁盘阵列比较</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-10T14:34:00+08:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>一.RAID-0 (交错模式-stripe)</strong></p>
+
+<p>这种模式主要是利用容量相同的磁盘来达成,效能会比较好。 所谓的交错 (stripe) 是因为数据是同步写到不同的磁盘上头去的意思，也就是说，假设我有两颗磁盘设定成 RAID-0，那么当我有 100MB 数据要写入时, 则 100MB 会被拆成两个 50MB 分别写入不同的磁盘上头去。所以，因为每一个磁盘写入的数据量只有一半。因此，读写的效能都会大大的增加；而且越多颗磁盘所组成的 RAID-0 在理论上，性能增加的越明显。 但是这种模式有个最大的问题，那就是，因为一笔数据被拆成几个部分分布在不同的磁盘上面, 因此『任何一颗磁盘的损毁,都会让你的数据救不回来』。另外,如果使用不同容量的磁盘来达成 RAID-0 时，则在储存数据长大到一定程度时， RAID-0 的性能会变差。假设我用了一颗 20GB 两颗 16GB 的硬盘好了，那么当总数据量少于 48GB (16x3) 时,性能是很不错的。 但是当超过 48GB 时,则数据仅能储存在 20GB 那一颗了 (可用容量剩下 4GB )，所以性能就会变差。 <!--more--></p>
+
+<p><strong>二.RAID-1 (镜像模式-mirror)</strong></p>
+
+<p>这种模式也是需要相同的磁盘容量的，最好是一模一样的磁盘。 如果是不同容量的磁盘组成 RAID-1 时，那么总容量将以最小的那一颗磁盘为主。 这种模式主要是『让同一份数据,完整的保存在两颗磁盘上头』。也就是说，如果我有一个 100MB 的文件,且我仅有两颗磁盘组成 RAID-1 时, 那么这两颗磁盘将会同步写入 100MB 到他们的储存空间去，因此,整体容量几乎少了 50%。由于两颗硬盘内容一模一样，好像镜子映照出来一样，所以我们也称他为 mirror 模式。这种模式最大的优点大概就是在进行备份吧，因为所有的数据都被存放在两个磁盘上面，所以任何一颗磁盘损毁时，所有的数据可都还是保存的好好的。至于性能上面,由于要写入的数据变多了(需要同步写入两颗硬盘嘛)。所以，性能会比单颗磁盘还要差一些。没办法，因为我们都是透过同一个总线在进行数据的通行。 不过，读取的效能还不错,因为数据有两份,如果多进程在读取同一笔数据时，RAID 会自行取得最佳的读取平衡。事实上，为了保有 RAID-1 的储存优点，又想要具有类似 RAID-0 的效能增强。所以，后来也有所谓的 RAID-0+1，亦即同时具有 RAID-0 与 RAID-1 的功能。但是，这样的功能至少需要四颗以上的相同容量的磁盘才行。而且总可用容量会减少一半 (因为 RAID-1)。</p>
+
+<p><strong>三.RAID-5</strong></p>
+
+<p>这个类型最有趣，也是目前最常见的一种类型了。 RAID-5 会整合多个磁盘 (通常需要三个以上),然后每个磁盘驱动器上面都会记录少许的其它部磁盘驱动器的信息 ，由于这个动作，因此,实际上可以使用的容量其实是 (N-1)*S ,那个 N 为全部的磁盘驱动器总数,S 则是最小的那个磁盘的容量。 少掉的空间就是用来作为信息记录用的。
+由于这个机制的存在,因此,当那 N 部磁盘驱动器有任何一部出问题时, 他的数据都会被平均记录到其它 N-1 部磁盘驱动器内,所以,只要你将坏掉的那一颗拿掉, 换一颗好的磁盘后,该磁盘原本的内容就会被恢复，这个作用非常重要。除此之外，因应目前所谓的热拔插 RAID 架构,因此,很多的硬件 RAID 在制作这个 RAID-5 的类型时，他会使用 N+1 颗磁盘,其中 N 颗用来作为 RAID-5 之用, 另外那一颗则做为磁盘损坏时的实时处理之用。 所以，假设有10颗磁盘在这样的架构下时，则事实上只有9颗在进行 RAID-5 的存取，一颗作为错误处理。所以总容量应该是 8xS 。而当有任何一颗磁盘出问题时，留作磁盘损坏时错误处理使用的磁盘就派上用场了,他会立刻被重建。因此，您只要将有问题的磁盘拔掉，换上一颗新的就行了。不过需要注意的是，因为 RAID-5 仅能处理一颗硬盘坏掉时的情况，如果同时有两颗以上的磁盘损毁，那么所有的数据还是还是会完蛋的。 所以，特别重要的信息还是得要复制出来才行。至于存取性能，读取的性能几乎可以媲美 RAID-0，但是写入的性能就无法像 RAID-0 那样明显。因为还得要计算分别写入到所有磁盘当中的奇偶校验信息和相对应的数据，所以写入的性能虽然是会增加不少。</p>
+
+<p><strong>四.RAID-10/01</strong>
+RAID-10/01分为：RAID-1+0或RAID-0+1（都至少需要4块以上的磁盘）。</p>
+
+<p>RAID-1+0是先镜像再分区数据。是将所有硬盘分为两组，视为是RAID-0的最低组合，然后将这两组各自视为RAID-1运作。RAID-1+0有着不错的读取速度，而且拥有比RAID-0更高的数据保护性。</p>
+
+<p>RAID-0+1则是跟RAID-1+0的程序相反，是先分区再将数据镜射到两组硬盘。它将所有的硬盘分为两组，变成RAID-1的最低组合，而将两组硬盘各自视为RAID-0运作。RAID-0+1比起RAID 1+0有着更快的读写速度，不过也多了一些会让整个硬盘组停止运转的机率；因为只要同一组的硬盘全部损毁，RAID-0+1就会停止运作，而RAID- 1+0则可以在牺牲RAID-0的优势下正常运作。</p>
+
+<p>RAID-10巧妙的利用了RAID-0的速度以及RAID-1的保护两种特性，不过它的缺点是需要的硬盘数较多，因为至少必须拥有四个以上的偶数硬盘才能使用。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-10T14:34:00+08:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/architecture/'>architecture</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/06/10/comparison-of-raid/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/06/10/comparison-of-raid/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

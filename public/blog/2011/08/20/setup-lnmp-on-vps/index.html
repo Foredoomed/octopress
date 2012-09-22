@@ -1,0 +1,1241 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>在VPS上搭建LNMP(Linux/Nginx/MySQL/PHP) - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="一.写在最前 从我开博到现在也有半年有余了，之前一直是放在一个共享空间里。当初选择共享空间主要是因为价格便宜，而且我只在空间里放一个WordPress，不需要很大的空间和流量。但是在这半年多时间里，这个空间经常出现响应速度变得很慢，FTP和CPANEL无法登录等问题，真让我的忍耐到达了极点； &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/08/20/setup-lnmp-on-vps/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">在VPS上搭建LNMP(Linux/Nginx/MySQL/PHP)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-20T17:12:00+08:00" pubdate data-updated="true">Aug 20<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>一.写在最前</strong></p>
+
+<p>从我开博到现在也有半年有余了，之前一直是放在一个共享空间里。当初选择共享空间主要是因为价格便宜，而且我只在空间里放一个WordPress，不需要很大的空间和流量。但是在这半年多时间里，这个空间经常出现响应速度变得很慢，FTP和CPANEL无法登录等问题，真让我的忍耐到达了极点；再加上我们不知道什么原因访问一些网站经常返回错误页面，所以我决定抛弃这个空间(一年的时间还没到，浪费劳资的钱啊。。。)，转投VPS的怀抱。 <!--more--></p>
+
+<p>其实在几年之前就知道VPS这样东西了，但是真正当我要去搞一个的时候，却发现有太多的选择。经过一番思想斗争，我最终选择了<a href="http://buyvm.net/" title="buyvm">buyvm</a>这个VPS。如果你要问我为什么选择这个VPS，我想有三个原因：1.便宜 2.便宜 3.还是便宜。谁不想要被称为最好的VPS之称的<a href="http://www.linode.com/" title="Linode">Linode</a>啊，但是穷逼只能捡便宜的用。当然，并不是便宜的就不好，buyvm的VPS虽然便宜，质量和服务也是非常好的，并且它还在<a href="http://www.lowendbox.com" title="lowendbox">lowendbox</a>的评选中获得过第三名的好成绩。</p>
+
+<p>重要的来了，你需要搞清楚在VPS上放些什么东西，因为这关系着你选OpenVZ还是Xen。提前告知一下：<strong>如果你想在VPS上装L2TP/IPSec VPN的话，就不要选OpenVZ</strong>。以我的经验来看，OpenVZ还是有很多限制的，如果手头宽裕的话还是首选Xen吧。好了，扯蛋完毕，开工搭建。</p>
+
+<p><strong>二.安装LNMP+Dropbear+vsFTP</strong></p>
+
+<p>本次搭建必要的是：</p>
+<ul>
+<li>1台VPS</li>
+<li>CentOS操作系统(我的是CentOS 5.6，其他Linux发行版应该差不多)</li>
+<li>能够以root权限从SSH登录</li>
+<li>有足够的耐心和时间，因为接下来的工作还是蛮多的</li>
+</ul>
+
+<p><strong>1.安装必要的软件包</strong></p>
+
+<p>首先以root权限从SSH登录，然后运行下面的命令：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">yum -y install gcc gcc-c++ autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel zlib zlib-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>2.在home目录新建一个software目录用来存放这次搭建所需的软件：</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nb">cd</span> ~
+</span><span class="line">mkdir software
+</span><span class="line"><span class="nb">cd </span>software
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后下载我们需要的软件：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">wget http://nginx.org/download/nginx-1.0.5.tar.gz
+</span><span class="line">wget http://www.php.net/get/php-5.3.7.tar.gz/from/a/mirror
+</span><span class="line">wget http://dev.mysql.com/downloads/mirror.php?id<span class="o">=</span>403104#mirrors
+</span><span class="line">wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+</span><span class="line">wget http://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/libmcrypt-2.5.8.tar.bz2/download
+</span><span class="line">wget http://sourceforge.net/projects/mcrypt/files/MCrypt/2.6.8/mcrypt-2.6.8.tar.gz/download
+</span><span class="line">wget http://pecl.php.net/get/memcache-3.0.6.tgz
+</span><span class="line">wget http://sourceforge.net/projects/mhash/files/mhash/0.9.9.9/mhash-0.9.9.9.tar.gz/download
+</span><span class="line">wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
+</span><span class="line">wget http://pecl.php.net/get/APC-3.1.9.tgz
+</span><span class="line">wget http://pecl.php.net/get/PDO_MYSQL-1.0.2.tgz
+</span><span class="line">wget ftp://ftp.imagemagick.org/pub/ImageMagick/ImageMagick.tar.gz
+</span><span class="line">wget http://pecl.php.net/get/imagick-3.0.1.tgz
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>3.编译安装MySQL</strong></p>
+
+<p>首先添加mysql用户组和用户：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/sbin/groupadd mysql
+</span><span class="line">/usr/sbin/useradd -g mysql mysql
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>编译安装mysql：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">tar zxvf mysql-5.1.58.tar.gz
+</span><span class="line"><span class="nb">cd </span>mysql-5.1.58
+</span><span class="line">./configure --prefix<span class="o">=</span>/usr/local/webserver/mysql/ --localstatedir<span class="o">=</span>/usr/webserver/local/mysql/data --with-unix-socket-path<span class="o">=</span>/tmp/mysql.sock --with-charset<span class="o">=</span>utf8 --with-collation<span class="o">=</span>utf8_general_ci --enable-assembler --with-extra-charsets<span class="o">=</span>complex --enable-thread-safe-client --with-big-tables --with-readline --with-ssl --with-embedded-server --enable-local-infile --with-client-ldflags<span class="o">=</span>-all-static --with-mysqld-ldflags<span class="o">=</span>-all-static --with-plugins<span class="o">=</span>partition,innobase,myisammrg
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">cp support-files/my-medium.cnf /usr/local/webserver/mysql/my.cnf
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>赋予mysql权限：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">chmod +w /usr/local/webserver/mysql
+</span><span class="line">chown -R mysql:mysql /usr/local/webserver/mysql
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>以mysql用户建立数据库表：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/local/webserver/mysql/bin/mysql_install_db --basedir<span class="o">=</span>/usr/local/webserver/mysql --datadir<span class="o">=</span>/usr/local/webserver/mysql/data --user<span class="o">=</span>mysql
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>修改mysql的配置文件为：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="o">[</span>client<span class="o">]</span>
+</span><span class="line">character-set-server <span class="o">=</span> utf8
+</span><span class="line"><span class="nv">port</span>		<span class="o">=</span> 3306
+</span><span class="line"><span class="nv">socket</span>		<span class="o">=</span> /tmp/mysql.sock
+</span><span class="line">
+</span><span class="line"><span class="o">[</span>mysqld<span class="o">]</span>
+</span><span class="line">character-set-server <span class="o">=</span> utf8
+</span><span class="line"><span class="nv">port</span>		<span class="o">=</span> 3306
+</span><span class="line"><span class="nv">socket</span>		<span class="o">=</span> /tmp/mysql.sock
+</span><span class="line">skip-locking
+</span><span class="line"><span class="nv">key_buffer_size</span> <span class="o">=</span> 16M
+</span><span class="line"><span class="nv">max_allowed_packet</span> <span class="o">=</span> 16M
+</span><span class="line"><span class="nv">table_open_cache</span> <span class="o">=</span> 64
+</span><span class="line"><span class="nv">sort_buffer_size</span> <span class="o">=</span> 128K
+</span><span class="line"><span class="nv">net_buffer_length</span> <span class="o">=</span> 8K
+</span><span class="line"><span class="nv">read_buffer_size</span> <span class="o">=</span> 256K
+</span><span class="line"><span class="nv">read_rnd_buffer_size</span> <span class="o">=</span> 512K
+</span><span class="line"><span class="nv">myisam_sort_buffer_size</span> <span class="o">=</span> 8M
+</span><span class="line">
+</span><span class="line"><span class="nv">basedir</span> <span class="o">=</span> /usr/local/webserver/mysql
+</span><span class="line"><span class="nv">datadir</span> <span class="o">=</span> /usr/local/webserver/mysql/data
+</span><span class="line"><span class="nv">open_files_limit</span> <span class="o">=</span> 600
+</span><span class="line"><span class="nv">back_log</span> <span class="o">=</span> 20
+</span><span class="line"><span class="nv">max_connections</span> <span class="o">=</span> 100
+</span><span class="line"><span class="nv">max_connect_errors</span> <span class="o">=</span> 200
+</span><span class="line"><span class="nv">table_cache</span> <span class="o">=</span> 60
+</span><span class="line">external-locking <span class="o">=</span> FALSE
+</span><span class="line"><span class="nv">join_buffer_size</span> <span class="o">=</span> 128K
+</span><span class="line"><span class="nv">thread_cache_size</span> <span class="o">=</span> 10
+</span><span class="line"><span class="nv">thread_concurrency</span> <span class="o">=</span> 8
+</span><span class="line"><span class="nv">query_cache_size</span> <span class="o">=</span> 0M
+</span><span class="line"><span class="nv">query_cache_limit</span> <span class="o">=</span> 2M
+</span><span class="line"><span class="nv">query_cache_min_res_unit</span> <span class="o">=</span> 2k
+</span><span class="line"><span class="nv">default_table_type</span> <span class="o">=</span> MyISAM
+</span><span class="line"><span class="nv">thread_stack</span> <span class="o">=</span> 192K
+</span><span class="line"><span class="nv">tmp_table_size</span> <span class="o">=</span> 512K
+</span><span class="line"><span class="nv">max_heap_table_size</span> <span class="o">=</span> 32M
+</span><span class="line"><span class="nv">long_query_time</span> <span class="o">=</span> 1
+</span><span class="line">log_long_format
+</span><span class="line"><span class="nv">binlog_cache_size</span> <span class="o">=</span> 2M
+</span><span class="line"><span class="nv">max_binlog_cache_size</span> <span class="o">=</span> 4M
+</span><span class="line"><span class="nv">max_binlog_size</span> <span class="o">=</span> 512M
+</span><span class="line"><span class="nv">expire_logs_days</span> <span class="o">=</span> 7
+</span><span class="line">
+</span><span class="line"><span class="o">[</span>myisamchk<span class="o">]</span>
+</span><span class="line"><span class="nv">key_buffer_size</span> <span class="o">=</span> 4M
+</span><span class="line"><span class="nv">sort_buffer_size</span> <span class="o">=</span> 1M
+</span><span class="line"><span class="nv">read_buffer</span> <span class="o">=</span> 2M
+</span><span class="line"><span class="nv">write_buffer</span> <span class="o">=</span> 2M
+</span><span class="line">
+</span><span class="line"><span class="nv">read_rnd_buffer_size</span> <span class="o">=</span> 2M
+</span><span class="line"><span class="nv">bulk_insert_buffer_size</span> <span class="o">=</span> 2M
+</span><span class="line"><span class="nv">myisam_sort_buffer_size</span> <span class="o">=</span> 4M
+</span><span class="line"><span class="nv">myisam_max_sort_file_size</span> <span class="o">=</span> 10G
+</span><span class="line"><span class="nv">myisam_max_extra_sort_file_size</span> <span class="o">=</span> 10G
+</span><span class="line"><span class="nv">myisam_repair_threads</span> <span class="o">=</span> 1
+</span><span class="line">myisam_recover
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>创建一个脚本，方便管理mysql：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /usr/local/webserver/mysql/mysql
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>在其中添加下面的脚本命令：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="c">#!/bin/sh</span>
+</span><span class="line">
+</span><span class="line">function_start_mysql<span class="o">()</span>
+</span><span class="line"><span class="o">{</span>
+</span><span class="line">   <span class="nb">printf</span> <span class="s2">&quot;Starting MySQL...\n&quot;</span>
+</span><span class="line">   /bin/sh /usr/local/webserver/mysql/bin/mysqld_safe --defaults-file<span class="o">=</span>/usr/local/webserver/mysql/my.cnf &amp;
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">function_stop_mysql<span class="o">()</span>
+</span><span class="line"><span class="o">{</span>
+</span><span class="line">   <span class="nb">printf</span> <span class="s2">&quot;Stopping MySQL...\n&quot;</span>
+</span><span class="line">   /usr/local/webserver/mysql/bin/mysqladmin -u mysql -pmysql shutdown
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">function_restart_mysql<span class="o">()</span>
+</span><span class="line"><span class="o">{</span>
+</span><span class="line">   <span class="nb">printf</span> <span class="s2">&quot;Restarting MySQL...\n&quot;</span>
+</span><span class="line">   function_stop_mysql
+</span><span class="line">   sleep 5
+</span><span class="line">   function_start_mysql
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">function_kill_mysql<span class="o">()</span>
+</span><span class="line"><span class="o">{</span>
+</span><span class="line">   <span class="nb">kill</span> -9 <span class="k">$(</span>ps -ef | grep <span class="s1">&#39;bin/mysqld_safe&#39;</span> | grep 3306 | awk <span class="s1">&#39;{printf $2}&#39;</span><span class="k">)</span>
+</span><span class="line">   <span class="nb">kill</span> -9 <span class="k">$(</span>ps -ef | grep <span class="s1">&#39;libexec/mysqld&#39;</span> | grep 3306 | awk <span class="s1">&#39;{printf $2}&#39;</span><span class="k">)</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span> <span class="s2">&quot;start&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class="line">function_start_mysql
+</span><span class="line"><span class="k">elif</span> <span class="o">[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span> <span class="s2">&quot;stop&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class="line">function_stop_mysql
+</span><span class="line"><span class="k">elif</span> <span class="o">[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span> <span class="s2">&quot;restart&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class="line">function_restart_mysql
+</span><span class="line"><span class="k">elif</span> <span class="o">[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span> <span class="s2">&quot;kill&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class="line">function_kill_mysql
+</span><span class="line"><span class="k">else</span>
+</span><span class="line"><span class="nb">printf</span> <span class="s2">&quot;Usage: /usr/local/webserver/mysql {start|stop|restart|kill}\n&quot;</span>
+</span><span class="line"><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后赋予脚本执行权限：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">chmod +x /usr/local/webserver/mysql/mysql
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>启动mysql：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/local/webserver/mysql/mysql start
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>给mysql用户赋予数据库的所有权限：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">GRANT ALL PRIVILEGES ON *.* TO <span class="s1">&#39;mysql&#39;</span>@<span class="s1">&#39;localhost&#39;</span> IDENTIFIED BY <span class="s1">&#39;mysql&#39;</span>;
+</span><span class="line">GRANT ALL PRIVILEGES ON *.* TO <span class="s1">&#39;mysql&#39;</span>@<span class="s1">&#39;127.0.0.1&#39;</span> IDENTIFIED BY <span class="s1">&#39;mysql&#39;</span>;
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>配置开机自启动mysql</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /etc/rc.local
+</span><span class="line">/usr/local/webserver/mysql/bin/mysqld_safe --defaults-file<span class="o">=</span>/usr/local/webserver/mysql/my.cnf &amp;
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>4.编译安装PHP</strong></p>
+
+<p>首先创建一个用户和组(用来管理PHP/Nginx/Wordpress)
+创建用户和组</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">groupadd www
+</span><span class="line">useradd -g www www
+</span><span class="line">mkdir -p /data/htdocs/blog  //blog目录是Wordpress的根目录
+</span><span class="line">chmod +w /data/htdocs/blog
+</span><span class="line">chown -R www:www /data/htdocs/blog
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>编译安装PHP所需的支持库：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">tar zxvf libiconv-1.14.tar.gz
+</span><span class="line"><span class="nb">cd </span>libiconv-1.13.1/
+</span><span class="line">./configure --prefix<span class="o">=</span>/usr/local
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">
+</span><span class="line">tar zxvf libmcrypt-2.5.8.tar.gz
+</span><span class="line"><span class="nb">cd </span>libmcrypt-2.5.8/
+</span><span class="line">./configure
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">/sbin/ldconfig
+</span><span class="line"><span class="nb">cd </span>libltdl
+</span><span class="line">./configure --enable-ltdl-install
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">
+</span><span class="line">tar zxvf mhash-0.9.9.9.tar.gz
+</span><span class="line"><span class="nb">cd </span>mhash-0.9.9.9/
+</span><span class="line">./configure
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">
+</span><span class="line">tar zxvf mcrypt-2.6.8.tar.gz
+</span><span class="line"><span class="nb">cd </span>mcrypt-2.6.8/
+</span><span class="line">/sbin/ldconfig
+</span><span class="line">./configure
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">
+</span><span class="line">ln -s /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
+</span><span class="line">ln -s /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
+</span><span class="line">ln -s /usr/local/lib/libmcrypt.so.4 /usr/lib/libmcrypt.so.4
+</span><span class="line">ln -s /usr/local/lib/libmcrypt.so.4.4.8 /usr/lib/libmcrypt.so.4.4.8
+</span><span class="line">ln -s /usr/local/lib/libmhash.a /usr/lib/libmhash.a
+</span><span class="line">ln -s /usr/local/lib/libmhash.la /usr/lib/libmhash.la
+</span><span class="line">ln -s /usr/local/lib/libmhash.so /usr/lib/libmhash.so
+</span><span class="line">ln -s /usr/local/lib/libmhash.so.2 /usr/lib/libmhash.so.2
+</span><span class="line">ln -s /usr/local/lib/libmhash.so.2.0.1 /usr/lib/libmhash.so.2.0.1
+</span><span class="line">ln -s /usr/local/bin/libmcrypt-config /usr/bin/libmcrypt-config
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">tar zxvf php-5.3.7.tar.gz
+</span><span class="line"><span class="nb">cd </span>php-5.3.7
+</span><span class="line">./configure --prefix<span class="o">=</span>/usr/local/webserver/php --with-config-file-path<span class="o">=</span>/usr/local/webserver/php/etc --with-mysql<span class="o">=</span>/usr/local/webserver/mysql --with-mysqli<span class="o">=</span>/usr/local/webserver/mysql/bin/mysql_config --with-iconv-dir<span class="o">=</span>/usr/local --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir<span class="o">=</span>/usr --enable-xml --disable-rpath  --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex  --enable-fpm  --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-ldap --with-ldap-sasl --with-xmlrpc --enable-ftp --enable-zip --enable-exif --enable-soap --without-pear --with-fpm-user<span class="o">=</span>www --with-fpm-group<span class="o">=</span>www
+</span><span class="line">make <span class="nv">ZEND_EXTRA_LIBS</span><span class="o">=</span><span class="s1">&#39;-liconv&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>如果遇到下面的问题：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/root/source/php-5.3.7/sapi/cli/php: error <span class="k">while </span>loading shared libraries: libmysqlclient.so.18: cannot open shared object file: No such file or directory
+</span><span class="line">make: *** <span class="o">[</span>ext/phar/phar.php<span class="o">]</span> Error 127
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>解决方法：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">ln -s /usr/local/webserver/mysql/lib/libmysqlclient.so.18 /usr/lib/
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后再执行：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">make install
+</span><span class="line">cp php.ini-production /usr/local/webserver/php/etc/php.ini
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>安装PHP扩展包：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">tar zxvf memcache-3.0.6.tgz
+</span><span class="line"><span class="nb">cd </span>memcache-3.0.6
+</span><span class="line">/usr/local/webserver/php/bin/phpize
+</span><span class="line">./configure --with-php-config<span class="o">=</span>/usr/local/webserver/php/bin/php-config
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">
+</span><span class="line">tar jxvf APC-3.1.9.tgz
+</span><span class="line"><span class="nb">cd </span>APC-3.1.9
+</span><span class="line">/usr/local/webserver/php/bin/phpize
+</span><span class="line">./configure --with-php-config<span class="o">=</span>/usr/local/webserver/php/bin/php-config --prefix<span class="o">=</span>/usr/local/webserver/ --enable-apc --enable-apc-mmap --enable-apc-spinlocks
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">
+</span><span class="line">tar zxvf PDO_MYSQL-1.0.2.tgz
+</span><span class="line"><span class="nb">cd </span>PDO_MYSQL-1.0.2
+</span><span class="line">/usr/local/webserver/php/bin/phpize
+</span><span class="line">./configure --with-php-config<span class="o">=</span>/usr/local/webserver/php/bin/php-config --with-pdo-mysql<span class="o">=</span>/usr/local/webserver/mysql
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">
+</span><span class="line">tar zxvf ImageMagick.tar.gz
+</span><span class="line"><span class="nb">cd </span>ImageMagick-6.7.1-7
+</span><span class="line">./configure
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span><span class="line">
+</span><span class="line">tar zxvf imagick-3.0.1.tgz
+</span><span class="line"><span class="nb">cd </span>imagick-3.0.1
+</span><span class="line">/usr/local/webserver/php/bin/phpize
+</span><span class="line">./configure --with-php-config<span class="o">=</span>/usr/local/webserver/php/bin/php-config
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>修改php.ini文件:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nv">output_buffering</span> <span class="o">=</span> On
+</span><span class="line">cgi.fix_pathinfo <span class="o">=</span> 0
+</span><span class="line">
+</span><span class="line"><span class="nv">extension_dir</span> <span class="o">=</span> <span class="s2">&quot;/usr/local/webserver/php/lib/php/extensions/no-debug-non-zts-20090626/&quot;</span>
+</span><span class="line">
+</span><span class="line">//并在此行后增加以下几行
+</span><span class="line"><span class="nv">extension</span> <span class="o">=</span> <span class="s2">&quot;memcache.so&quot;</span>
+</span><span class="line"><span class="nv">extension</span> <span class="o">=</span> <span class="s2">&quot;pdo_mysql.so&quot;</span>
+</span><span class="line"><span class="nv">extension</span> <span class="o">=</span> <span class="s2">&quot;imagick.so&quot;</span>
+</span><span class="line">
+</span><span class="line"><span class="o">[</span>APC<span class="o">]</span>
+</span><span class="line">apc.enabled <span class="o">=</span> 1
+</span><span class="line">apc.shm_segments <span class="o">=</span> 1
+</span><span class="line">apc.shm_size <span class="o">=</span> 8M
+</span><span class="line">apc.ttl <span class="o">=</span> 7200
+</span><span class="line">apc.user_ttl <span class="o">=</span> 7200
+</span><span class="line">apc.optimization <span class="o">=</span> 1
+</span><span class="line">apc.num_files_hint <span class="o">=</span> 1024
+</span><span class="line">apc.mmap_file_mask <span class="o">=</span>/tmp/apc.XXXXXX
+</span><span class="line">apc.enable_cli <span class="o">=</span> 1
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>打开php-fpm.conf文件:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /usr/local/webserver/php/etc/php-fpm.conf
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>修改添加如下配置：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">pm.max_children <span class="o">=</span> 1
+</span><span class="line"><span class="nv">pid</span> <span class="o">=</span> run/php-fpm.pid
+</span><span class="line"><span class="nv">error_log</span> <span class="o">=</span> log/php-fpm.log
+</span><span class="line"><span class="nv">log_level</span> <span class="o">=</span> notice
+</span><span class="line">emergency_restart_threshold :10
+</span><span class="line">emergency_restart_interval:1m
+</span><span class="line">process_control_timeout:5s
+</span><span class="line">daemonize:yes
+</span><span class="line">
+</span><span class="line">backlog:-1
+</span><span class="line">listen.owner <span class="o">=</span> www
+</span><span class="line">listen.group <span class="o">=</span> www
+</span><span class="line">listen.mode <span class="o">=</span> 0666
+</span><span class="line"><span class="nv">user</span> <span class="o">=</span> www
+</span><span class="line"><span class="nv">group</span> <span class="o">=</span> www
+</span><span class="line"><span class="nv">pm</span> <span class="o">=</span> static
+</span><span class="line"><span class="nv">request_terminate_timeout</span> <span class="o">=</span> 0
+</span><span class="line"><span class="nv">request_slowlog_timeout</span> <span class="o">=</span> 0s
+</span><span class="line"><span class="nv">slowlog</span> <span class="o">=</span> log/<span class="nv">$pool</span>.log.slow
+</span><span class="line"><span class="nv">rlimit_files</span> <span class="o">=</span> 51200
+</span><span class="line"><span class="nv">rlimit_core</span> <span class="o">=</span> 0
+</span><span class="line"><span class="nv">catch_workers_output</span> <span class="o">=</span> yes
+</span><span class="line">pm.max_requests <span class="o">=</span> 500
+</span><span class="line">listen.allowed_clients <span class="o">=</span> 127.0.0.1
+</span><span class="line">env<span class="o">[</span>HOSTNAME<span class="o">]</span> <span class="o">=</span> <span class="nv">$HOSTNAME</span>
+</span><span class="line">env<span class="o">[</span>PATH<span class="o">]</span> <span class="o">=</span> /usr/local/bin:/usr/bin:/bin
+</span><span class="line">env<span class="o">[</span>TMP<span class="o">]</span> <span class="o">=</span> /tmp
+</span><span class="line">env<span class="o">[</span>TMPDIR<span class="o">]</span> <span class="o">=</span> /tmp
+</span><span class="line">env<span class="o">[</span>TEMP<span class="o">]</span> <span class="o">=</span> /tmp
+</span><span class="line">env<span class="o">[</span>OSTYPE<span class="o">]</span> <span class="o">=</span> <span class="nv">$OSTYPE</span>
+</span><span class="line">env<span class="o">[</span>MACHTYPE<span class="o">]</span> <span class="o">=</span> <span class="nv">$MACHTYPE</span>
+</span><span class="line">env<span class="o">[</span>MALLOC_CHECK_<span class="o">]</span> <span class="o">=</span> 2
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>启动php-fpm：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/local/webserver/php/sbin/php-fpm
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>配置开机自动启动php-fpm:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /etc/rc.local
+</span><span class="line">/usr/local/webserver/php/sbin/php-fpm
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>5.编译安装Nginx</strong>
+首先编译安装Nginx所需的pcre库：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">tar zxvf pcre-8.12.tar.gz
+</span><span class="line"><span class="nb">cd </span>pcre-8.12
+</span><span class="line">./configure
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>编译安装Nginx:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">tar zxvf nginx-1.0.5.tar.gz
+</span><span class="line"><span class="nb">cd </span>nginx-1.0.5
+</span><span class="line">./configure --user<span class="o">=</span>www --group<span class="o">=</span>www --prefix<span class="o">=</span>/usr/local/webserver/nginx --with-http_stub_status_module --with-http_ssl_module
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>创建Nginx日志目录:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">mkdir -p /data/log
+</span><span class="line">chmod +w /data/log
+</span><span class="line">chown -R www:www /data/log
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>修改Nginx配置文件:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+<span class="line-number">72</span>
+<span class="line-number">73</span>
+<span class="line-number">74</span>
+<span class="line-number">75</span>
+<span class="line-number">76</span>
+<span class="line-number">77</span>
+<span class="line-number">78</span>
+<span class="line-number">79</span>
+<span class="line-number">80</span>
+<span class="line-number">81</span>
+<span class="line-number">82</span>
+<span class="line-number">83</span>
+<span class="line-number">84</span>
+<span class="line-number">85</span>
+<span class="line-number">86</span>
+<span class="line-number">87</span>
+<span class="line-number">88</span>
+<span class="line-number">89</span>
+<span class="line-number">90</span>
+<span class="line-number">91</span>
+<span class="line-number">92</span>
+<span class="line-number">93</span>
+<span class="line-number">94</span>
+<span class="line-number">95</span>
+<span class="line-number">96</span>
+<span class="line-number">97</span>
+<span class="line-number">98</span>
+<span class="line-number">99</span>
+<span class="line-number">100</span>
+<span class="line-number">101</span>
+<span class="line-number">102</span>
+<span class="line-number">103</span>
+<span class="line-number">104</span>
+<span class="line-number">105</span>
+<span class="line-number">106</span>
+<span class="line-number">107</span>
+<span class="line-number">108</span>
+<span class="line-number">109</span>
+<span class="line-number">110</span>
+<span class="line-number">111</span>
+<span class="line-number">112</span>
+<span class="line-number">113</span>
+<span class="line-number">114</span>
+<span class="line-number">115</span>
+<span class="line-number">116</span>
+<span class="line-number">117</span>
+<span class="line-number">118</span>
+<span class="line-number">119</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">user  www www;
+</span><span class="line">
+</span><span class="line">worker_processes 1;
+</span><span class="line">
+</span><span class="line">error_log  /data/log/nginx_error.log  crit;
+</span><span class="line">
+</span><span class="line">pid        /usr/local/webserver/nginx/nginx.pid;
+</span><span class="line">
+</span><span class="line"><span class="c">#Specifies the value for maximum file descriptors that can be opened by this process.</span>
+</span><span class="line">worker_rlimit_nofile 65535;
+</span><span class="line">
+</span><span class="line">events
+</span><span class="line"><span class="o">{</span>
+</span><span class="line">  use epoll;
+</span><span class="line">  worker_connections 65535;
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">http
+</span><span class="line"><span class="o">{</span>
+</span><span class="line">  include       mime.types;
+</span><span class="line">  default_type  application/octet-stream;
+</span><span class="line">
+</span><span class="line">  <span class="c">#charset  gb2312;</span>
+</span><span class="line">
+</span><span class="line">  server_names_hash_bucket_size 128;
+</span><span class="line">  large_client_header_buffers 4 32k;
+</span><span class="line">  client_header_buffer_size 32k;
+</span><span class="line">  client_max_body_size 8m;
+</span><span class="line">
+</span><span class="line">  sendfile on;
+</span><span class="line">  keepalive_timeout 10 10;
+</span><span class="line">  tcp_nopush on;
+</span><span class="line">  tcp_nodelay on;
+</span><span class="line">
+</span><span class="line">  fastcgi_connect_timeout 300;
+</span><span class="line">  fastcgi_send_timeout 300;
+</span><span class="line">  fastcgi_read_timeout 300;
+</span><span class="line">  fastcgi_buffer_size 32k;
+</span><span class="line">  fastcgi_buffers 4 32k;
+</span><span class="line">  fastcgi_busy_buffers_size 32k;
+</span><span class="line">  fastcgi_temp_file_write_size 32k;
+</span><span class="line">  fastcgi_intercept_errors on;
+</span><span class="line">
+</span><span class="line">  gzip on;
+</span><span class="line">  gzip_min_length  1k;
+</span><span class="line">  gzip_buffers     4 16k;
+</span><span class="line">  gzip_http_version 1.0;
+</span><span class="line">  gzip_comp_level 1;
+</span><span class="line">  gzip_types       text/plain application/x-javascript text/css application/xml;
+</span><span class="line">  gzip_vary on;
+</span><span class="line">
+</span><span class="line">  <span class="c">#limit_zone  crawler  $binary_remote_addr  10m;</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line">  server
+</span><span class="line">  <span class="o">{</span>
+</span><span class="line">    listen       80;
+</span><span class="line">    server_name  liuxuan.info www.liuxuan.info;
+</span><span class="line">    index index.html index.htm index.php;
+</span><span class="line">    root  /data/htdocs/blog;
+</span><span class="line">
+</span><span class="line">    <span class="c">#limit_conn   crawler  20;</span>
+</span><span class="line">
+</span><span class="line">    location / <span class="o">{</span>
+</span><span class="line">       try_files <span class="nv">$uri</span> <span class="nv">$uri</span>/ /index.php?q<span class="o">=</span><span class="nv">$uri</span>&amp;<span class="nv">$args</span>;
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="c"># if file exists return it right away</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span>-f <span class="nv">$request_filename</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">       <span class="nb">break</span>;
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="c"># otherwise rewrite the request</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span>!-e <span class="nv">$request_filename</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">       rewrite ^<span class="o">(</span>.+<span class="o">)</span><span class="nv">$ </span>/index.php<span class="nv">$1</span> last;
+</span><span class="line">       <span class="nb">break</span>;
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line">    location ~ .*<span class="se">\.</span><span class="o">(</span>php|php5<span class="o">)</span>?<span class="err">$</span>
+</span><span class="line">    <span class="o">{</span>
+</span><span class="line">      fastcgi_pass  unix:/tmp/php-cgi.sock;
+</span><span class="line">      <span class="c">#fastcgi_pass  127.0.0.1:9000;</span>
+</span><span class="line">      fastcgi_index index.php;
+</span><span class="line">      include fastcgi.conf;
+</span><span class="line">
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    location ~ .*<span class="se">\.</span><span class="o">(</span>gif|jpg|jpeg|png|bmp|swf<span class="o">)</span><span class="err">$</span>
+</span><span class="line">    <span class="o">{</span>
+</span><span class="line">      access_log off;
+</span><span class="line">      expires      30d;
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    location ~ .*<span class="se">\.</span><span class="o">(</span>js|css<span class="o">)</span>?<span class="err">$</span>
+</span><span class="line">    <span class="o">{</span>
+</span><span class="line">      access_log off;
+</span><span class="line">      expires      1d;
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="c"># Only allow search engine to access pics</span>
+</span><span class="line">    location ~ .*<span class="se">\.</span><span class="o">(</span>gif|jpg|jpeg|png|bmp|swf|flv<span class="o">)</span><span class="err">$</span>
+</span><span class="line">    <span class="o">{</span>
+</span><span class="line">	valid_referers none blocked *.liuxuan.info *.google.com *.baidu.com;
+</span><span class="line">	<span class="k">if</span> <span class="o">(</span><span class="nv">$invalid_referer</span><span class="o">)</span>
+</span><span class="line">	<span class="o">{</span>
+</span><span class="line">	   <span class="k">return </span>403;
+</span><span class="line">	<span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line">    log_format  access  <span class="s1">&#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;</span>
+</span><span class="line">              <span class="s1">&#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;</span>
+</span><span class="line">              <span class="s1">&#39;&quot;$http_user_agent&quot; $http_x_forwarded_for&#39;</span>;
+</span><span class="line">    access_log  /data/log/access.log  access;
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>检查Nginx配置是否正确：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/local/webserver/nginx/sbin/nginx -t
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>启动Nginx：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/local/webserver/nginx/sbin/nginx
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>配置开机自动启动Nginx：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">vim /etc/rc.local
+</span><span class="line">/usr/local/webserver/nginx/sbin/nginx
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>在不停止Nginx服务的情况下平滑变更Nginx配置：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nb">kill</span> -HUP <span class="sb">`</span>cat /usr/local/webserver/nginx/nginx.pid<span class="sb">`</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>6.Linux设置：</strong></p>
+
+<p>修改服务器时间为上海时间：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>关闭不需要的服务：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">ntsysv  //按空格选择和取消，按F12退出
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>以下仅列出需要启动的服务，未列出的服务一律关闭：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">crond
+</span><span class="line">iptables
+</span><span class="line">network
+</span><span class="line">syslog
+</span><span class="line">vsftpd
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>四.总结</strong></p>
+
+<p>回顾这段搭建的过程可谓历经挫折和痛苦，其中碰到了很多问题，为此我还到StackOverflow上发贴求助，但是我还是坚持了下来，直到搭建成功，所以说坚持和永不放弃的精神是非常重要的。搭建完成后，通过top命令发现虽然只有19个进程，但是内存占用还是蛮高的，特别是系统启动后需要占用的内存。好了，希望能给看到这篇博文的朋友带来帮助，缩短他们搭建的时间。</p>
+
+<p>参考文章：</p>
+
+<p>[1] <a href="http://blog.s135.com/nginx_php_v6/" title="http://blog.s135.com/nginx_php_v6/">http://blog.s135.com/nginx_php_v6/</a><br />
+[2] <a href="http://www.fallday.org/archives/551" title="http://www.fallday.org/archives/551">http://www.fallday.org/archives/551</a></p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-20T17:12:00+08:00" pubdate data-updated="true">Aug 20<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/vps/'>vps</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/08/20/setup-lnmp-on-vps/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/08/20/setup-lnmp-on-vps/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

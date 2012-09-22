@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: vim | Zhixingheyi]]></title>
+  <link href="http://liuxuan.info/blog/categories/vim/atom.xml" rel="self"/>
+  <link href="http://liuxuan.info/"/>
+  <updated>2012-09-22T18:41:50+08:00</updated>
+  <id>http://liuxuan.info/</id>
+  <author>
+    <name><![CDATA[Foredoomed]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ubuntu下编译安装Vim]]></title>
+    <link href="http://liuxuan.info/blog/2011/06/25/compile-and-install-vim-on-ubuntu/"/>
+    <updated>2011-06-25T14:56:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/06/25/compile-and-install-vim-on-ubuntu</id>
+    <content type="html"><![CDATA[<p><strong>一.编译安装最新版本Vim</strong></p>
+
+<p>我们都知道在Ubuntu下如果直接在终端中用命令安装Vim，那么安装的都不是最新版本。如果要想安装最新版本只有下载最新版源代码包，然后再编译安装。</p>
+
+<p>首先，Vim最新版源代码包可以在 <a href="http://www.vim.org/" title="官网">官网</a> 下载，下载源代码包到本地Ubuntu主机后，解压缩，进入该目录，进行配置，编译和安装：
+Liquid error: ClassNotFound: no lexer for alias 'shell' found
+<!--more--></p>
+
+<p>如果安装出现错误则有可能是目录的权限问题，试试下面的命令吧：
+Liquid error: ClassNotFound: no lexer for alias 'shell' found</p>
+
+<p>好了，如果不出什么意外的话，Vim应该已经安装好了，接下来就是要安装和配置插件了。首先，要在主目录里新建<strong>.vimrc</strong>文件，然后在这个文件里配置Vim。
+配置可以参考<a href="https://github.com/panweizeng/env" title="这里">这里</a></p>
+
+<p>如果运行出现下面的错误：<br />
+    (gvim:6667): Gtk-WARNING **: Invalid input string</p>
+
+<p>解决办法是在主目录里<code>CTRL+H</code>显示<code>.bashrc</code>文件，然后在这里文件里添加如下代码：
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export  </span><span class="nv">LANG</span><span class="o">=</span>zh_CN.UTF-8;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_CTYPE</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_NUMERIC</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_TIME</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_COLLATE</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_MONETARY</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_MESSAGES</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_PAPER</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_NAME</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_ADDRESS</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_TELEPHONE</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_MEASUREMENT</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span><span class='line'><span class="nb">export  </span><span class="nv">LC_IDENTIFICATION</span><span class="o">=</span>”zh_CN.UTF-8”;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><strong>二.配置Vim对Ruby的支持</strong></p>
+
+<p>我主要用Vim来写Ruby代码，所以比如代码高亮，自动补全等都是必须的:</p>
+
+<p>1.安装Ruby也可以去<a href="http://www.ruby-lang.org/" title="官网">官网</a>上下载最新版本，然后编译安装。<br />
+2.设置环境变量。在<code>.bashrc</code>文件里添加如下代码：
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span>/usr/local/ruby/bin:<span class="nv">$PATH</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+3.下载<a href="http://rubyforge.org/projects/vim-ruby/" title="vim-ruby">vim-ruby</a>插件，解压后复制道Vim安装目录里。现在开始写Ruby代码吧，然后按F5看下运行结果是不是出来了呢。</p>
+
+<p>最后Show一下我的Vim：</p>
+
+<p><a href="http://www.flickr.com/photos/60110479@N08/5868623217/" title="Flickr 上 Foredoomed 的 vim_screenshot"><img src="http://farm6.static.flickr.com/5067/5868623217_70b3bcae76_z.jpg" width="640" height="480" alt="vim_screenshot" /></a></p>
+
+]]></content>
+  </entry>
+  
+</feed>

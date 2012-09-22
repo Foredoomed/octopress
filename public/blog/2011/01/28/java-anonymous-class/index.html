@@ -1,0 +1,384 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>为什么Java匿名内部类中的方法参数必须定义为final - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="今天在做一个功能，就是用户在注册后给他发送帐号激活邮件。在做这个功能的时候，我用匿名内部类来创建一个线程发送激活邮件，代码如下： UserController.java 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/01/28/java-anonymous-class/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">为什么Java匿名内部类中的方法参数必须定义为final</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-28T13:01:00+08:00" pubdate data-updated="true">Jan 28<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>今天在做一个功能，就是用户在注册后给他发送帐号激活邮件。在做这个功能的时候，我用匿名内部类来创建一个线程发送激活邮件，代码如下：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>UserController.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="nd">@Controller</span><span class="o">()</span>
+</span><span class="line"><span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/users&quot;</span><span class="o">)</span>
+</span><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserController</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Autowired</span>
+</span><span class="line">  <span class="kd">private</span> <span class="n">MailManager</span> <span class="n">mailManager</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMailManager</span><span class="o">(</span><span class="n">MailManager</span>  <span class="n">mailManager</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">this</span><span class="o">.</span><span class="na">mailManager</span> <span class="o">=</span> <span class="n">mailManager</span><span class="o">;</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">)</span>
+</span><span class="line">  <span class="kd">public</span> <span class="n">String</span> <span class="nf">doingSignUp</span><span class="o">(</span><span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_email_address&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_email_address</span><span class="o">,</span> <span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_password&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_password</span><span class="o">,</span> <span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_name&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_name</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">try</span> <span class="o">{</span>
+</span><span class="line">      <span class="c1">//用户注册代码省略</span>
+</span><span class="line">      <span class="k">new</span> <span class="nf">AbstractExecutionThreadService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">      <span class="nd">@Override</span>
+</span><span class="line">      <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">mailManager</span><span class="o">.</span><span class="na">sendActivateMail</span><span class="o">(</span><span class="n">user</span><span class="o">);</span><span class="c1">//发送邮件</span>
+</span><span class="line">      <span class="o">}}.</span><span class="na">start</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">      <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">      <span class="k">return</span> <span class="s">&quot;index&quot;</span><span class="o">;</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<!--more-->
+
+<p>MVC框架用的是Spring  MVC，这个框架以后还会写一些关于他的文章（从我目前使用过的MVC框架对比来看，Spring  MVC是我认为的使用起来最舒服的框架，至于和Struts比较的话，就仁者见仁，智者见智了）。创建多线程的时候使用了Google的 <a href="http://code.google.com/p/guava-libraries/" title="guava">guava</a> 工具包里的多线程类来创建多线程（以后还会写一些关于这个工具包的文章）。从代码中可以看到，<code>AbstractExecutionThreadService</code>是抽象类，在里面重写了<code>run</code>方法，<code>run</code>法里面就是干一件事就是发送邮件。那么到这里就有一个问题了，由于<code>sendActivateMail</code>这个方法需要一个<code>User</code>类作为参数，而因为这个发送邮件的方法是在匿名内部类的里面，所以这个<code>User</code>类必须：(1)作为<code>UserController</code>类的实例变量，或者(2)在<code>doingSignUp</code>方法中把<code>User</code>类定义为<code>final</code>的局部变量。</p>
+
+<p>一般在写Web程序的时候碰到类的实例变量的时候我们就因该当心多线程问题了，这里也是一样。由于Spring  MVC里的<code>Controller</code>类不是线程安全的，所以第一种把<code>User</code>类定义为<code>UserController</code>类的实例变量的方法就不能用了，那么剩下就只有用第二种方法：把<code>User</code>类定义为<code>final</code>。到这里第二个问题来了，这个问题是我以前没有想过的，为什么匿名内部类里的方法参数只能是<code>final</code>的。</p>
+
+<p>在《Core Java 8th Editon》里是这么说的： <strong>A local variable  that is declared final cannot be modified after it has been initialized. Thus,  it is guaranteed that the local variable and the copy that is made inside the  local class always have the same value</strong>.  这句话是在介绍局部内部类的时候说的，用到匿名内部类上是一样的。简单的两句话只说了局部变量要和和他的拷贝要保持一致，但为什么要保持一致没有说。在stackoverflow上搜索了一下，发现了这个帖子： <a href="http://stackoverflow.com/questions/3910324?tab=active#tab-top" title="Why inner  classes require &quot;final&quot; outer instance variables">Why inner  classes require “final” outer instance variables</a> 在这个帖子里还提到了另一个词：”Closures”（闭包），有兴趣的读者可以去看一下关于闭包的内容，这里只给出 <a href="http://en.wikipedia.org/wiki/Closure_(computer_science)" title="维基百科上关于闭包的解释">维基百科上关于闭包的解释</a> 。在这个帖子里又一次提到了为了防止在匿名内部类中的方法执行之前改变外部类局部变量的值，避免一些不可预测（奇怪）的问题，必须把外部类的局部变量声明为<code>final</code>。</p>
+
+<p>我们再来看一下<code>class</code>文件会发现，<code>UserController</code>类被编译成了两个<code>class</code>文件：<code>UserController.class</code>和<code>UserController$1.class</code>。其中<code>UserController.class</code>还是本来的类，而<code>UserController$1.class</code>则是匿名内部类。我们用<code>javap  -private classname</code>命令来看一下这两个<code>class</code>文件里面都有些什么。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>UserController.class  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="nl">D:</span><span class="err">\</span><span class="o">&gt;</span><span class="n">javap</span> <span class="o">-</span><span class="kd">private</span> <span class="n">UserController</span>
+</span><span class="line"><span class="n">Compiled</span> <span class="n">from</span> <span class="s">&quot;UserController.java&quot;</span>
+</span><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">controller</span><span class="o">.</span><span class="na">UserController</span> <span class="kd">extends</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Object</span><span class="o">{</span>
+</span><span class="line"><span class="kd">private</span> <span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">mail</span><span class="o">.</span><span class="na">MailManager</span> <span class="n">mailManager</span><span class="o">;</span>
+</span><span class="line"><span class="kd">public</span> <span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">controller</span><span class="o">.</span><span class="na">UserController</span><span class="o">();</span>
+</span><span class="line"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMailManager</span><span class="o">(</span><span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">mail</span><span class="o">.</span><span class="na">MailManager</span><span class="o">);</span>
+</span><span class="line"><span class="kd">public</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">String</span> <span class="nf">doingSignUp</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">String</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">String</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">String</span><span class="o">);</span>
+</span><span class="line"><span class="kd">static</span> <span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">mail</span><span class="o">.</span><span class="na">MailManager</span> <span class="n">access$0</span><span class="o">(</span><span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">controller</span><span class="o">.</span><span class="na">UserController</span><span class="o">);</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>UserController$1.class  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="nl">D:</span><span class="err">\</span><span class="o">&gt;</span><span class="n">javap</span> <span class="o">-</span><span class="kd">private</span> <span class="n">UserController$1</span>
+</span><span class="line"><span class="n">Compiled</span> <span class="n">from</span> <span class="s">&quot;UserController.java&quot;</span>
+</span><span class="line"><span class="kd">class</span> <span class="nc">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">controller</span><span class="o">.</span><span class="na">UserController</span><span class="n">$1</span> <span class="kd">extends</span> <span class="n">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">concurrent</span><span class="o">.</span><span class="na">AbstractExecutionThreadService</span><span class="o">{</span>
+</span><span class="line"><span class="kd">final</span> <span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">controller</span><span class="o">.</span><span class="na">UserController</span> <span class="k">this</span><span class="n">$0</span><span class="o">;</span>
+</span><span class="line"><span class="kd">private</span> <span class="kd">final</span> <span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">entity</span><span class="o">.</span><span class="na">User</span> <span class="n">val$user</span><span class="o">;</span>
+</span><span class="line"><span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">controller</span><span class="o">.</span><span class="na">UserController</span><span class="n">$1</span><span class="o">(</span><span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">controller</span><span class="o">.</span><span class="na">UserController</span><span class="o">,</span>  <span class="n">info</span><span class="o">.</span><span class="na">liuxuan</span><span class="o">.</span><span class="na">entity</span><span class="o">.</span><span class="na">User</span><span class="o">);</span>
+</span><span class="line"><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Exception</span><span class="o">;</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>我们可以清楚的看到在编译后的<code>UserController$1.class</code>中，<code>User</code>类已经变成了<code>UserController$1</code>的私有成员变量，并且通过构造方法来初始化。现在来看的话就可以理解为什么要保持一致了：构造方法传入外部类方法的局部变量，如果在内部类方法执行之前改变的话将发生与预想不同的结果。</p>
+
+<p>也许你已经注意到了，在<code>UserController.class</code>中的<code>access$0</code>方法被定义成了<code>static</code>，为什么被定义为<code>static</code>的呢？这是为了不被其他子类重写。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-28T13:01:00+08:00" pubdate data-updated="true">Jan 28<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>java</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/01/28/java-anonymous-class/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/01/28/java-anonymous-class/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

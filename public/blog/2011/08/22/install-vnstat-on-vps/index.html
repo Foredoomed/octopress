@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>在VPS上安装网络流量监控工具vnStat - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="用上VPS以后博客的访问速度是比以前快了很多，但是也有烦心的事，就是担心每个月的流量有没有超标。你可以通过VPS提供给你的Control Panel的地址登录，然后查看流量数据。但是这种方法始终有点复杂，最好有种直接输入一个URL就能查看流量数据的方法。在Google上搜索了一会儿之后， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/08/22/install-vnstat-on-vps/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">在VPS上安装网络流量监控工具vnStat</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-22T18:04:00+08:00" pubdate data-updated="true">Aug 22<span>nd</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>用上VPS以后博客的访问速度是比以前快了很多，但是也有烦心的事，就是担心每个月的流量有没有超标。你可以通过VPS提供给你的Control Panel的地址登录，然后查看流量数据。但是这种方法始终有点复杂，最好有种直接输入一个URL就能查看流量数据的方法。在Google上搜索了一会儿之后，终于找到了一个好工具：<a href="http://humdi.net/vnstat/" title="vnStat">vnStat</a>。 </p>
+
+<!--more-->
+
+<p>vnStat是Linux和BSD平台上基于控制台的网络流量监控工具。它使用的是Linux内核提供的网络接口统计作为信息源。vnStat不会嗅探网络并且保证占系统资源少，需要注意的是内核版本要在2.2之上。</p>
+
+<p>vnStat只是一个基于控制台的工具，我们还需要安装一个它的PHP扩展<a href="href=&quot;http://www.sqweek.com/sqweek/index.php?p=1" title="vnStat PHP frontend">vnStat PHP frontend</a>，那么我们就能直接通过流量器来查看流量数据了。</p>
+
+<p>速度安装起来：</p>
+
+<p>1.安装vnStat:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">wget http://humdi.net/vnstat/vnstat-1.11.tar.gz
+</span><span class="line">tar zxvf vnstat-1.11.tar.gz
+</span><span class="line"><span class="nb">cd </span>vnstat-1.11
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>2.安装vnStat PHP frontend：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">wget http://www.sqweek.com/sqweek/files/vnstat_php_frontend-1.5.1.tar.gz
+</span><span class="line">cp -r vnstat_php_frontend-1.5.1 /你的Nginx的根目录/vnstat
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后就可以通过访问<code>http://www.yourdomain.com/vnstat</code>，应该就可以看到流量数据页面了，但是现在还没有数据，接下来我们来给系统生成数据。</p>
+
+<p>3.建立流量数据库:</p>
+
+<p>首先查看你是哪种外网网卡：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">ifconfig    //Xen一般是eth0；OpenVZ一般是venet0
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后生成数据库：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">/usr/bin/vnstat -u -i venet0  //因为我的VPS是基于OpenVZ的，所以就是venet0
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>配置通过cron的方式定时更新数据库,编辑<code>/etc/cron.d/vnstat</code>文件，加入下面的内容：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">0-55/5 * * * *   root   vnstat -u -i venet0
+</span><span class="line">0-55/5 * * * *   root   vnstat --dumpdb -i venet0 &gt;/var/lib/vnstat/vnstat_dump_venet0
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>注意：第二行是为了更新venet0的数据后，dump出来一个文件提供给PHP访问.这里dump出来的vnstat_dump_venet0文件名是有规定的。</p>
+
+<p>4.修改配置文件,编辑<code>/你的Nginx的根目录/vnstat/config.php</code>：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="nv">$language</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span>;
+</span><span class="line"><span class="nv">$iface_list</span> <span class="o">=</span> array<span class="o">(</span><span class="s1">&#39;venet0&#39;</span><span class="o">)</span>;
+</span><span class="line"><span class="nv">$iface_title</span><span class="o">[</span><span class="s1">&#39;venet0&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;VPS&#39;</span>;
+</span><span class="line"><span class="nv">$data_dir</span> <span class="o">=</span> <span class="s1">&#39;/var/lib/vnstat/&#39;</span>;
+</span><span class="line"><span class="nv">$graph_format</span><span class="o">=</span><span class="s1">&#39;png&#39;</span>;
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>到这里安装就都完成了，就这么简单。现在访问www.yourdomain.com/vnstat就会发现有流量统计了,统计数据更新是５分钟刷新一次。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-22T18:04:00+08:00" pubdate data-updated="true">Aug 22<span>nd</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/vps/'>vps</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/08/22/install-vnstat-on-vps/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/08/22/install-vnstat-on-vps/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

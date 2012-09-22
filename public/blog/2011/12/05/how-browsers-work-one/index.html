@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>浏览器是如何工作的(一) - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="浏览器可能是目前使用的人最多的软件，对于软件开发人员来说更是如此。我对浏览器的认识差不多是这样的： 发送请求到服务器(get/post) 解析从服务器返回的response(HTML,CSS) 执行JavaScript代码 基本上就是上面这些，但是至于细节就不了解了。直到我看到了这篇长长的文章： &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/12/05/how-browsers-work-one/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">浏览器是如何工作的(一)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-05T23:03:00+08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>浏览器可能是目前使用的人最多的软件，对于软件开发人员来说更是如此。我对浏览器的认识差不多是这样的：</p>
+
+<ul>
+  <li>发送请求到服务器(get/post)</li>
+  <li>解析从服务器返回的response(HTML,CSS)</li>
+  <li>执行JavaScript代码</li>
+</ul>
+
+<p>基本上就是上面这些，但是至于细节就不了解了。直到我看到了这篇长长的文章：<a href="http://www.html5rocks.com/en/tutorials/internals/howbrowserswork/" title="How Browsers Work:Behind the Scenes of Modern Web Browsers">How Browsers Work:Behind the Scenes of Modern Web Browsers</a>,才第一次窥探到了浏览器的处理细节。这个主题一共分成了10章来讲，对于学习和参考浏览器的工作原理都非常有用。所以，我就决定把它翻译成中文，供以后参考用。值得一提的是，这篇文章的作者是一个有着10年以上经验的女程序员，让我们像她致敬！</p>
+
+<p>由于原文较长，所以我也会分成几篇博客来翻，而这篇博客是这个系列的第一篇翻译。</p>
+
+<!-- more -->
+
+<p>=================正文开始====================</p>
+
+<p>1 引子</p>
+
+<p>浏览器可能是目前使用最广的软件。在这个系列的文章中，我将解释浏览器是如何工作的。我们将会看到在浏览器的地址栏中敲入google.com到你看到google的页面这段时间内到底发生了什么。</p>
+
+<p>1.1 我们将会讨论的浏览器</p>
+
+<p>现在有5个主流的浏览器，他们是：IE,Firefox,Safari, Chrome和Opera。我会从开源浏览器Firefox,Chrome以及部分开源的Safari中举例。根据<a href="http://gs.statcounter.com/" title="StatCounter browser statistics">StatCounter browser statistics</a>上的统计，到2011年8月为止，Firefox,Chrome和Safari三者加起来的占有率已经到达将近60%。所以开源浏览器是浏览器领域的重要组成部分。</p>
+
+<p>1.2 浏览器的主要功能</p>
+
+<p>浏览器的主要功能是展现用户选择的网络资源，这是通过发送请求给服务器并且在浏览器中显示返回结果。而这个网络资源一般是一个HTML文档，但也有可能是PDF，图片或者其他类型的资源。资源的地址是通过URI来描述的。</p>
+
+<p>浏览器解释和显示HTML文件的方式是在HTML和CSS规范里面规定的。这些规范是由<a href="http://www.w3.org/" title="W3C">W3C</a>维护的。</p>
+
+<p>多年以来，那些浏览器只遵守了一部分的规范，并且开发他们自己的扩展。但是这就给开发人员带来了严重的兼容性问题。目前大多数浏览器或多或少遵守着规范。</p>
+
+<p>浏览器的用户接口基本上差不多，他们有：</p>
+
+<ul>
+  <li>地址栏</li>
+  <li>后退和前进按钮</li>
+  <li>书签选项</li>
+  <li>刷新和停止按钮</li>
+  <li>主页按钮</li>
+</ul>
+
+<p>奇怪的是，浏览器的用户接口并有在任何正式的规范里规定过，而是来自于多年经验形成的最佳实践，还有浏览器之间的相互模仿。HTML5规范并没有规定浏览器必须具有的UI元素，但是它列出了一些共有的元素。在他们之中有地址栏，状态栏和工具栏。当然，浏览器也可以有自己独特的特性，比如Firefox的Download Manager。</p>
+
+<p>1.3 浏览器的结构概览</p>
+
+<ol>
+  <li>用户接口 - 前面已经提到过</li>
+  <li>浏览器引擎 - 处理UI和渲染引擎之间的行为</li>
+  <li>渲染引擎 - 负责显示请求的内容。比如解析HTML和CSS后显示出来。</li>
+  <li>网络 - 用来网络调用，比如HTTP请求。它是不依赖于平台并且实现隐藏于平台之下。</li>
+  <li>UI后端 - 用来画基本的组合框和窗口。它暴露一个不依赖平台的通用接口，在它之下使用的是操作系统的用户接口方法。</li>
+  <li>JavaScript解释器 - 解析和执行JavaScript代码</li>
+  <li>数据存储 - 这是一个持久层，浏览器需要保存所有类型的数据到硬盘上，比如cookie。而HTML5规定了浏览器的数据库web database。</li>
+</ol>
+
+<p><img src="http://farm8.staticflickr.com/7172/6459942245_401c8ce2ac.jpg&quot; width=&quot;500&quot; height=&quot;339&quot;" alt="layers" /></p>
+
+<p>需要注意的是，Chrome跟大多数浏览器不一样的是，它会有多个渲染引擎的实例，每个标签页都有一个渲染引擎，每个标签页是个独立的进程。</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-05T23:03:00+08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/browsers/'>browsers</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/12/05/how-browsers-work-one/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/12/05/how-browsers-work-one/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

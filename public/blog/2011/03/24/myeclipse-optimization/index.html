@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>MyEclipse优化设置 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="原文地址：MyEclipse优化设置 第一步: 取消自动validation validation有一堆，什么xml、jsp、jsf、js等等，我们没有必要全部都去自动校验一下，只是需要的时候才会手工校验一下！
+取消方法：
+windows–&gt;perferences–&gt;myeclipse &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/03/24/myeclipse-optimization/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">MyEclipse优化设置</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-24T18:27:00+08:00" pubdate data-updated="true">Mar 24<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>原文地址：<a href="http://www.javaeye.com/topic/789541" title="MyEclipse优化设置">MyEclipse优化设置</a> </p>
+
+<p><strong>第一步: 取消自动validation</strong></p>
+
+<p>validation有一堆，什么xml、jsp、jsf、js等等，我们没有必要全部都去自动校验一下，只是需要的时候才会手工校验一下！
+取消方法：
+windows–&gt;perferences–&gt;myeclipse–&gt;validation
+除开Manual下面的复选框全部选中之外，其他全部不选</p>
+
+<p>手工验证方法：
+在要验证的文件上，单击鼠标右键–&gt;myeclipse–&gt;run validation</p>
+
+<p><strong>第二步：取消Eclipse拼写检查</strong></p>
+
+<p>1、拼写检查会给我们带来不少的麻烦，我们的方法命名都会是单词的缩写，他也会提示有错，所以最好去掉，没有多大的用处
+windows–&gt;perferences–&gt;general–&gt;validation-&gt;editors-&gt;Text Editors-&gt;spelling</p>
+
+<p><strong>第三步：取消myeclipse的启动项</strong></p>
+
+<p>myeclipse会有很多的启动项，而其中很多我们都用不着，或者只用一两个，取消前面不用的就可以
+windows–&gt;perferences–&gt;general–&gt;startup and shutdown  (详见底端介绍)</p>
+
+<!--more-->
+
+<p><strong>第四步：更改jsp默认打开的方式</strong></p>
+
+<p>安装了myeclipse后，编辑jsp页面，会打开他的编辑页面，同时也有预览页面，速度很慢，不适合开发。
+修改windows–&gt;perferences–&gt;general–&gt;editors-&gt;file associations
+在下方选择一种编辑器，然后点击左边的default按钮</p>
+
+<p><strong>第五步：更改代码提示快捷键(不建议使用增强提示,使用Ctrl+/在自己需要的时候提示更佳)</strong></p>
+
+<p>现在的代码提示快捷键，默认为<code>ctrl+space</code>，而我们输入法切换也是，所以会有冲突。
+找到windows–&gt;perferences–&gt;general–&gt;Keys
+更改<code>content assist</code>为<code>alt+/</code>
+同时由于<code>alt+/</code>已经被<code>word completion</code>占用，所以得同时修改<code>word completion</code>的快捷键值。</p>
+
+<p><strong>第六步: 更改内存使用文件</strong></p>
+
+<p>1、打开 eclipse.ini</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>eclipse.ini  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="o">-</span><span class="n">showsplash</span>
+</span><span class="line"><span class="n">com</span><span class="o">.</span><span class="na">genuitec</span><span class="o">.</span><span class="na">myeclipse</span><span class="o">.</span><span class="na">product</span>
+</span><span class="line"><span class="o">--</span><span class="n">launcher</span><span class="o">.</span><span class="na">XXMaxPermSize</span> <span class="mi">256</span><span class="n">M</span>
+</span><span class="line"><span class="o">-</span><span class="n">vmargs</span>
+</span><span class="line"><span class="o">-</span><span class="n">Dosgi</span><span class="o">.</span><span class="na">requiredJavaVersion</span><span class="o">=</span><span class="mf">1.5</span>
+</span><span class="line"><span class="o">-</span><span class="n">Xms256m</span>
+</span><span class="line"><span class="o">-</span><span class="n">Xmx1024m</span>
+</span><span class="line"><span class="o">-</span><span class="n">Dosgi</span><span class="o">.</span><span class="na">splashLocation</span><span class="o">=</span><span class="nl">e:</span><span class="n">MyEclipse</span> <span class="mf">6.0</span><span class="n">eclipseMyEclipseSplash</span><span class="o">.</span><span class="na">bmp</span>
+</span><span class="line"><span class="o">-</span><span class="n">Duser</span><span class="o">.</span><span class="na">language</span><span class="o">=</span><span class="n">en</span>
+</span><span class="line"><span class="o">-</span><span class="nl">XX:</span><span class="n">PermSize</span><span class="o">=</span><span class="mi">128</span><span class="n">M</span>
+</span><span class="line"><span class="o">-</span><span class="nl">XX:</span><span class="n">MaxPermSize</span><span class="o">=</span><span class="mi">256</span><span class="n">M</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>把下面的那个<code>-XX:MaxPermSize</code>调大，比如<code>-XX:MaxPermSize=512M</code>，再把<code>-XX:PermSize</code>调成跟<code>-XX:MaxPermSize</code>一样大
+原因：大家一定对这个画面很熟悉吧：
+几乎每次 eclipse 卡到当都是因为这个非堆内存不足造成的，把最大跟最小调成一样是因为不让myeclipse频繁的换内存区域大小
+注意：<code>XX:MaxPermSize</code>和<code>Xmx</code>的大小之和不能超过你的电脑内存大小</p>
+
+<p><strong>第七步: 修改Struts-config.xml文件打开错误</strong></p>
+
+<p>有时点击myeclipse里的struts的xml配置文件，会报错：
+Error opening the editorUnable to open the editor ,unknow the editor id…..
+把这个窗口关闭后才出正确的xml文件显示，这个我们这样改：
+windows–&gt;perferences–&gt;general–&gt;editors-&gt;file associations选择<code>*.xml</code>，选择<code>myeclipse xml editor</code>点<code>default</code></p>
+
+<p><strong>第八步: 取消自动验证,该成手动验证</strong></p>
+
+<p>windows–&gt;perferences–&gt;myeclipse–&gt;validation
+将Build下全部勾取消,保留Manual(手动) 如果你需要验证某个文件的时候，我们可以单独去验证它。方法是，在需要验证的文件上(右键 -&gt; MyEclipse -&gt; Run Validation)</p>
+
+<p><strong>第九步: 取消Maven更新(启动更新)</strong></p>
+
+<p>Window &gt; Preferences &gt; Myeclipse Enterprise Workbench &gt; Maven4Myeclipse &gt; Maven&gt;禁用Download repository index updates on startup</p>
+
+<p><strong>附件:</strong></p>
+
+<p>第一项: 启动功能介绍和样例(红色为需要保留的文件,此为本人样例,请按需选择)</p>
+<ol>
+<li><span><span>Automatic&nbsp;Updates&nbsp;Scheduler&nbsp;</span><span><span style="color: rgb(0, 130, 0);">//自动升级调度</span></span> <span>&nbsp;&nbsp;</span></span></li>
+<li>
+<span>MyEclipse&nbsp;QuickSetup&nbsp;</span><span><span style="color: rgb(0, 130, 0);">//快速启动</span></span> <span>&nbsp;&nbsp;</span> </li>
+<li>
+<span>MyEclipse&nbsp;Derby&nbsp;</span><span><span style="color: rgb(0, 130, 0);">//derby是一个开源数据库的名字</span></span> </li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Geronimo&nbsp;</span><span>1</span><span>&nbsp;</span><span>//同色都是应用服务器的名字</span> <span>&nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Geronimo&nbsp;</span><span>2</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;JBOSS&nbsp;</span><span>2</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;JBOSS&nbsp;</span><span>3</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;JBOSS&nbsp;</span><span>4</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;JBOSS&nbsp;</span><span>5</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);">MyEclipse&nbsp;EASIE&nbsp;JBOSS&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Jetty&nbsp;</span><span>4</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Jetty&nbsp;</span><span>5</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Jetty&nbsp;</span><span>6</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);">MyEclipse&nbsp;EASIE&nbsp;Jetty&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;JOnAS&nbsp;</span><span>3</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;JOnAS&nbsp;</span><span>4</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);">MyEclipse&nbsp;EASIE&nbsp;JOnAS&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;JRun&nbsp;</span><span>4</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);">MyEclipse&nbsp;EASIE&nbsp;JRun&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Oracle&nbsp;</span><span>10</span><span>&nbsp;AS&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span style="color: rgb(237, 28, 36);"><span>MyEclipse&nbsp;EASIE&nbsp;Oracle&nbsp;</span><span>9</span></span><span><span style="color: rgb(237, 28, 36);">&nbsp;AS</span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);">MyEclipse&nbsp;EASIE&nbsp;Oracle&nbsp;AS&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Orion&nbsp;</span><span>1</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Orion&nbsp;</span><span>2</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Resin&nbsp;</span><span>2</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Resin&nbsp;</span><span>3</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);">MyEclipse&nbsp;EASIE&nbsp;Resin&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Sun&nbsp;</span><span>8</span><span>.x&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Sun&nbsp;</span><span>8</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Sun&nbsp;</span><span>9</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Glassfish&nbsp;</span><span>2</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Glassfish&nbsp;</span><span>1</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);">MyEclipse&nbsp;EASIE&nbsp;Sun&nbsp;One&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span style="color: rgb(255, 0, 0);"><span>MyEclipse&nbsp;EASIE&nbsp;MyEclipse&nbsp;Tomcat&nbsp;</span><span>6</span></span><span><span style="color: rgb(255, 0, 0);">&nbsp;Server</span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Tomcat&nbsp;</span><span>4</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;Tomcat&nbsp;</span><span>5</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(237, 28, 36);"><span>MyEclipse&nbsp;EASIE&nbsp;Tomcat&nbsp;</span><span>6</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);"><span style="color: rgb(237, 28, 36);">MyEclipse&nbsp;EASIE&nbsp;Tomcat</span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;WebLogic&nbsp;</span><span>10</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;WebLogic&nbsp;</span><span>6</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;WebLogic&nbsp;</span><span>7</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;WebLogic&nbsp;</span><span>8</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span style="color: rgb(237, 28, 36);"><span>MyEclipse&nbsp;EASIE&nbsp;WebLogic&nbsp;</span><span>9</span></span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span><span style="color: rgb(34, 177, 76);">MyEclipse&nbsp;EASIE&nbsp;WebLogic&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;WebSphere&nbsp;</span><span>5</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;WebSphere&nbsp;</span><span>6.1</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;WebSphere&nbsp;</span><span>6</span><span>&nbsp; &nbsp;&nbsp;</span></span></li>
+<li>
+<span style="color: rgb(34, 177, 76);"><span>MyEclipse&nbsp;EASIE&nbsp;WebSphere&nbsp;</span><span>4</span></span><span>&nbsp; &nbsp;&nbsp;</span> </li>
+<li>
+<span>MyEclipse&nbsp;Examples&nbsp;</span><span><span style="color: rgb(0, 130, 0);">//样例</span></span> <span>&nbsp;&nbsp;</span> </li>
+<li><span style="color: rgb(237, 28, 36);"><span>MyEclipse&nbsp;Memory&nbsp;Monitor&nbsp;</span><span>//内存监控</span> <span>&nbsp;&nbsp;</span></span></li>
+<li>
+<span><span style="color: rgb(237, 28, 36);">MyEclipse&nbsp;Tapestry&nbsp;Integration&nbsp;</span></span><span><span style="color: rgb(0, 130, 0);"><span style="color: rgb(237, 28, 36);">//插件集成</span></span></span> <span>&nbsp;&nbsp;</span> </li>
+<li><span style="color: rgb(237, 28, 36);"><span>MyEclipse&nbsp;JSP&nbsp;Debug&nbsp;Tooling&nbsp;</span><span>//jsp调试插件</span> <span>&nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(237, 28, 36);"><span>MyEclipse&nbsp;File&nbsp;Creation&nbsp;Wizards&nbsp;</span><span>//文件创建程序&nbsp;</span><span>&nbsp;&nbsp;</span></span></li>
+<li><span style="color: rgb(237, 28, 36);"><span>ICEfaces Integration for MyEclipse //基于Ajax的JSF开发框架()</span></span></li>
+<li><span style="color: rgb(237, 28, 36);"><span>MyEclipse&nbsp;Backward&nbsp;Compatibility&nbsp;</span><span>//后台功能</span> <span>&nbsp;&nbsp;</span></span></li>
+<li>
+<span><span style="color: rgb(237, 28, 36);">MyEclipse&nbsp;Perspective&nbsp;Plug-in&nbsp;</span></span><span><span style="color: rgb(0, 130, 0);"><span style="color: rgb(237, 28, 36);">//透视图插件</span>&nbsp;</span></span><span>&nbsp;&nbsp;</span> </li>
+<li><span>Pluse Collaboration Control Center //Eclipse的网页管理中心</span></li>
+<li><span><span style="color: rgb(237, 28, 36);">eclipse-cs 4.x.x -&gt; 5.0.0 Migration Plug-in&nbsp; //Eclipse插件兼容组件</span></span></li>
+<li>
+<span>Mozilla&nbsp;Debug&nbsp;UI&nbsp;Plug-in(Incubation)&nbsp;</span><span><span style="color: rgb(0, 130, 0);">//Mozilla调试插件（Mozilla是一款浏览器)&nbsp;</span></span><span>&nbsp;&nbsp;</span> </li>
+<li><span><span style="color: rgb(237, 28, 36);">Dynamic Languages ToolKit Core UI //对入PHP等动态语言支持的用户接口</span></span></li>
+<li>
+<span>WTP&nbsp;Webservice&nbsp;UI&nbsp;Plug-in&nbsp;</span><span><span style="color: rgb(0, 130, 0);">//Web&nbsp;服务视图插件</span></span> <span>&nbsp;&nbsp;</span> </li>
+<li><span style="color: rgb(237, 28, 36);"><span>JavaServer&nbsp;Faces&nbsp;Tools&nbsp;-&nbsp;Core&nbsp;</span><span>//jsf工具核心包&nbsp;</span><span>&nbsp;&nbsp;</span></span></li>
+<li><span>Automatic Updates Scheduler //自动更新</span></li>
+<li><span><span style="color: rgb(237, 28, 36);">Service policy&nbsp; //Web提供的服务性能目标定义,自动管理</span></span></li>
+<li><span><span style="color: rgb(237, 28, 36);">Atfdebug Plug-in(Incubation)&nbsp; //动态语言的调试工具</span></span></li>
+<li><span><span style="color: rgb(237, 28, 36);">Auxiliary Web Module Support for MeEclipse// 辅助的Web模块支持.(可能是Struts等文件自动添加)</span></span></li>
+<li>
+<span style="color: rgb(237, 28, 36);"><span>JSF&nbsp;Editor&nbsp;Preview&nbsp;Support&nbsp;</span><span>**for**</span><span>&nbsp;MyEclipse</span><span>//jsf编辑器</span></span><span>&nbsp;&nbsp;</span> </li>
+</ol>
+
+<p>第二项: MyEclipse Validation
+由于文件导入的时候，不能保证文件的正确性，所以在启动服务前需要做一下验证，包括语法等。另外可以自己添加需要的验证模块．如checkStyle的验证。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-24T18:27:00+08:00" pubdate data-updated="true">Mar 24<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>programming</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/03/24/myeclipse-optimization/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/03/24/myeclipse-optimization/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

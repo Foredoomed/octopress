@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Facebook的系统架构 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="原文地址：What is Facebooks architecture Web前端用PHP写的。然后，Facebook的HipHop[1]把它转换成C++,用g++编译, 这样做可以提供高性能模板和Web逻辑执行层。 业务逻辑用Thrift[2]作为服务暴露处理。这其中的一些服务是用PHP实现的， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2011/05/10/facebook-architecture/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Facebook的系统架构</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-10T22:46:00+08:00" pubdate data-updated="true">May 10<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>原文地址：<a href="http://www.quora.com/What-is-Facebooks-architecture" title="What is Facebooks architecture">What is Facebooks architecture</a> </p>
+
+<ul>
+  <li>Web前端用PHP写的。然后，Facebook的HipHop[1]把它转换成C++,用g++编译, 这样做可以提供高性能模板和Web逻辑执行层。</li>
+  <li>业务逻辑用Thrift[2]作为服务暴露处理。这其中的一些服务是用PHP实现的，C++或Java要看服务的需求（也可能使用其他一些语言…)。</li>
+  <li>用Java实现的服务不使用任何一个普通的企业级应用服务器，而是用Facebook为自己定制开发的应用服务器。一开始这样做是被看作重复造轮子，但是当这些服务只（或绝大多数）使用Thrift暴露和消费，Tomcat甚至Jetty的开销可能会非常大，而且还没有加入他们需要的重要的作用。</li>
+  <li>持久化使用MySQL, Memcached[3], Facebook’s Cassandra[4], Hadoop’s HBase[5]。Memcached被用作MySQL的缓存和一般目的的缓存。Facebook的工程师们承认他们目前对于Cassandra的使用正在减少，他们更喜欢使用HBase,因为HBase有简单的一致性模型和MapReduce功能。</li>
+  <li>线下处理使用Hadoop和Hive处理。</li>
+  <li>像日志，点击和feeds等数据用Scribe[6]处理，这些数据被聚集和储存在Hadoop分布式文件系统Scribe-HDFS[7]中, 这样可以让MapReduce做扩展分析。</li>
+  <li>BigPipe[8]是他们定制的技术，这个技术使用流水线逻辑可以加速网页渲染速度。</li>
+  <li>Varnish Cache[9]被用作HTTP代理。他们更喜欢使用Varnish，因为它的高性能表现[10]。</li>
+  <li>使用Haystack处理数10亿的照片的存储，Facebook自己开发的点对点存储解决方案带来的是低等级的优化和只能增加的写操作[11]。</li>
+  <li>Facebook Messages使用的是他们自己的架构，这个架构是构建在基础设施分区和动态集群管理。业务逻辑和持久化被包装在所谓的’单元’（cell）里。每个单元处理一部分用户；随着用户的增长新的单元能够被增加[12]。持久化数据用HBase归档[13]。</li>
+  <li>Facebook Messages的搜索引擎是用存储在HBase里倒转的索引构建的[14]。</li>
+  <li>Facebook搜索引擎的实现细节还不清楚，自动完成搜索使用一个自定义的存储和检索逻辑[15]。</li>
+  <li>聊天功能是在用Erlang开发的Epoll服务器上，而且可以被Thrift访问[16]。</li>
+</ul>
+
+<p>关于为这些组件中的每个提供的资源，一些信息和数据:</p>
+
+<ul>
+  <li>Facebook被估计拥有超过60,000台服务器[17]。他们最近新的在普赖恩维尔和俄勒冈州的数据中心的硬件都是自己他们自己设计的[18]，而且最近作为Open Compute Project[19]公诸于众。</li>
+  <li>300TB的数据被存储在memcached processes[20]里。</li>
+  <li>Hadoop和Hive集群是用3000台8核，32G内存，12TB硬盘的服务器里[20]。</li>
+  <li>每天1亿的点击量，500亿的照片，缓存着3兆的对象，到2010年7月为止，每天有130TB的日志[21]。</li>
+</ul>
+
+<p>[1] <em>HipHop for PHP</em>: <a href="http://developers.facebook.com/blog/post/358" title="http://developers.facebook.com/b...">http://developers.facebook.com/b…</a><br />
+[2] <em>Thrift</em>: <a href="http://thrift.apache.org/" title="http://thrift.apache.org">http://thrift.apache.org</a><br />
+[3] <em>Memcached</em>: <a href="http://memcached.org/" title="http://memcached.org">http://memcached.org</a><br />
+[4] <em>Cassandra</em>: <a href="http://cassandra.apache.org/" title="http://cassandra.apache.org">http://cassandra.apache.org</a><br />
+[5] <em>HBase</em>: <a href="http://hbase.apache.org/" title="http://hbase.apache.org">http://hbase.apache.org</a><br />
+[6] <em>Scribe</em>: <a href="https://github.com/facebook/scribe" title="https://github.com/facebook/scribe">https://github.com/facebook/scribe</a><br />
+[7] <em>Scribe-HDFS</em>: <a href="http://hadoopblog.blogspot.com/2009/06/hdfs-scribe-integration.html" title="http://hadoopblog.blogspot.com/2...">http://hadoopblog.blogspot.com/2…</a><br />
+[8] <em>BigPipe</em>: <a href="http://www.facebook.com/notes/facebook-engineering/bigpipe-pipelining-web-pages-for-high-performance/389414033919" title="http://www.facebook.com/notes/fa...">http://www.facebook.com/notes/fa…</a><br />
+[9] <em>Varnish Cache</em>: <a href="http://www.varnish-cache.org/" title="http://www.varnish-cache.org">http://www.varnish-cache.org</a><br />
+[10] <em>Facebook goes for Varnish</em>: <a href="http://www.varnish-software.com/customers/facebook" title="http://www.varnish-software.com/...">http://www.varnish-software.com/…</a><br />
+[11] <em>Needle in a haystack</em>: efficient storage of billions of photos: <a href="http://www.facebook.com/note.php?note_id=76191543919" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a><br />
+[12] <em>Scaling the Messages Application Back End</em>: <a href="http://www.facebook.com/note.php?note_id=10150148835363920" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a><br />
+[13] <em>The Underlying Technology of Messages</em>: <a href="https://www.facebook.com/note.php?note_id=454991608919" title="https://www.facebook.com/note.ph...">https://www.facebook.com/note.ph…</a><br />
+[14] <em>The Underlying Technology of Messages Tech Talk</em>: <a href="http://www.facebook.com/video/video.php?v=690851516105" title="http://www.facebook.com/video/vi...">http://www.facebook.com/video/vi…</a><br />
+[15] <em>Facebook’s typeahead search architecture</em>: <a href="http://www.facebook.com/video/video.php?v=432864835468" title="http://www.facebook.com/video/vi...">http://www.facebook.com/video/vi…</a><br />
+[16] <em>Facebook Chat</em>: <a href="http://www.facebook.com/note.php?note_id=14218138919" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a><br />
+[17] <em>Who has the most Web Servers?</em>: <a href="http://www.datacenterknowledge.com/archives/2009/05/14/whos-got-the-most-web-servers/" title="http://www.datacenterknowledge.c...">http://www.datacenterknowledge.c…</a><br />
+[18] <em>Building Efficient Data Centers with the Open Compute Project</em>: <a href="http://www.facebook.com/note.php?note_id=10150144039563920" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a><br />
+[19] <em>Open Compute Project</em>: <a href="http://opencompute.org/" title="http://opencompute.org">http://opencompute.org</a><br />
+[20] <em>Facebook’s architecture presentation at Devoxx 2010</em>: <a href="http://www.devoxx.com" title="http://www.devoxx.com">http://www.devoxx.com</a><br />
+[21] <em>Scaling Facebook to 500 millions users and beyond</em>: <a href="http://www.facebook.com/note.php?note_id=409881258919" title="http://www.facebook.com/note.php...">http://www.facebook.com/note.php…</a>  </p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-10T22:46:00+08:00" pubdate data-updated="true">May 10<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/architecture/'>architecture</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2011/05/10/facebook-architecture/';
+        var disqus_url = 'http://liuxuan.info/blog/2011/05/10/facebook-architecture/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

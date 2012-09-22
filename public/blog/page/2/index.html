@@ -1,0 +1,719 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="4.3.3 简单规则匹配的例子 样式规则有下面几种： CSS规则，外部表单或style元素 p {color:blue} 内联style属性 HTML的视觉属性(会被映射到相关的样式规则) ">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/page/2/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/11/how-browsers-work-eight/">浏览器是如何工作的(八)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-11T21:32:00+08:00" pubdate data-updated="true">Dec 11<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/11/how-browsers-work-eight/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>4.3.3 简单规则匹配的例子</p>
+
+<p>样式规则有下面几种：</p>
+
+<ul>
+  <li>
+    <p>CSS规则，外部表单或style元素</p>
+
+    <p>p {color:blue}</p>
+  </li>
+  <li>
+    <p>内联style属性</p>
+
+    <p style="color:blue" />
+  </li>
+  <li>
+    <p>HTML的视觉属性(会被映射到相关的样式规则)</p>
+
+    <p bgcolor="blue" />
+  </li>
+</ul>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/11/how-browsers-work-eight/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/11/how-browsers-work-seven/">浏览器是如何工作的(七)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-11T15:13:00+08:00" pubdate data-updated="true">Dec 11<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/11/how-browsers-work-seven/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>4.1 渲染树和DOM树的关系</p>
+
+<p>renderer对应于DOM的元素，但并不是一对一的关系。非视觉DOM元素不会被插入渲染树，比如”head”元素。元素的视觉属性是”none”的元素不会出现在树中(视觉属性是”hidden”话会出现在树中)。</p>
+
+<p>DOM元素对应多个视觉对象。一般情况下，复杂结构的元素不能在单个矩形中被描述清楚。比如，<code>select</code>元素有3个renderer：一个是显示区域；一个是下拉框；还有一个是按钮。当文字被分成多行的时候(在一行里显示的宽度不够)，新的行会被作为附加renderer加入到树中。</p>
+
+<p>另一个有许多renderer的例子例子是不完整的HTML。根据CSS规范，内联元素必须包含块元素或着只包含内联元素。为了防止混合的内容，匿名块renderer会被创建来包裹内敛元素。</p>
+
+<p>有些渲染对象对应于DOM节点，但不是在树中的相同位置。浮动元素和绝对固定位置的元素会被放置在树中的不同的位置，而且映射到实际的frame中去，所以它应该是有站位符的frame。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/11/how-browsers-work-seven/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/10/how-browsers-work-six/">浏览器是如何工作的(六)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-10T20:57:00+08:00" pubdate data-updated="true">Dec 10<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/10/how-browsers-work-six/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>3.3 CSS解析</p>
+
+<p>和HTML不同，CSS是内容无关的语法，所以可以被一般解析器解析。CSS规范定义了词法和语法。</p>
+
+<p>让我们来看一些例子：</p>
+
+<p>CSS的文法(词汇)是用正则表达式定义的</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">comment   \/\*[^*]*\*+([^/*][^*]*\*+)*\/
+</span><span class="line">num   [0-9]+|[0-9]*"."[0-9]+
+</span><span class="line">nonascii  [\200-\377]
+</span><span class="line">nmstart   [_a-z]|{nonascii}|{escape}
+</span><span class="line">nmchar    [_a-z0-9-]|{nonascii}|{escape}
+</span><span class="line">name    {nmchar}+
+</span><span class="line">ident   {nmstart}{nmchar}*</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>ident是identifier的缩写，比如class的名字；name是元素id(#号引用)。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/10/how-browsers-work-six/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/10/how-browsers-work-five/">浏览器是如何工作的(五)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-10T17:14:00+08:00" pubdate data-updated="true">Dec 10<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/10/how-browsers-work-five/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>3.2.6 标记算法</p>
+
+<p>这个算法的输出是一个HTML标记，它可以用状态机来表示。每个状态消费输入流的一个或多个字符，然后根据这些字符更新下一个状态。状态的更新是由当前标记状态和树构造状态决定的。这意味着根据当前状态，同样的字符会对下一个正确的状态产生不同的结果。这个算法太复杂，所以不能完全描述清楚，所以让我来看一个简单的例子，这个例子会帮助我们理解这个算法。</p>
+
+<p>标记下面的HTML：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;html&gt;
+</span><span class="line">  &lt;body&gt;
+</span><span class="line">    Hello world
+</span><span class="line">  &lt;/body&gt;
+</span><span class="line">&lt;/html&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/10/how-browsers-work-five/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/10/how-browsers-work-four/">浏览器是如何工作的(四)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-10T14:18:00+08:00" pubdate data-updated="true">Dec 10<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/10/how-browsers-work-four/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>3.2 HTML解析器</p>
+
+<p>HTML解析器的工作是把HTML标记语言解析成为解析树。</p>
+
+<p>3.2.1 HTML语法定义</p>
+
+<p>HTML的词汇和语法是由W3C组织制定的。当前的版本是HTML4，HTML5还在制定当中。</p>
+
+<p>3.2.2 不是内容无关语法的HTML</p>
+
+<p>我们在介绍解析的时候知道了，语法可以被定义为正式使用的格式，比如BNF。</p>
+
+<p>不过不幸的是，所有约定的解析器都不适用于HTML。HTML不能简单的定义一个解析器需要的内容无关语法。</p>
+
+<p>有一个定义HTML的正式格式 - DTD，但它也不是内容无关语法。</p>
+
+<p>所以第一眼看上去就很奇怪，HTML更接近于XML。而XML的解析器却有很多，而且有一个HTML的XML版本 - XHTML，那么有什么不同呢？</p>
+
+<p>不同之处在于，HTML的方式更加宽松，它允许你省略特定的标签，然后会隐式的为你加上去。总的来看，相对于XML来说，HTML是“软”语法。</p>
+
+<p>显然，这个细小的差别让两者大不一样。一方面这是HTML流行的主要原因 - 允许你犯错，而且对于开发人员来说非常容易。另一方面，它有使的写一个正式语法变得非常困难。所以总结来看 - HTML不能被简单的解析，不能被约定的解析器解析，因为它不是内容无关语法，也不能被XML解析器解析。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/10/how-browsers-work-four/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/09/how-browsers-work-three/">浏览器是如何工作的(三)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-09T23:54:00+08:00" pubdate data-updated="true">Dec 9<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/09/how-browsers-work-three/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>3.1 解析</p>
+
+<p>从渲染引擎解析开始是非常重要的阶段，我们会对它作更深入的研究。首先还是简略的介绍一下什么是解析。</p>
+
+<p>解析一个文档(document)的含义是：把这个文档转换成一些有意义的结构或可以被理解和使用的代码。解析的结果通常是一棵，它的节点代表文档的结构。这棵树被称为解析树或语法树。</p>
+
+<p>实例 - <code>2 + 3 - 1</code>这个表达式的解析结果会返回下面的树：</p>
+
+<p><img src="http://farm8.staticflickr.com/7158/6481798259_420d333218.jpg&quot; width=&quot;400&quot; height=&quot;155&quot;" alt="paring tree" /></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/09/how-browsers-work-three/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/06/code-rush/">Code Rush</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-06T22:38:00+08:00" pubdate data-updated="true">Dec 6<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/06/code-rush/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在<a href="http://www.ruanyifeng.com/blog/2009/09/code_rush.html" title="纪录片《Code Rush》">阮一峰的博客</a>看到了这个纪录片，不过年代有些久远了，记录了Netscape公司从1998年到1999年这一年之间的事，在其中还看到了Jamie Zawinski这位牛人，果真是那样特立独行啊。总之强力推荐，看完后也许你会像我一样找到一些共鸣。</p>
+
+<embed src="http://player.youku.com/player.php/sid/XMTc5OTc5Njcy/v.swf" allowfullscreen="true" quality="high" width="480" height="400" align="middle" allowscriptaccess="always" type="application/x-shockwave-flash" />
+<p>&lt;/embed&gt;</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/06/how-browsers-work-two/">浏览器是如何工作的(二)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-06T22:18:00+08:00" pubdate data-updated="true">Dec 6<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/06/how-browsers-work-two/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>2 渲染引擎</p>
+
+<p>渲染引擎要做的就是渲染，也就是在浏览器的窗体里显示请求的内容。</p>
+
+<p>一般情况下，渲染引擎可以显示HTML,XML和图片。它也可以通过插件的方式显示其他类型类型的文件，比如PDF。但是，在这章中我们将把焦点放在主要的用例上：显示由CSS格式化过的HTML和图片。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/06/how-browsers-work-two/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/05/how-browsers-work-one/">浏览器是如何工作的(一)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-05T23:03:00+08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/05/how-browsers-work-one/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>浏览器可能是目前使用的人最多的软件，对于软件开发人员来说更是如此。我对浏览器的认识差不多是这样的：</p>
+
+<ul>
+  <li>发送请求到服务器(get/post)</li>
+  <li>解析从服务器返回的response(HTML,CSS)</li>
+  <li>执行JavaScript代码</li>
+</ul>
+
+<p>基本上就是上面这些，但是至于细节就不了解了。直到我看到了这篇长长的文章：<a href="http://www.html5rocks.com/en/tutorials/internals/howbrowserswork/" title="How Browsers Work:Behind the Scenes of Modern Web Browsers">How Browsers Work:Behind the Scenes of Modern Web Browsers</a>,才第一次窥探到了浏览器的处理细节。这个主题一共分成了10章来讲，对于学习和参考浏览器的工作原理都非常有用。所以，我就决定把它翻译成中文，供以后参考用。值得一提的是，这篇文章的作者是一个有着10年以上经验的女程序员，让我们像她致敬！</p>
+
+<p>由于原文较长，所以我也会分成几篇博客来翻，而这篇博客是这个系列的第一篇翻译。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/05/how-browsers-work-one/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/03/what-does-jit-do-in-hotspot/">JIT到底做了些什么事</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-03T15:15:00+08:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/03/what-does-jit-do-in-hotspot/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近在网上看到一篇关JIT(Just in Time)的文章<a href="http://java.dzone.com/articles/just-time-compiler-jit-hotspot?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+javalobby%2Ffrontpage+%28Javalobby+%2F+Java+Zone%29&amp;utm_content=Google+Reader" title="Just in Time Compiler (JIT) in Hotspot">Just in Time Compiler (JIT) in Hotspot</a>,这篇文章很短，但是对JIT的作用基本上说的比较清楚的，可以作为JIT的学习参考，所以我就决定把这篇文章翻译成中文，供以后复习参考用。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/03/what-does-jit-do-in-hotspot/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
+<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
