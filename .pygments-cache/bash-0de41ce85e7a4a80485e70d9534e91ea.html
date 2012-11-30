@@ -1,0 +1,17 @@
+<div class="highlight"><pre><span class="nb">cd</span> /etc/munin
+
+vim munin.conf
+
+// 打开下面几行的注释
+dbdir   /var/lib/munin
+htmldir /var/www/html/munin
+logdir  /var/log/munin
+rundir  /var/run/munin
+
+tmpldir /etc/munin/templates
+
+// 修改munin页面上显示的munin
+<span class="o">[</span>liuxuan.info<span class="o">]</span>
+    address 127.0.0.1
+    use_node_name yes
+</pre></div>

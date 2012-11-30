@@ -9,8 +9,7 @@
   <meta name="author" content="Foredoomed">
 
   
-  <meta name="description" content="1.MIME(Multipurpose Internet Mail Extensions):是一个数据格式标签，用来解决不同的电子邮件系统中传输消息时遇到的问题。 MIME是一个文本类型的标签，用一个主要对象类型和一个特指的子类型，中间加上斜杠表示
-例如： An HTML-formatted &hellip;">
+  <meta name="description" content="一.Beginning Agility 1.Work for Outcome 2.Quick Fixes Become Quicksand 3.Criticize Ideas,Not People 4.Damnthe Torpedoes,Go Ahead 二.Feeding Agility 5. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -29,7 +28,8 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
+
 
   
   <script type="text/javascript">
@@ -79,6 +79,138 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/08/pragmatic-programmers-practices-of-an-agile-developer-note/">《Pragmatic Programmers - Practices of an Agile Developer》读书笔记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-08T21:26:00+08:00" pubdate data-updated="true">May 8<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/05/08/pragmatic-programmers-practices-of-an-agile-developer-note/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>一.Beginning Agility</strong></p>
+
+<p>1.Work for Outcome</p>
+
+<p>2.Quick Fixes Become Quicksand</p>
+
+<p>3.Criticize Ideas,Not People</p>
+
+<p>4.Damnthe Torpedoes,Go Ahead</p>
+
+<p><strong>二.Feeding Agility</strong></p>
+
+<p>5.Keep Up with Change</p>
+
+<p>6.Invest in Your Team</p>
+
+<p>7.Know When to Un learn</p>
+
+<p>8.Question Until You Understand</p>
+
+<p><strong>9.Feel the Rhythm</strong><br />
+(我觉得软件开发的节奏是很重要的。但是敏捷有迭代周期，不使用敏捷这个节奏就比较难控制了，要么需求变化不大并且前期设计考虑周全。我碰到过一个项目，前期需求分析和设计都做的相当差，到了编码阶段都是在不断的修正前期的错误，时间就这样过去了，前期制定的计划都没有按时完成，项目来不及就往后拖。每次自己感觉编码差不多了可以进行集成测试了，拿到客户那里演示后发觉距离他们的真正的需求还有十万八千里，我们就这样迭代下去。。。交付日期也遥遥无期。。。这个时候是真正陷入了焦油地啊） </div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/05/08/pragmatic-programmers-practices-of-an-agile-developer-note/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/06/initialization-on-demand-holder-idiom/">Initialization on Demand Holder Idiom</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-06T20:04:00+08:00" pubdate data-updated="true">May 6<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/05/06/initialization-on-demand-holder-idiom/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This implementation is a well-performing and concurrent implementation valid in all versions of Java. The original implementation from Bill Pugh (see links below), based on the earlier work of Steve Quirk, has been modified to reduce the scope of LazyHolder.something  to private and to make the field final. </p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Something.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Something</span> <span class="o">{</span>
+</span><span class="line">  <span class="kd">private</span> <span class="nf">Something</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">LazyHolder</span> <span class="o">{</span>
+</span><span class="line">    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Something</span> <span class="n">something</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Something</span><span class="o">();</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">public</span> <span class="kd">static</span> <span class="n">Something</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">LazyHolder</span><span class="o">.</span><span class="na">something</span><span class="o">;</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/05/06/initialization-on-demand-holder-idiom/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -219,20 +351,20 @@
   </header>
 
 
-  <div class="entry-content"><p><strong>一.Java基本类型和类的大小</strong></p>
+  <div class="entry-content"><p><strong>0.Java基本类型和类的大小</strong></p>
 
-<p>1.Java手册上的类型大小</p>
+<p>Java手册上的类型大小</p>
 
 <p>byte : 8-bit                           <br />
 short : 16-bit                           <br />
 Int : 32-bit                              <br />
 long : 64-bit                               <br />
-char : 16 bit unsigned integer         <br />
+char : 16-bit unsigned integer         <br />
 float : 32-bit                             <br />
 double: 64-bit                              <br />
 boolean: 1-bit                             </p>
 
-<p>2.实际存储大小(根据JVM实现而定)</p>
+<p>实际存储大小(根据JVM实现而定)</p>
 
 <p>Byte : 16 bytes<br />
 Short : 16 bytes<br />
@@ -576,170 +708,9 @@ java.util.WeakHashMap</td>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/01/28/java-anonymous-class/">为什么Java匿名内部类中的方法参数必须定义为final</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-01-28T13:01:00+08:00" pubdate data-updated="true">Jan 28<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/01/28/java-anonymous-class/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>今天在做一个功能，就是用户在注册后给他发送帐号激活邮件。在做这个功能的时候，我用匿名内部类来创建一个线程发送激活邮件，代码如下：</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>UserController.java  </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-<span class="line-number">26</span>
-<span class="line-number">27</span>
-</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="nd">@Controller</span><span class="o">()</span>
-</span><span class="line"><span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/users&quot;</span><span class="o">)</span>
-</span><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserController</span> <span class="o">{</span>
-</span><span class="line">
-</span><span class="line">  <span class="nd">@Autowired</span>
-</span><span class="line">  <span class="kd">private</span> <span class="n">MailManager</span> <span class="n">mailManager</span><span class="o">;</span>
-</span><span class="line">
-</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMailManager</span><span class="o">(</span><span class="n">MailManager</span>  <span class="n">mailManager</span><span class="o">)</span> <span class="o">{</span>
-</span><span class="line">    <span class="k">this</span><span class="o">.</span><span class="na">mailManager</span> <span class="o">=</span> <span class="n">mailManager</span><span class="o">;</span>
-</span><span class="line">  <span class="o">}</span>
-</span><span class="line">
-</span><span class="line">  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">)</span>
-</span><span class="line">  <span class="kd">public</span> <span class="n">String</span> <span class="nf">doingSignUp</span><span class="o">(</span><span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_email_address&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_email_address</span><span class="o">,</span> <span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_password&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_password</span><span class="o">,</span> <span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_name&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_name</span><span class="o">)</span> <span class="o">{</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">try</span> <span class="o">{</span>
-</span><span class="line">      <span class="c1">//用户注册代码省略</span>
-</span><span class="line">      <span class="k">new</span> <span class="nf">AbstractExecutionThreadService</span><span class="o">()</span> <span class="o">{</span>
-</span><span class="line">      <span class="nd">@Override</span>
-</span><span class="line">      <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class="line">      <span class="n">mailManager</span><span class="o">.</span><span class="na">sendActivateMail</span><span class="o">(</span><span class="n">user</span><span class="o">);</span><span class="c1">//发送邮件</span>
-</span><span class="line">      <span class="o">}}.</span><span class="na">start</span><span class="o">();</span>
-</span><span class="line">    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class="line">      <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class="line">    <span class="o">}</span>
-</span><span class="line">      <span class="k">return</span> <span class="s">&quot;index&quot;</span><span class="o">;</span>
-</span><span class="line">  <span class="o">}</span>
-</span><span class="line"><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/01/28/java-anonymous-class/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/01/01/plans-for-2011/">2011年的计划</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-01-01T11:19:00+08:00" pubdate data-updated="true">Jan 1<span>st</span>, 2011</time>
-        
-         | <a href="/blog/2011/01/01/plans-for-2011/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>2011年到了，离2012也只有一年的时间了。以前没有博客的时候也没有个地方在年初的时候制定个计划，从今年开始，在每年年初给自己制定个计划，到了年末再回过头来看看完成了其中的多少，给自己一个鞭策。</p>
-
-<p>在2011年里我希望可以完成这几件事:</p>
-
-<ul>
-  <li>
-    <p>读10本以上的书</p>
-  </li>
-  <li>
-    <p>至少研究2个框架的源代码</p>
-  </li>
-  <li>
-    <p>多写博客</p>
-  </li>
-  <li>
-    <p>看完韩语教程1-3</p>
-  </li>
-  <li>
-    <p>多做一些运动</p>
-  </li>
-  <li>
-    <p>买一个苹果的笔记本（争取在今年完成）</p>
-  </li>
-</ul>
-
-<p>等到明年这个时候再来看看完成了多少。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/7/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -762,6 +733,14 @@ java.util.WeakHashMap</td>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
       </li>
     
@@ -773,21 +752,12 @@ java.util.WeakHashMap</td>
         <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
-<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+    <li class='category'><a href='/blog/categories/algorithms/'>algorithms (3)</a></li>
 <li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
 <li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
 <li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
@@ -797,7 +767,7 @@ java.util.WeakHashMap</td>
 <li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
 <li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
 <li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
-<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (7)</a></li>
 <li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
 <li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
 
@@ -814,6 +784,22 @@ java.util.WeakHashMap</td>
 Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
   Copyright &copy; 2012 - Foredoomed -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=8495631; 
+var sc_invisible=0; 
+var sc_security="5b0817e1"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost +
+"statcounter.com/counter/counter_xhtml.js'></"+"script>");</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="https://c.statcounter.com/8495631/0/5b0817e1/0/"
+alt="free hit counters" /></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
 
 </footer>
   

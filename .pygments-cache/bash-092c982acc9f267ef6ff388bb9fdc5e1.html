@@ -1,0 +1,37 @@
+<div class="highlight"><pre><span class="nb">cd</span> /etc/munin/plugins/
+ln -s /usr/share/munin/plugins/nginx_request nginx_request
+ln -s /usr/share/munin/plugins/nginx_status nginx_status
+
+// 修改nginx_request里的hostname，搜索<span class="nv">$URL</span>,把其中的<span class="nv">$fqdn</span>改为localhost
+// 然后输入下面的命令，如果输出yes则说明配置成功
+perl nginx_request autoconf
+
+// 配置nginx
+<span class="nb">cd</span> /etc/nginx/conf.d
+vim munin.conf
+// 然后加入下面的配置
+server <span class="o">{</span>
+        listen 127.0.0.1;
+        server_name localhost;
+        location /nginx_status <span class="o">{</span>
+                stub_status on;
+                access_log   off;
+                allow 127.0.0.1;
+                deny all;
+        <span class="o">}</span>
+        
+	    location /munin <span class="o">{</span>
+        	root /var/www/html/munin;
+  			expires off;
+  			access_log   off;
+  			auth_basic <span class="s2">&quot;Munin&quot;</span>;
+  			auth_basic_user_file /etc/nginx/.htpasswd;
+		 <span class="o">}</span>
+<span class="o">}</span>
+
+// 重启nginx使配置生效
+nginx -s reload
+
+// 设置访问munin的用户名和秘密
+htpasswd -c /etc/nginx/.htpasswd username
+</pre></div>

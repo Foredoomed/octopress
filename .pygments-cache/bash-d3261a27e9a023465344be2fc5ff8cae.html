@@ -1,0 +1,23 @@
+<div class="highlight"><pre>0   new info.liuxuan.test.Missing <span class="o">[</span>16<span class="o">]</span>
+3   dup
+4   invokespecial info.liuxuan.test.Missing<span class="o">()</span> <span class="o">[</span>18<span class="o">]</span>
+7   astore_1 <span class="o">[</span>m<span class="o">]</span>
+8   goto 20
+11  astore_1 <span class="o">[</span>ex<span class="o">]</span>
+12  getstatic java.lang.System.out : java.io.PrintStream <span class="o">[</span>19<span class="o">]</span>
+15  ldc &lt;string <span class="s2">&quot;Got it!&quot;</span>&gt; <span class="o">[</span>25<span class="o">]</span>
+17  invokevirtual java.io.PrintStream.println<span class="o">(</span>java.lang.String<span class="o">)</span> : void <span class="o">[</span>27<span class="o">]</span>
+20  <span class="k">return</span>
+<span class="k">      </span>Exception Table:
+        <span class="o">[</span>pc: 0, pc: 8<span class="o">]</span> -&gt; 11 when : java.lang.NoClassDefFoundError
+      Line numbers:
+        <span class="o">[</span>pc: 0, line: 14<span class="o">]</span>
+        <span class="o">[</span>pc: 11, line: 15<span class="o">]</span>
+        <span class="o">[</span>pc: 12, line: 16<span class="o">]</span>
+        <span class="o">[</span>pc: 20, line: 18<span class="o">]</span>
+      Local variable table:
+        <span class="o">[</span>pc: 0, pc: 21<span class="o">]</span> <span class="nb">local</span>: args index: 0 <span class="nb">type</span>: java.lang.String<span class="o">[]</span>
+        <span class="o">[</span>pc: 8, pc: 11<span class="o">]</span> <span class="nb">local</span>: m index: 1 <span class="nb">type</span>: info.liuxuan.test.Missing
+        <span class="o">[</span>pc: 12, pc: 20<span class="o">]</span> <span class="nb">local</span>: ex index: 1 <span class="nb">type</span>: java.lang.NoClassDefFoundError
+&lt;/string&gt;
+</pre></div>

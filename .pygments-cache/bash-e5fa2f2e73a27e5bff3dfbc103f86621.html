@@ -1,0 +1,5 @@
+<div class="highlight"><pre>sudo -u munin crontab -e
+*/5 * * * *  /usr/bin/munin-cron
+// 一定要先执行下面这行命令，否则不会生成index.html，访问会报403错误
+sudo -u munin munin-cron
+</pre></div>

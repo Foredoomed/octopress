@@ -1,0 +1,30 @@
+<div class="highlight"><pre>  <span class="kd">private</span> <span class="n">CacheController</span> <span class="n">controller</span><span class="o">;</span>
+
+ <span class="cm">/**</span>
+<span class="cm">   * Add an object to the cache</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param key   The key of the object to be cached</span>
+<span class="cm">   * @param value The object to be cached</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">putObject</span><span class="o">(</span><span class="n">CacheKey</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+  	<span class="k">if</span> <span class="o">(</span><span class="kc">null</span> <span class="o">==</span> <span class="n">value</span><span class="o">)</span> <span class="n">value</span> <span class="o">=</span> <span class="n">NULL_OBJECT</span><span class="o">;</span>
+  	<span class="kd">synchronized</span> <span class="o">(</span> <span class="k">this</span> <span class="o">)</span>  <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">serialize</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">readOnly</span> <span class="o">&amp;&amp;</span> <span class="n">value</span> <span class="o">!=</span> <span class="n">NULL_OBJECT</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+          <span class="n">ByteArrayOutputStream</span> <span class="n">bos</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ByteArrayOutputStream</span><span class="o">();</span>
+          <span class="n">ObjectOutputStream</span> <span class="n">oos</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ObjectOutputStream</span><span class="o">(</span><span class="n">bos</span><span class="o">);</span>
+          <span class="n">oos</span><span class="o">.</span><span class="na">writeObject</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+          <span class="n">oos</span><span class="o">.</span><span class="na">flush</span><span class="o">();</span>
+          <span class="n">oos</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+          <span class="n">value</span> <span class="o">=</span> <span class="n">bos</span><span class="o">.</span><span class="na">toByteArray</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">&quot;Error caching serializable object.  Cause: &quot;</span> <span class="o">+</span> <span class="n">e</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="n">controller</span><span class="o">.</span><span class="na">putObject</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(</span> <span class="n">log</span><span class="o">.</span><span class="na">isDebugEnabled</span><span class="o">()</span> <span class="o">)</span>  <span class="o">{</span>
+        <span class="n">log</span><span class="o">(</span><span class="s">&quot;stored object&quot;</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+</pre></div>

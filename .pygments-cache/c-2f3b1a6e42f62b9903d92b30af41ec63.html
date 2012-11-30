@@ -1,0 +1,13 @@
+<div class="highlight"><pre><span class="c1">// www.liceo.edu.mx is an example of a site that achieves a level of nesting of about </span>
+<span class="c1">// 1500 tags, all from a bunch of &lt;b&gt;s. We will only allow at most 20 nested tags   </span>
+<span class="c1">// of the same type before just ignoring them all together.</span>
+<span class="n">bool</span> <span class="n">HTMLParser</span><span class="o">::</span><span class="n">allowNestedRedundantTag</span><span class="p">(</span><span class="k">const</span> <span class="n">AtomicString</span><span class="o">&amp;</span> <span class="n">tagName</span><span class="p">)</span>
+<span class="p">{</span>
+
+<span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">HTMLStackElem</span><span class="o">*</span> <span class="n">curr</span> <span class="o">=</span> <span class="n">m_blockStack</span><span class="p">;</span>
+         <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cMaxRedundantTagDepth</span> <span class="o">&amp;&amp;</span> <span class="n">curr</span> <span class="o">&amp;&amp;</span> <span class="n">curr</span><span class="o">-&gt;</span><span class="n">tagName</span> <span class="o">==</span> <span class="n">tagName</span><span class="p">;</span>
+     <span class="n">curr</span> <span class="o">=</span> <span class="n">curr</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">,</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<span class="k">return</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">cMaxRedundantTagDepth</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

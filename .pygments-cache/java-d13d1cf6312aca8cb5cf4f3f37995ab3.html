@@ -1,0 +1,35 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TransactionalCacheManager</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="n">Map</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">cache</span> <span class="o">,</span> <span class="n">TransactionalCache</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">transactionalCaches</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">cache</span> <span class="o">,</span> <span class="n">TransactionalCache</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;();&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kt">void</span> <span class="n">clear</span><span class="o">(</span><span class="n">Cache</span> <span class="n">cache</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">getTransactionalCache</span><span class="o">(</span><span class="n">cache</span><span class="o">).</span><span class="na">clear</span><span class="o">();</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kt">void</span> <span class="n">putObject</span><span class="o">(</span><span class="n">Cache</span> <span class="n">cache</span><span class="o">,</span> <span class="n">CacheKey</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">getTransactionalCache</span><span class="o">(</span><span class="n">cache</span><span class="o">).</span><span class="na">putObject</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kt">void</span> <span class="n">commit</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">TransactionalCache</span> <span class="n">txCache</span> <span class="o">:</span> <span class="n">transactionalCaches</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+      <span class="n">txCache</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kt">void</span> <span class="n">rollback</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">TransactionalCache</span> <span class="n">txCache</span> <span class="o">:</span> <span class="n">transactionalCaches</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+      <span class="n">txCache</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="n">TransactionalCache</span> <span class="n">getTransactionalCache</span><span class="o">(</span><span class="n">Cache</span> <span class="n">cache</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">TransactionalCache</span> <span class="n">txCache</span> <span class="o">=</span> <span class="n">transactionalCaches</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">cache</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">txCache</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">txCache</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TransactionalCache</span><span class="o">(</span><span class="n">cache</span><span class="o">);</span>
+      <span class="n">transactionalCaches</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">cache</span><span class="o">,</span> <span class="n">txCache</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">txCache</span><span class="o">;</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</pre></div>

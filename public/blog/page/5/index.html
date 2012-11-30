@@ -9,7 +9,7 @@
   <meta name="author" content="Foredoomed">
 
   
-  <meta name="description" content=" A_Brief_Introduction_to_JMeter View more presentations from Foredoomed ">
+  <meta name="description" content="Martin Fowler 在他的博客里发表了一篇关于方法的标志参数（Flag Argument）的博文，原文参见这里。 我读完后立刻开始回忆起我以前的做法来，假设有这样一个场景，我们有两类人（即有钱人和穷人），现在房地产那边需要定义个买房子的方法，如果是有钱人就能买房；反之， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +28,8 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
+
 
   
   <script type="text/javascript">
@@ -78,6 +79,116 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/28/flag-argument/">方法的标记参数</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-28T15:16:00+08:00" pubdate data-updated="true">Jun 28<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/06/28/flag-argument/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Martin Fowler 在他的博客里发表了一篇关于方法的标志参数（Flag Argument）的博文，原文参见<a href="http://martinfowler.com/bliki/FlagArgument.html" title="http://martinfowler.com/bliki/FlagArgument.html">这里</a>。</p>
+
+<p>我读完后立刻开始回忆起我以前的做法来，假设有这样一个场景，我们有两类人（即有钱人和穷人），现在房地产那边需要定义个买房子的方法，如果是有钱人就能买房；反之，如果是穷人则买不了房子。好了，如果是我的话，我想我会这么定义：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="n">Customer</span> <span class="nf">buyHouse</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">isRich</span><span class="o">){</span>
+</span><span class="line">    <span class="c1">//do something</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>在我看到这篇博文之前，我一定会这么干。看，这样做多简单，只要在这个方法里再根据这个布尔值判断一下就行了。但是在我看完这篇博文后，我的想法发生了比较大的改变。这样定义方法虽然简单，但对于阅读代码的人来说却很头大。如果结合真实情况来看，这个<strong>isRich</strong>参数在大多数情况下都要通过调用另外一个方法计算出来再传入这个方法。也就是说，在调用这个方法的时候，<strong>isRich</strong>是<strong>True</strong>还是<strong>False</strong>是不确定的。 </div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/06/28/flag-argument/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/25/compile-and-install-vim-on-ubuntu/">Ubuntu下编译安装Vim</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-25T14:56:00+08:00" pubdate data-updated="true">Jun 25<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/06/25/compile-and-install-vim-on-ubuntu/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>一.编译安装最新版本Vim</strong></p>
+
+<p>我们都知道在Ubuntu下如果直接在终端中用命令安装Vim，那么安装的都不是最新版本。如果要想安装最新版本只有下载最新版源代码包，然后再编译安装。</p>
+
+<p>首先，Vim最新版源代码包可以在 <a href="http://www.vim.org/" title="官网">官网</a> 下载，下载源代码包到本地Ubuntu主机后，解压缩，进入该目录，进行配置，编译和安装：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="shell"><span class="line">tar xzvf vim-7.3.tar.bz2
+</span><span class="line"><span class="nb">cd </span>vim73
+</span><span class="line">./configure --prefix<span class="o">=</span>/usr/local/vim --enable-rubyinterp --enable-multibyte --enable-gui<span class="o">=</span>gnome2 --enable-xim --enable-fontset --with-features<span class="o">=</span>huge
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/06/25/compile-and-install-vim-on-ubuntu/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -536,138 +647,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/05/08/pragmatic-programmers-practices-of-an-agile-developer-note/">《Pragmatic Programmers - Practices of an Agile Developer》读书笔记</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-05-08T21:26:00+08:00" pubdate data-updated="true">May 8<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/05/08/pragmatic-programmers-practices-of-an-agile-developer-note/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>一.Beginning Agility</strong></p>
-
-<p>1.Work for Outcome</p>
-
-<p>2.Quick Fixes Become Quicksand</p>
-
-<p>3.Criticize Ideas,Not People</p>
-
-<p>4.Damnthe Torpedoes,Go Ahead</p>
-
-<p><strong>二.Feeding Agility</strong></p>
-
-<p>5.Keep Up with Change</p>
-
-<p>6.Invest in Your Team</p>
-
-<p>7.Know When to Un learn</p>
-
-<p>8.Question Until You Understand</p>
-
-<p><strong>9.Feel the Rhythm</strong><br />
-(我觉得软件开发的节奏是很重要的。但是敏捷有迭代周期，不使用敏捷这个节奏就比较难控制了，要么需求变化不大并且前期设计考虑周全。我碰到过一个项目，前期需求分析和设计都做的相当差，到了编码阶段都是在不断的修正前期的错误，时间就这样过去了，前期制定的计划都没有按时完成，项目来不及就往后拖。每次自己感觉编码差不多了可以进行集成测试了，拿到客户那里演示后发觉距离他们的真正的需求还有十万八千里，我们就这样迭代下去。。。交付日期也遥遥无期。。。这个时候是真正陷入了焦油地啊） </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/05/08/pragmatic-programmers-practices-of-an-agile-developer-note/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/05/06/initialization-on-demand-holder-idiom/">Initialization on Demand Holder Idiom</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-05-06T20:04:00+08:00" pubdate data-updated="true">May 6<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/05/06/initialization-on-demand-holder-idiom/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This implementation is a well-performing and concurrent implementation valid in all versions of Java. The original implementation from Bill Pugh (see links below), based on the earlier work of Steve Quirk, has been modified to reduce the scope of LazyHolder.something  to private and to make the field final. </p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Something.java  </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Something</span> <span class="o">{</span>
-</span><span class="line">  <span class="kd">private</span> <span class="nf">Something</span><span class="o">()</span> <span class="o">{</span>
-</span><span class="line">  <span class="o">}</span>
-</span><span class="line">
-</span><span class="line">  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">LazyHolder</span> <span class="o">{</span>
-</span><span class="line">    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Something</span> <span class="n">something</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Something</span><span class="o">();</span>
-</span><span class="line">  <span class="o">}</span>
-</span><span class="line">
-</span><span class="line">  <span class="kd">public</span> <span class="kd">static</span> <span class="n">Something</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
-</span><span class="line">    <span class="k">return</span> <span class="n">LazyHolder</span><span class="o">.</span><span class="na">something</span><span class="o">;</span>
-</span><span class="line">  <span class="o">}</span>
-</span><span class="line"><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/05/06/initialization-on-demand-holder-idiom/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -693,6 +672,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
       </li>
     
@@ -704,21 +691,12 @@
         <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
-<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+    <li class='category'><a href='/blog/categories/algorithms/'>algorithms (3)</a></li>
 <li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
 <li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
 <li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
@@ -728,7 +706,7 @@
 <li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
 <li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
 <li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
-<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (7)</a></li>
 <li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
 <li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
 
@@ -745,6 +723,22 @@
 Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
   Copyright &copy; 2012 - Foredoomed -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=8495631; 
+var sc_invisible=0; 
+var sc_security="5b0817e1"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost +
+"statcounter.com/counter/counter_xhtml.js'></"+"script>");</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="https://c.statcounter.com/8495631/0/5b0817e1/0/"
+alt="free hit counters" /></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
 
 </footer>
   

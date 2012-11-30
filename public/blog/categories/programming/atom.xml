@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Zhixingheyi]]></title>
   <link href="http://liuxuan.info/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://liuxuan.info/"/>
-  <updated>2012-09-22T18:41:50+08:00</updated>
+  <updated>2012-11-28T21:10:24+08:00</updated>
   <id>http://liuxuan.info/</id>
   <author>
     <name><![CDATA[Foredoomed]]></name>
@@ -12,6 +12,66 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Hashing神话]]></title>
+    <link href="http://liuxuan.info/blog/2012/10/21/hashing-myths/"/>
+    <updated>2012-10-21T20:33:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/10/21/hashing-myths</id>
+    <content type="html"><![CDATA[<p>最近许多网站的用户名和秘密都被泄露，这也引发了一场对密码的存储问题的大讨论。其中的核心就是hashing，所以就让我们来看看关于hashing的几个常见的误解吧。这篇博文是一篇英文帖子的翻译，原文请戳<a href="http://webdevrefinery.com/forums/topic/4850-hashing-myths/page_hl_hashing" title="Hashing Myths">Hashing Myths</a>。</p>
+
+<p><strong>神话#1：Hashing后的结果是独一无二的</strong></p>
+
+<p><strong>大错特错</strong>。让我们用简单的逻辑来解释。比如有一个32位长的hash，如果再对33位长的字符串hash的话，就有可能产生相同的hash(又叫“碰撞”)。道理很简单，33位长字符串的排列组合比32位长的字符串要多得多，因为可以在32位长字符串的尾部加上一个任意字符就是33位长的字符串。所以打个比方来说，如果有90000个33位长字符串和20000个32位长字符串，前者其中的某些字符串一定跟后者中的一些字符串的hash值相同。Hashing算法的目的是尽量减少碰撞，<strong>但是不可能完全消除碰撞</strong>。</p>
+
+<!-- more -->
+
+<p><strong>神话#2：MD5是不安全的</strong></p>
+
+<p><strong>大错特错</strong>。MD5是比SHA-256来说没那么负责(因此速度更快)的算法，但是这个算法是安全的。一个不安全的hash代表这个hash可以被逆向破解，或者可以仅凭hash值就可以用一个字符串产生相同的hash，而在MD5下不行。事实上最接近的是修改一个存在的大文件，但是并不改变它已有的hash值。人类历史上还没有一个人能够逆向破解MD5。产生这个误解是因为MD5是一个常见的秘密破解攻击对象，这就又产生了下一个误解。</p>
+
+<p><strong>神话#3：MD5没有其他hash算法(像SHA)安全</strong></p>
+
+<p><strong>大错特错</strong>。如果你有秘密的hash值的话，那么确定就有三种攻击手段来找出密码原文。<br />
+1. 查hash数据库。你可以到在线的hash数据库里查有没有你的hash。对于这种攻击的常见防范手段就是对秘密hash时加<a href="http://en.wikipedia.org/wiki/Salt_(cryptography)" title="salt">salt</a>。<br />
+2. Brute force算法。对字典中的所有单词hash，比较是否符合。如果没用的话就对5，6，7，8位长所有可能的字符串hash。这种攻击需要消耗大量时间，而且经常得不到想要的结果，而且很容易的用salt来防范。<br />
+3. Rainbow tables。这是hashing和rehashing方法，它可以找到不同单词的hash值的相似之处，并最终找到秘密原文。salt在这种攻击下作用不大。  </p>
+
+<p><strong>神话#4：复杂超常的hash值(像SHA-256)不容易被攻击</strong></p>
+
+<p><strong>大错特错</strong>。Hash破解的最大威胁是Rainbow table，它是时间和空间的折衷，经常在1分钟之内就能破解密码。但是Rainbow table并不神奇，大多数人更容易去相信，而不是理解它的原理。如果你有15分钟的话可以看下<a href="http://en.wikipedia.org/wiki/Rainbow_table" title="rainbow table">介绍</a>。</p>
+
+<p>如果你已经知道Rainbow table的原理的话，你就会知道它最大的弱点就是hash碰撞。所以安全密码的hash是一个折折衷：你希望的是一个算法产生的碰撞越少越好，这样两个秘密就不会产生相同的hash；但你又希望这个算法能产生足够的碰撞，这样的话rainbow table就会陷入死循环，密码被破解的可能性也就降低了。就这两点说，SHA-256是可怕的。因为它几乎不产生碰撞，不管有没有salt，所以更容易被攻击。SHA-256适用与hash大文件而不是密码。</p>
+
+<p><strong>神话#5：SHA-1仍然比MD5更好，因为MD5更容易被破解</strong></p>
+
+<p><strong>大错特错</strong>。再一次你搞错了。SHA-1有160位，碰撞比MD5少，而且hash数据库和rainbow table对与SHA-1和MD5是一样的。这个误解在程序员中被广泛传播的原因是他们没有花时间去研究事实的真相。事实上，SHA产生的较长的hash对hash数据库和rainbow table的攻击几乎无用。与MD5相比，SHA-1只是多了一些存储空间，因为SHA-1有160位，而MD5才128位长。长度的增加可以减少碰撞的产生，相对大文件来说这对于密码的hash根本没用。</p>
+
+<p><strong>神话#6：用多个算法hash就更安全</strong></p>
+
+<p><strong>大错特错</strong>。我看到过这样的hash：<code>sha1(md5("Password"))</code>，这样的计算方式是非常荒谬的。你在把128位转换成160位，这会非常容易被破解。你不能多次hash。你为了防止被破解会在hash时多加一个处理步骤，但是最终结果还是一样的。不要猜什么更安全，要去理解什么更安全。</p>
+
+<p><strong>神话#7：全局salt和用户salt的组合比单个用户salt更安全</strong></p>
+
+<p>最近在一篇文章里有人支持用全局salt加上用户salt的方法，但是我认为这是没用的。我的观点遭到了强烈的反对，他们说黑客窃取数据库而不是源代码更安全。我同意，但是这种方式提供的安全性可以忽略不计。下面就是原因：</p>
+
+<p>上面的三个hash攻击中，只有brute force法是用了全局salt比不用更难破解，但同时这个方法也是最难成功的方法。全局salt只是把几乎不可能变成非常不可能。我承认有点作用，但是黑客们的常用攻击手段是rainbow table而不是brute force，不然他们会发疯的。在rainbow table的攻击下，全局salt不比用户salt安全多少。如果有人可以窃取到你的数据库的拷贝，他们也可以轻易地窃取你源代码的拷贝。</p>
+
+<p>如果你在寻找保护你数据库被窃取的方法的话，一个非常非常非常有效的方法就是对称加密hash。选择一个速度快，简单的对称加密算法(RC4,Blowfish等)，创建ke并保存在配置文件中，用它加密数据库中所有加过salt的密码hash。当从数据库中读取他们时，只要用key解密出来就可以了。现在即使有人入侵了数据库或服务器，就连rainbow table的攻击也对你的hash无效，这对在公共软件仍然有效，而且比全局salt要有效的多的多。</p>
+
+<p><strong>那么密码hashing的最佳实践是什么呢？</strong></p>
+
+<p>对于密码来说只有两个hash算法是比较好的选择：MD5和SHA-1，而你应该让你的编程语言来决定选择哪个算法。对于PHP和大多数语言来说，MD5比SHA-1快，所以MD5是比较好的选择。保证密码安全的关键是用一个合适长度的salt。安全的保存密码，避免字典和brute force的攻击是相对rainbow table来说比较安全的折衷点是用生成一个2倍于原本hash长度的hash。比如MD5的话，可以hash两个MD5生成的hash。你可以为它生成一个128位的salt(对许多用户来说会占用非常多的存储空间)，或者你可以hash一个字符串来生成salt。我最喜欢的方法是：</p>
+
+<p><code>
+$finalHash = md5(md5($salt) . md5($password))
+</code>
+这个方法的有点是：用两个MD5生成一个新的hash，它非常容易移植，因为任何一个语言(包括SQL)都支持上面的方法，3次MD5仍然是一个相对速度快的处理过程，而且如果是web的话，在密码发送到服务器之前，你可以用javascript来hash密码，而且仍然可以用它来生成最终的hash。</p>
+
+<p>是否在最终hash上做对称加密完全取决于你。</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[深入浅出Coroutine]]></title>
@@ -457,56 +517,6 @@ Unicode符号范围 | UTF-8编码方式<br />
 
 <p>[1] <a href="http://en.wikipedia.org/wiki/Single_precision_floating-point_format" title="Single_precision_floating-point_format">Single_precision_floating-point_format</a><br />
 [2] [IEEE<em>754-1985#Exponent_biasing](http://en.wikipedia.org/wiki/IEEE</em>754-1985#Exponent_biasing “IEEE_754-1985#Exponent_biasing”)</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[方法的标记参数]]></title>
-    <link href="http://liuxuan.info/blog/2011/06/28/flag-argument/"/>
-    <updated>2011-06-28T15:16:00+08:00</updated>
-    <id>http://liuxuan.info/blog/2011/06/28/flag-argument</id>
-    <content type="html"><![CDATA[<p>Martin Fowler 在他的博客里发表了一篇关于方法的标志参数（Flag Argument）的博文，原文参见<a href="http://martinfowler.com/bliki/FlagArgument.html" title="http://martinfowler.com/bliki/FlagArgument.html">这里</a>。</p>
-
-<p>我读完后立刻开始回忆起我以前的做法来，假设有这样一个场景，我们有两类人（即有钱人和穷人），现在房地产那边需要定义个买房子的方法，如果是有钱人就能买房；反之，如果是穷人则买不了房子。好了，如果是我的话，我想我会这么定义：</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="n">Customer</span> <span class="nf">buyHouse</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">isRich</span><span class="o">){</span>
-</span><span class='line'>    <span class="c1">//do something</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>在我看到这篇博文之前，我一定会这么干。看，这样做多简单，只要在这个方法里再根据这个布尔值判断一下就行了。但是在我看完这篇博文后，我的想法发生了比较大的改变。这样定义方法虽然简单，但对于阅读代码的人来说却很头大。如果结合真实情况来看，这个<strong>isRich</strong>参数在大多数情况下都要通过调用另外一个方法计算出来再传入这个方法。也就是说，在调用这个方法的时候，<strong>isRich</strong>是<strong>True</strong>还是<strong>False</strong>是不确定的。 <!--more--></p>
-
-<p>这样做有问题吗？按照Martin Fowler在博文上写的，他偏向于定义两个方法来处理这种情况，即：</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="n">Customer</span> <span class="nf">richesCanBuyHouse</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">){</span><span class="err">…</span><span class="o">}</span>
-</span><span class='line'><span class="kd">public</span> <span class="n">Customer</span> <span class="nf">poorsCantBuyHouse</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">){</span><span class="err">…</span><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Martin Fowler的理由是调用这个方法的时候，就能清楚的知道程序员的意图，而不是要记住这个标记参数的意义。经过思考和实验，我发现将方法中的功能尽量单一化的做法将使整个系统收益，不仅可以提高测试覆盖率，易于定位Bug，而且还易于修改和重构。</p>
-
-<p>Martin Fowler还举了另外一个例子，即布尔值的Set方法：</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">//提倡这种做法</span>
-</span><span class='line'><span class="kt">void</span> <span class="nf">setOn</span><span class="o">();</span>
-</span><span class='line'><span class="kt">void</span> <span class="nf">setOff</span><span class="o">();&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">//而不是这种做法</span>
-</span><span class='line'><span class="kt">void</span> <span class="nf">setSwitch</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">on</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>这个例子其实和上面的例子差不多，虽然多了一个方法，但是程序将会变得清晰易读。</p>
 
 ]]></content>
   </entry>

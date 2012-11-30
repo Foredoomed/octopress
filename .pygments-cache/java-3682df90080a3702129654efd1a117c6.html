@@ -1,0 +1,15 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="nf">SqlMapConfigParser</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">parser</span><span class="o">.</span><span class="na">setValidation</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="n">parser</span><span class="o">.</span><span class="na">setEntityResolver</span><span class="o">(</span><span class="k">new</span> <span class="n">SqlMapClasspathEntityResolver</span><span class="o">());</span>
+
+    <span class="n">addSqlMapConfigNodelets</span><span class="o">();</span>
+    <span class="n">addGlobalPropNodelets</span><span class="o">();</span>
+    <span class="n">addSettingsNodelets</span><span class="o">();</span>
+    <span class="n">addTypeAliasNodelets</span><span class="o">();</span>
+    <span class="n">addTypeHandlerNodelets</span><span class="o">();</span>
+    <span class="n">addTransactionManagerNodelets</span><span class="o">();</span>
+    <span class="n">addSqlMapNodelets</span><span class="o">();</span>
+    <span class="n">addResultObjectFactoryNodelets</span><span class="o">();</span>
+
+<span class="o">}</span>
+</pre></div>

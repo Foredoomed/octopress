@@ -1,0 +1,25 @@
+<div class="highlight"><pre><span class="c"># 配置vim</span>
+vim /etc/vimrc&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;section-2&quot;</span>&gt;加入下面几行&lt;/h1&gt;
+&lt;p&gt;syntax on
+<span class="nb">set </span>nu
+<span class="nb">set </span><span class="nv">mouse</span><span class="o">=</span>a
+<span class="nb">set </span><span class="nv">tabstop</span><span class="o">=</span>4&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;ipv6&quot;</span>&gt;禁用IPv6&lt;/h1&gt;
+&lt;p&gt;vim /etc/sysconfig/network
+<span class="nv">NETWORKING_IPV6</span><span class="o">=</span>”no”&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;section-3&quot;</span>&gt;设置文件最大打开数&lt;/h1&gt;
+&lt;p&gt;vim /etc/security/limits.conf
+<span class="c"># 加入下面两行</span>
+* soft nofile 65535
+* hard nofile 65535&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;section-4&quot;</span>&gt;把服务器时间改为上海时间&lt;/h1&gt;
+&lt;p&gt;cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;section-5&quot;</span>&gt;关闭不需要的服务&lt;/h1&gt;
+&lt;p&gt;ntsysv  <span class="c">#按空格选择和取消，按F12退出</span>
+</pre></div>

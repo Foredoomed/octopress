@@ -9,7 +9,10 @@
   <meta name="author" content="Foredoomed">
 
   
-  <meta name="description" content="用上VPS以后博客的访问速度是比以前快了很多，但是也有烦心的事，就是担心每个月的流量有没有超标。你可以通过VPS提供给你的Control Panel的地址登录，然后查看流量数据。但是这种方法始终有点复杂，最好有种直接输入一个URL就能查看流量数据的方法。在Google上搜索了一会儿之后， &hellip;">
+  <meta name="description" content="一.包结构分析 1.iBatis的logging包结构： Packages com.ibatis.common.logging
+&nbsp; com.ibatis.common.logging.jakarta
+&nbsp; com.ibatis.common.logging.jdk14
+&nbsp &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +31,8 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
+
 
   
   <script type="text/javascript">
@@ -78,6 +82,119 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/08/26/ibatis-and-mybatis-source-code-analysis-logging/">iBatis和myBatis源码分析之日志</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-26T18:20:00+08:00" pubdate data-updated="true">Aug 26<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/08/26/ibatis-and-mybatis-source-code-analysis-logging/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>一.包结构分析</strong></p>
+
+<p>1.iBatis的logging包结构：</p>
+
+<table border="1" width="100%" cellpadding="3" cellspacing="0" summary=""><tbody><tr>
+<th align="left" colspan="2" style="background-color:#CCCCFF">
+<b>Packages</b></th></tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.common.logging</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.common.logging.jakarta</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.common.logging.jdk14</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.common.logging.log4j</b></td>
+<td>&nbsp;</td>
+</tr>
+<tr bgcolor="white">
+<td width="20%"><b>com.ibatis.common.logging.nologging</b></td>
+<td>&nbsp;</td>
+</tr>
+</tbody></table>
+
+<p>iBatis把对logging支持的类全部放在了common包的子包下，并且又根据不同的logging实现又分成了commons-logging，jdk1.4自带的logging，log4j和nologging四个子包。个人感觉整个包的划分还是非常清晰的，但是nologging包的存在感觉有点鸡肋，因为日志是一个系统必备的功能之一，很难想象一个系统缺少了日志怎么做数据分析，性能调优等。难道作者认为有些时候或有一天就不需要日志了？ </div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/08/26/ibatis-and-mybatis-source-code-analysis-logging/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/08/24/ibatis-and-mybatis-source-code-analysis-overview/">iBatis和myBatis源码分析之概览</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-24T18:08:00+08:00" pubdate data-updated="true">Aug 24<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/08/24/ibatis-and-mybatis-source-code-analysis-overview/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>一.写在最前</strong></p>
+
+<p>记得第一次知道<a href="http://ibatis.apache.org/" title="iBatis">iBatis</a>这个框架还是在2、3年前，那段时间Hibernate风头正劲，Java EE开发已经被概括为SSH，各个软件公司把Hibernate作为Java程序员一种标配的技能而来考核。正是在这样一种情况下，iBatis作为与Hibernate不同的ORM思想的实现，仍然被一部分开发者喜爱和支持，当然我也是其中之一。而且在一个偶然的机会让我知道原来淘宝的ORM工具也是用的iBatis后，就更加坚定了我对iBatis的信心(可能是因为Rails的关系，现在我觉得<a href="http://www.springsource.org/roo" title="Spring Roo">Spring Roo</a>会更有前途)。 </div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/08/24/ibatis-and-mybatis-source-code-analysis-overview/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -518,106 +635,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/28/flag-argument/">方法的标记参数</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-28T15:16:00+08:00" pubdate data-updated="true">Jun 28<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/06/28/flag-argument/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Martin Fowler 在他的博客里发表了一篇关于方法的标志参数（Flag Argument）的博文，原文参见<a href="http://martinfowler.com/bliki/FlagArgument.html" title="http://martinfowler.com/bliki/FlagArgument.html">这里</a>。</p>
-
-<p>我读完后立刻开始回忆起我以前的做法来，假设有这样一个场景，我们有两类人（即有钱人和穷人），现在房地产那边需要定义个买房子的方法，如果是有钱人就能买房；反之，如果是穷人则买不了房子。好了，如果是我的话，我想我会这么定义：</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="n">Customer</span> <span class="nf">buyHouse</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">isRich</span><span class="o">){</span>
-</span><span class="line">    <span class="c1">//do something</span>
-</span><span class="line"><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>在我看到这篇博文之前，我一定会这么干。看，这样做多简单，只要在这个方法里再根据这个布尔值判断一下就行了。但是在我看完这篇博文后，我的想法发生了比较大的改变。这样定义方法虽然简单，但对于阅读代码的人来说却很头大。如果结合真实情况来看，这个<strong>isRich</strong>参数在大多数情况下都要通过调用另外一个方法计算出来再传入这个方法。也就是说，在调用这个方法的时候，<strong>isRich</strong>是<strong>True</strong>还是<strong>False</strong>是不确定的。 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/06/28/flag-argument/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/25/compile-and-install-vim-on-ubuntu/">Ubuntu下编译安装Vim</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-25T14:56:00+08:00" pubdate data-updated="true">Jun 25<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/06/25/compile-and-install-vim-on-ubuntu/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>一.编译安装最新版本Vim</strong></p>
-
-<p>我们都知道在Ubuntu下如果直接在终端中用命令安装Vim，那么安装的都不是最新版本。如果要想安装最新版本只有下载最新版源代码包，然后再编译安装。</p>
-
-<p>首先，Vim最新版源代码包可以在 <a href="http://www.vim.org/" title="官网">官网</a> 下载，下载源代码包到本地Ubuntu主机后，解压缩，进入该目录，进行配置，编译和安装：
-Liquid error: ClassNotFound: no lexer for alias ‘shell’ found
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/06/25/compile-and-install-vim-on-ubuntu/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -643,6 +660,14 @@ Liquid error: ClassNotFound: no lexer for alias ‘shell’ found
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
       </li>
     
@@ -654,21 +679,12 @@ Liquid error: ClassNotFound: no lexer for alias ‘shell’ found
         <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
-<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+    <li class='category'><a href='/blog/categories/algorithms/'>algorithms (3)</a></li>
 <li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
 <li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
 <li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
@@ -678,7 +694,7 @@ Liquid error: ClassNotFound: no lexer for alias ‘shell’ found
 <li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
 <li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
 <li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
-<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (7)</a></li>
 <li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
 <li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
 
@@ -695,6 +711,22 @@ Liquid error: ClassNotFound: no lexer for alias ‘shell’ found
 Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
   Copyright &copy; 2012 - Foredoomed -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=8495631; 
+var sc_invisible=0; 
+var sc_security="5b0817e1"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost +
+"statcounter.com/counter/counter_xhtml.js'></"+"script>");</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="https://c.statcounter.com/8495631/0/5b0817e1/0/"
+alt="free hit counters" /></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
 
 </footer>
   

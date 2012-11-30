@@ -1,0 +1,52 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="n">SqlText</span> <span class="nf">parseInlineParameterMap</span><span class="o">(</span><span class="n">TypeHandlerFactory</span> <span class="n">typeHandlerFactory</span><span class="o">,</span> <span class="n">String</span> <span class="n">sqlStatement</span><span class="o">,</span> <span class="n">Class</span> <span class="n">parameterClass</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="n">String</span> <span class="n">newSql</span> <span class="o">=</span> <span class="n">sqlStatement</span><span class="o">;</span>
+
+    <span class="n">List</span> <span class="n">mappingList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">();</span>
+
+    <span class="n">StringTokenizer</span> <span class="n">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringTokenizer</span><span class="o">(</span><span class="n">sqlStatement</span><span class="o">,</span> <span class="n">PARAMETER_TOKEN</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+    <span class="n">StringBuffer</span> <span class="n">newSqlBuffer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">();</span>
+
+    <span class="n">String</span> <span class="n">token</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">String</span> <span class="n">lastToken</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">parser</span><span class="o">.</span><span class="na">hasMoreTokens</span><span class="o">())</span> <span class="o">{</span>
+      <span class="n">token</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="na">nextToken</span><span class="o">();</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">PARAMETER_TOKEN</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">lastToken</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">PARAMETER_TOKEN</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">token</span><span class="o">))</span> <span class="o">{</span>
+          <span class="n">newSqlBuffer</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">PARAMETER_TOKEN</span><span class="o">);</span>
+          <span class="n">token</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="n">ParameterMapping</span> <span class="n">mapping</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">token</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">PARAM_DELIM</span><span class="o">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="n">oldParseMapping</span><span class="o">(</span><span class="n">token</span><span class="o">,</span> <span class="n">parameterClass</span><span class="o">,</span> <span class="n">typeHandlerFactory</span><span class="o">);</span>
+          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="n">newParseMapping</span><span class="o">(</span><span class="n">token</span><span class="o">,</span> <span class="n">parameterClass</span><span class="o">,</span> <span class="n">typeHandlerFactory</span><span class="o">);</span>
+          <span class="o">}</span>
+
+          <span class="n">mappingList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">mapping</span><span class="o">);</span>
+          <span class="n">newSqlBuffer</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;?&quot;</span><span class="o">);</span>
+          <span class="n">token</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="na">nextToken</span><span class="o">();</span>
+          <span class="k">if</span> <span class="o">(!</span><span class="n">PARAMETER_TOKEN</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">token</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">SqlMapException</span><span class="o">(</span><span class="s">&quot;Unterminated inline parameter in mapped statement (&quot;</span> <span class="o">+</span> <span class="s">&quot;statement.getId()&quot;</span> <span class="o">+</span> <span class="s">&quot;).&quot;</span><span class="o">);</span>
+          <span class="o">}</span>
+          <span class="n">token</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">PARAMETER_TOKEN</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">token</span><span class="o">))</span> <span class="o">{</span>
+          <span class="n">newSqlBuffer</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">token</span><span class="o">);</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+
+      <span class="n">lastToken</span> <span class="o">=</span> <span class="n">token</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="n">newSql</span> <span class="o">=</span> <span class="n">newSqlBuffer</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+
+    <span class="n">ParameterMapping</span><span class="o">[]</span> <span class="n">mappingArray</span> <span class="o">=</span> <span class="o">(</span><span class="n">ParameterMapping</span><span class="o">[])</span> <span class="n">mappingList</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="k">new</span> <span class="n">ParameterMapping</span><span class="o">[</span><span class="n">mappingList</span><span class="o">.</span><span class="na">size</span><span class="o">()]);</span>
+
+    <span class="n">SqlText</span> <span class="n">sqlText</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SqlText</span><span class="o">();</span>
+    <span class="n">sqlText</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">newSql</span><span class="o">);</span>
+    <span class="n">sqlText</span><span class="o">.</span><span class="na">setParameterMappings</span><span class="o">(</span><span class="n">mappingArray</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">sqlText</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>

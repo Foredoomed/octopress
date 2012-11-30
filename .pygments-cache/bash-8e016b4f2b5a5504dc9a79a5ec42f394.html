@@ -1,0 +1,33 @@
+<div class="highlight"><pre>pm.max_children <span class="o">=</span> 1
+<span class="nv">pid</span> <span class="o">=</span> run/php-fpm.pid
+<span class="nv">error_log</span> <span class="o">=</span> log/php-fpm.log
+<span class="nv">log_level</span> <span class="o">=</span> notice
+emergency_restart_threshold :10
+emergency_restart_interval:1m
+process_control_timeout:5s
+daemonize:yes
+
+backlog:-1
+listen.owner <span class="o">=</span> www
+listen.group <span class="o">=</span> www
+listen.mode <span class="o">=</span> 0666
+<span class="nv">user</span> <span class="o">=</span> www
+<span class="nv">group</span> <span class="o">=</span> www
+<span class="nv">pm</span> <span class="o">=</span> static
+<span class="nv">request_terminate_timeout</span> <span class="o">=</span> 0
+<span class="nv">request_slowlog_timeout</span> <span class="o">=</span> 0s
+<span class="nv">slowlog</span> <span class="o">=</span> log/<span class="nv">$pool</span>.log.slow
+<span class="nv">rlimit_files</span> <span class="o">=</span> 51200
+<span class="nv">rlimit_core</span> <span class="o">=</span> 0
+<span class="nv">catch_workers_output</span> <span class="o">=</span> yes
+pm.max_requests <span class="o">=</span> 500
+listen.allowed_clients <span class="o">=</span> 127.0.0.1
+env<span class="o">[</span>HOSTNAME<span class="o">]</span> <span class="o">=</span> <span class="nv">$HOSTNAME</span>
+env<span class="o">[</span>PATH<span class="o">]</span> <span class="o">=</span> /usr/local/bin:/usr/bin:/bin
+env<span class="o">[</span>TMP<span class="o">]</span> <span class="o">=</span> /tmp
+env<span class="o">[</span>TMPDIR<span class="o">]</span> <span class="o">=</span> /tmp
+env<span class="o">[</span>TEMP<span class="o">]</span> <span class="o">=</span> /tmp
+env<span class="o">[</span>OSTYPE<span class="o">]</span> <span class="o">=</span> <span class="nv">$OSTYPE</span>
+env<span class="o">[</span>MACHTYPE<span class="o">]</span> <span class="o">=</span> <span class="nv">$MACHTYPE</span>
+env<span class="o">[</span>MALLOC_CHECK_<span class="o">]</span> <span class="o">=</span> 2
+</pre></div>

@@ -1,0 +1,11 @@
+<div class="highlight"><pre><span class="c1">// Don&#39;t do this either - circumvents exception checking!</span>
+<span class="kd">class</span> <span class="nc">TigerThrower</span><span class="o">&lt;</span><span class="n">t</span> <span class="kd">extends</span> <span class="n">Throwable</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sneakyThrow</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">new</span> <span class="n">TigerThrower</span><span class="o">&lt;</span><span class="n">error</span><span class="o">&gt;().</span><span class="na">sneakyThrow2</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">sneakyThrow2</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">T</span> <span class="o">{</span>
+    <span class="k">throw</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span> <span class="n">t</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>

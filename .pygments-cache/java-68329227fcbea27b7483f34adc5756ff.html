@@ -1,0 +1,5 @@
+<div class="highlight"><pre><span class="c1">// Don’t do this - circumvents exception checking!</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sneakyThrow</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">stop</span><span class="o">(</span><span class="n">t</span><span class="o">);</span> <span class="c1">// Deprecated</span>
+<span class="o">}</span>
+</pre></div>

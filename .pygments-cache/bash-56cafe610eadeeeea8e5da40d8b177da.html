@@ -1,0 +1,21 @@
+<div class="highlight"><pre><span class="nv">output_buffering</span> <span class="o">=</span> On
+cgi.fix_pathinfo <span class="o">=</span> 0&lt;/p&gt;
+
+&lt;p&gt;extension_dir <span class="o">=</span> “/usr/local/webserver/php/lib/php/extensions/no-debug-non-zts-20090626/”&lt;/p&gt;
+
+&lt;p&gt;//并在此行后增加以下几行
+<span class="nv">extension</span> <span class="o">=</span> “memcache.so”
+<span class="nv">extension</span> <span class="o">=</span> “pdo_mysql.so”
+<span class="nv">extension</span> <span class="o">=</span> “imagick.so”&lt;/p&gt;
+
+&lt;p&gt;<span class="o">[</span>APC<span class="o">]</span>
+apc.enabled <span class="o">=</span> 1
+apc.shm_segments <span class="o">=</span> 1
+apc.shm_size <span class="o">=</span> 8M
+apc.ttl <span class="o">=</span> 7200
+apc.user_ttl <span class="o">=</span> 7200
+apc.optimization <span class="o">=</span> 1
+apc.num_files_hint <span class="o">=</span> 1024
+apc.mmap_file_mask <span class="o">=</span>/tmp/apc.XXXXXX 
+apc.enable_cli <span class="o">=</span> 1
+</pre></div>

@@ -1,0 +1,18 @@
+<div class="highlight"><pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="c1">// f: function that takes a double and returns a double</span>
+    <span class="c1">// deltaX: small positive number</span>
+    <span class="c1">// returns a function that is an approximate derivative of f</span>
+    <span class="k">static</span> <span class="n">Func</span><span class="err">＜</span><span class="kt">double</span> <span class="p">,</span> <span class="kt">double</span><span class="err">＞</span> <span class="n">MakeDerivative</span><span class="p">(</span><span class="n">Func</span><span class="err">＜</span><span class="kt">double</span> <span class="p">,</span> <span class="kt">double</span><span class="err">＞</span> <span class="n">f</span><span class="p">,</span> <span class="kt">double</span> <span class="n">deltaX</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span> <span class="p">+</span> <span class="n">deltaX</span><span class="p">)</span> <span class="p">-</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="p">/</span> <span class="n">deltaX</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">cos</span> <span class="p">=</span> <span class="n">MakeDerivative</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="n">Sin</span><span class="p">,</span> <span class="m">0.00000001</span><span class="p">);</span>
+        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="m">0</span><span class="p">));</span>                    <span class="c1">// 1</span>
+        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="n">PI</span> <span class="p">/</span> <span class="m">2</span><span class="p">));</span>          <span class="c1">// 0</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>

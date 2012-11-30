@@ -1,0 +1,107 @@
+<div class="highlight"><pre><span class="c">#!/bin/sh</span>
+<span class="c">#</span>
+<span class="c"># nginx - this script starts and stops the nginx daemin</span>
+<span class="c">#</span>
+<span class="c"># chkconfig:   - 85 15 </span>
+<span class="c"># description:  Nginx is an HTTP(S) server, HTTP(S) reverse \</span>
+<span class="c">#               proxy and IMAP/POP3 proxy server</span>
+<span class="c"># processname: nginx</span>
+<span class="c"># config:      /usr/local/nginx/conf/nginx.conf</span>
+<span class="c"># pidfile:     /usr/local/nginx/logs/nginx.pid&lt;/p&gt;</span>
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;source-function-library&quot;</span>&gt;Source <span class="k">function </span>library.&lt;/h1&gt;
+&lt;p&gt;. /etc/rc.d/init.d/functions&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;source-networking-configuration&quot;</span>&gt;Source networking configuration.&lt;/h1&gt;
+&lt;p&gt;. /etc/sysconfig/network&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;check-that-networking-is-up&quot;</span>&gt;Check that networking is up.&lt;/h1&gt;
+&lt;p&gt;<span class="o">[</span> “<span class="nv">$NETWORKING</span>” <span class="o">=</span> “no” <span class="o">]</span> &amp;amp;&amp;amp; <span class="nb">exit </span>0&lt;/p&gt;
+
+&lt;p&gt;nginx<span class="o">=</span>”/usr/local/nginx/sbin/nginx”
+<span class="nv">prog</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$nginx</span><span class="k">)</span>&lt;/p&gt;
+
+&lt;p&gt;NGINX_CONF_FILE<span class="o">=</span>”/usr/local/nginx/conf/nginx.conf”&lt;/p&gt;
+
+&lt;p&gt;lockfile<span class="o">=</span>/var/lock/subsys/nginx&lt;/p&gt;
+
+&lt;p&gt;start<span class="o">()</span> <span class="o">{</span>
+    <span class="o">[</span> -x <span class="nv">$nginx</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit </span>5
+    <span class="o">[</span> -f <span class="nv">$NGINX_CONF_FILE</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit </span>6
+    <span class="nb">echo</span> -n <span class="nv">$”</span>Starting <span class="nv">$prog</span>: “
+    daemon <span class="nv">$nginx</span> -c <span class="nv">$NGINX_CONF_FILE</span>
+    <span class="nv">retval</span><span class="o">=</span><span class="nv">$?</span>
+    <span class="nb">echo</span>
+    <span class="o">[</span> <span class="nv">$retval</span> -eq 0 <span class="o">]</span> &amp;amp;&amp;amp; touch <span class="nv">$lockfile</span>
+    <span class="k">return</span> <span class="nv">$retval</span>
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;stop<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">echo</span> -n <span class="nv">$”</span>Stopping <span class="nv">$prog</span>: “
+    killproc <span class="nv">$prog</span> -QUIT
+    <span class="nv">retval</span><span class="o">=</span><span class="nv">$?</span>
+    <span class="nb">echo</span>
+    <span class="o">[</span> <span class="nv">$retval</span> -eq 0 <span class="o">]</span> &amp;amp;&amp;amp; rm -f <span class="nv">$lockfile</span>
+    <span class="k">return</span> <span class="nv">$retval</span>
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;restart<span class="o">()</span> <span class="o">{</span>
+    configtest <span class="o">||</span> <span class="k">return</span> <span class="nv">$?</span>
+    stop
+    start
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;reload<span class="o">()</span> <span class="o">{</span>
+    configtest <span class="o">||</span> <span class="k">return</span> <span class="nv">$?</span>
+    <span class="nb">echo</span> -n <span class="nv">$”</span>Reloading <span class="nv">$prog</span>: “
+    killproc <span class="nv">$nginx</span> -HUP
+    <span class="nv">RETVAL</span><span class="o">=</span><span class="nv">$?</span>
+    <span class="nb">echo</span>
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;force_reload<span class="o">()</span> <span class="o">{</span>
+    restart
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;configtest<span class="o">()</span> <span class="o">{</span>
+  <span class="nv">$nginx</span> -t -c <span class="nv">$NGINX_CONF_FILE</span>
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;rh_status<span class="o">()</span> <span class="o">{</span>
+    status <span class="nv">$prog</span>
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;rh_status_q<span class="o">()</span> <span class="o">{</span>
+    rh_status &amp;gt;/dev/null 2&amp;gt;&amp;amp;1
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;case “<span class="nv">$1</span>” in
+    start<span class="o">)</span>
+        rh_status_q &amp;amp;&amp;amp; <span class="nb">exit </span>0
+        <span class="nv">$1</span>
+        ;;
+    stop<span class="o">)</span>
+        rh_status_q <span class="o">||</span> <span class="nb">exit </span>0
+        <span class="nv">$1</span>
+        ;;
+    restart|configtest<span class="o">)</span>
+        <span class="nv">$1</span>
+        ;;
+    reload<span class="o">)</span>
+        rh_status_q <span class="o">||</span> <span class="nb">exit </span>7
+        <span class="nv">$1</span>
+        ;;
+    force-reload<span class="o">)</span>
+        force_reload
+        ;;
+    status<span class="o">)</span>
+        rh_status
+        ;;
+    condrestart|try-restart<span class="o">)</span>
+        rh_status_q <span class="o">||</span> <span class="nb">exit </span>0
+            ;;
+    *<span class="o">)</span>
+        <span class="nb">echo</span> <span class="nv">$”</span>Usage: <span class="nv">$0</span> <span class="o">{</span>start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest<span class="o">}</span>”
+        <span class="nb">exit </span>2
+<span class="k">esac</span>
+</pre></div>

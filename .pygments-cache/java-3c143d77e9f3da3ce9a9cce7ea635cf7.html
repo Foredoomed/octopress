@@ -1,0 +1,24 @@
+<div class="highlight"><pre>  <span class="kd">private</span> <span class="n">Configuration</span> <span class="n">configuration</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="n">Executor</span> <span class="n">executor</span><span class="o">;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kt">boolean</span> <span class="n">autoCommit</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">dirty</span><span class="o">;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="n">DefaultSqlSession</span><span class="o">(</span><span class="n">Configuration</span> <span class="n">configuration</span><span class="o">,</span> <span class="n">Executor</span> <span class="n">executor</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">autoCommit</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">configuration</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">executor</span> <span class="o">=</span> <span class="n">executor</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">autoCommit</span> <span class="o">=</span> <span class="n">autoCommit</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="n">List</span> <span class="n">selectList</span><span class="o">(</span><span class="n">String</span> <span class="n">statement</span><span class="o">,</span> <span class="n">Object</span> <span class="n">parameter</span><span class="o">,</span> <span class="n">RowBounds</span> <span class="n">rowBounds</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">MappedStatement</span> <span class="n">ms</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="na">getMappedStatement</span><span class="o">(</span><span class="n">statement</span><span class="o">);</span>
+      <span class="k">return</span> <span class="n">executor</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">ms</span><span class="o">,</span> <span class="n">wrapCollection</span><span class="o">(</span><span class="n">parameter</span><span class="o">),</span> <span class="n">rowBounds</span><span class="o">,</span> <span class="n">Executor</span><span class="o">.</span><span class="na">NO_RESULT_HANDLER</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="n">ExceptionFactory</span><span class="o">.</span><span class="na">wrapException</span><span class="o">(</span><span class="err">“</span><span class="n">Error</span> <span class="n">querying</span> <span class="n">database</span><span class="o">.</span>  <span class="nl">Cause:</span> <span class="err">“</span> <span class="o">+</span> <span class="n">e</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="n">ErrorContext</span><span class="o">.</span><span class="na">instance</span><span class="o">().</span><span class="na">reset</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+</pre></div>

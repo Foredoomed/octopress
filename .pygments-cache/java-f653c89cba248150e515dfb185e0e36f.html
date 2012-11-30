@@ -1,0 +1,25 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UnwelcomeGuest</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">GUEST_USER_ID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">USER_ID</span><span class="o">;</span>
+  <span class="kd">static</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">USER_ID</span> <span class="o">=</span> <span class="n">getUserIdFromEnvironment</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IdUnavailableException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">USER_ID</span> <span class="o">=</span> <span class="n">GUEST_USER_ID</span><span class="o">;</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Logging in as guest&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kt">long</span> <span class="nf">getUserIdFromEnvironment</span><span class="o">()</span>
+  <span class="kd">throws</span> <span class="n">IdUnavailableException</span> <span class="o">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nf">IdUnavailableException</span><span class="o">();</span>
+  <span class="o">}</span>
+
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;User ID: &quot;</span> <span class="o">+</span> <span class="n">USER_ID</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">IdUnavailableException</span> <span class="kd">extends</span> <span class="n">Exception</span> <span class="o">{</span>
+<span class="o">}</span>
+</pre></div>

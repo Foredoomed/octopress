@@ -4,7 +4,7 @@
   <title><![CDATA[Category: algorithms | Zhixingheyi]]></title>
   <link href="http://liuxuan.info/blog/categories/algorithms/atom.xml" rel="self"/>
   <link href="http://liuxuan.info/"/>
-  <updated>2012-09-22T18:41:50+08:00</updated>
+  <updated>2012-11-28T21:10:24+08:00</updated>
   <id>http://liuxuan.info/</id>
   <author>
     <name><![CDATA[Foredoomed]]></name>
@@ -12,6 +12,151 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[字符串搜索算法]]></title>
+    <link href="http://liuxuan.info/blog/2012/10/20/string-searching-algorithms/"/>
+    <updated>2012-10-20T22:30:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/10/20/string-searching-algorithms</id>
+    <content type="html"><![CDATA[<p>字符串搜索算法</p>
+
+<p><strong>0.Brute-force search (BFS)</strong></p>
+
+<p>BFS应该是字符串搜索算法中最简单的一个，维基百科上的描述是：</p>
+
+<blockquote>
+  <p>a trivial but very general problem-solving technique that consists of systematically enumerating all possible candidates for the solution and checking whether each candidate satisfies the problem’s statement.</p>
+</blockquote>
+
+<p>所以BFS算法就是用模式串去和搜索串逐一比较，直到找到模式串为止。</p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/bruteforcesearch_zps3f5d214f.png" title="BFS BFS" ></p>
+
+<p>BFS的特征有：</p>
+
+<ul>
+  <li>模式串不做预处理</li>
+  <li>从左边开始一个字符一个字符的匹配</li>
+  <li>最差情况下需要比较<code>mn</code>次</li>
+  <li>返回的是第一次匹配的字符串</li>
+</ul>
+
+<p>BSF的优点和缺点都很明显：优点就是简单；缺点速度慢，不稳定。</p>
+
+<!-- more -->
+
+<p><strong>1.Knuth-Morris-Pratt (KMP)</strong></p>
+
+<p>维基百科上的描述是：</p>
+
+<blockquote>
+  <p>searches for occurrences of a “word” W within a main “text string” S by employing the observation that when a mismatch occurs, the word itself embodies sufficient information to determine where the next match could begin, thus bypassing re-examination of previously matched characters.</p>
+</blockquote>
+
+<p>BFS算法最大的问题就是当匹配失败时，需要把模式串右移一位重新开始匹配。但是很有可能匹配失败，然后再右移一位匹配。这当中重复了很多不必要的匹配过程，这也是造成BFS算法效率差的原因(当搜索串不是很大时，BFS应该比其他算法更有优势)。</p>
+
+<p>KMP解决了不必要匹配过多的问题，大大提高了算法的效率。显然，匹配的核心问题就是当匹配失败出现时，模式串右移多少位再开始重新匹配。KMP算法是通过对模式串的预处理，建立一张前缀表来实现。</p>
+
+<p><code>
+i    0  1  2  3  4  5  6
+W[i] A  B  C  D  A  B  D   
+T[i] -1 0  0  0  0  1  2  
+</code></p>
+
+<p>建立这张表的算法是：从左往右遍历模式串，观察前<code>i-1</code>长子串中，最长前缀子串和后缀子串匹配的长度。如上图所示，匹配串<code>W[i]=ABCDABD</code>的第一个字符是<code>a</code>，约定<code>T[0]=-1</code>；<code>W[1]</code>之前的字串是<code>A</code>，因为只有一个字符，它没有前缀子串和后缀子串，所以<code>T[1]=0</code>；同理<code>T[2]=0</code>，<code>T[3]=0</code>，<code>T[4]=0</code>；当<code>W[5]=ABCDA</code>时，有前缀和后缀字串<code>A</code>，所以<code>T[5]=1</code>；同理<code>T[6]=2</code>。</p>
+
+<p>我们来看下面的例子：</p>
+
+<p><code>
+0	1	2	3	4	5	6	7	8	9
+a	b	c	a	b	c	a	b	d		
+a	b	c	a	b	d					
+        a	b	c	a	b	d
+</code></p>
+
+<p>当<code>i=5</code>时匹配失败，又<code>T[5]=2</code>，所以模式串往右移<code>i-T[5]=5-2=3</code>位继续匹配。</p>
+
+<p>KMP算法的特点有：</p>
+
+<ul>
+  <li>从左往右匹配</li>
+  <li>预处理模式串，时间负责度<code>Θ(m)</code></li>
+  <li>搜索时间负责度<code>Θ(m+n)</code></li>
+  <li>最多比较<code>2n-1</code>次</li>
+</ul>
+
+<p>KMP算法的优点有：简单，速度快，对处理大文件有优势；缺点是随着字符种类增加，匹配失败的几率也随之增加。</p>
+
+<p><strong>2.Boyer-Moore (BM)</strong></p>
+
+<p>维基百科上的描述是：</p>
+
+<blockquote>
+  <p>is an efficient string searching algorithm that is the standard benchmark for practical string search literature. It was developed by Robert S. Boyer and J Strother Moore in 1977. The algorithm preprocesses the string being searched for (the pattern), but not the string being searched in (the text). It is thus well-suited for applications in which the text does not persist across multiple searches. The Boyer-Moore algorithm uses information gathered during the preprocess step to skip sections of the text, resulting in a lower constant factor than many other string algorithms. In general, the algorithm runs faster as the pattern length increases.</p>
+</blockquote>
+
+<p>简单来说，BM算法是从模式串的右边开始往左边匹配搜索串，如果搜索串中的字符与模式串最右的字符不匹配，并且模式串里不包含这个字符的话，那么模式串可以右移m(模式串的长度)位。</p>
+
+<p>例子：</p>
+
+<p><code>
+0	1	2	3	4	5	6	7	8	9	
+a	b	b	a	d	a	b	a	c	b	a
+b	a	b	a	c						
+                b	a	b	a	c
+</code></p>
+
+<p><strong>2.1 Bad character 搜索法</strong></p>
+
+<p><code>
+0	1	2	3	4	5	6	7	8	9  
+a	b	b	a	b	a	b	a	c	b	a
+b	a	b	a	c						
+        b	a	b	a	c  
+</code></p>
+
+<p>首先匹配<code>i=4</code>位置上的<code>b</code>和<code>c</code>，显然不相等，然后我们发觉<code>b</code>在模式串中出现在了<code>0</code>和<code>2</code>的位置上，所以我们可以把搜索串<code>i=4</code>位置上的<code>b</code>和模式串<code>i=2</code>位置上的<code>b</code>对齐。</p>
+
+<p><strong>2.2 Good suffix 搜索法</strong>	</p>
+
+<p><code>      
+0	1	2	3	4	5	6	7	8	9   
+a	b	a	a	b	a	b	a	c	b	a  
+c	a	b	a	b						
+        c	a	b	a	b  
+</code></p>
+
+<p>从右开始匹配到<code>i=2</code>时匹配失败，这时后缀<code>ab</code>匹配成功，我们可以把模式串中的下一个<code>ab</code>(如果有的话)与搜索串的<code>ab</code>对齐。但是如果碰到下面这种情况：</p>
+
+<p><code>
+0	1	2	3	4	5	6	7	8	9  
+a	a	b	a	b	a	b	a	c	b	a
+a	b	b	a	b						
+        a	b	b	a	b		
+</code></p>
+
+<p>我们可以看到后缀<code>bab</code>匹配成功，但是模式串中没有第二个<code>bab</code>，所以我们可以在模式串中寻找<code>bab</code>的字串，就像上面的<code>ab</code>，然后把它与搜索串对齐。</p>
+
+<p>BM算法的特点：</p>
+
+<ul>
+  <li>从右往左匹配</li>
+  <li>预处理模式串，时间负责度<code>Θ(m+σ)</code></li>
+  <li>搜索时间负责度<code>Θ(m*n)</code></li>
+  <li>最多比较<code>3n</code>次</li>
+</ul>
+
+<p>BM算法是字符串搜索算法里效率最高的算法，但是缺点是比较复杂(需要考虑的情况很多)，对<code>good suffix</code>的预处理比较难理解和实现。</p>
+
+<p>参考资料</p>
+
+<p>[1] <a href="http://en.wikipedia.org/wiki/Brute-force_search" title="Wikipedia，Brute-force searching algorithm">Wikipedia-Brute-force searching algorithm</a><br />
+[2] <a href="http://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm" title="Wikipedia，Knuth–Morris–Pratt algorithm">Wikipedia-Knuth–Morris–Pratt algorithm</a><br />
+[3] <a href="http://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string_search_algorithm" title="Wikipedia，Boyer–Moore string search algorithm">Wikipedia-Boyer–Moore string search algorithm</a><br />
+[4] <a href="http://www.inf.fh-flensburg.de/lang/algorithmen/pattern/" title="algorithms">algorithms</a></p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Skip List原理简述]]></title>
@@ -53,6 +198,267 @@
 <p>[1] <a href="http://en.wikipedia.org/wiki/Skip_list">Skip List on Wikipedia</a><br />
 [2] <a href="http://www.sable.mcgill.ca/~dbelan2/cs251/skip_lists.html">DATA STRUCTURES AND ALGORITHMS Project #25: SKIP LISTS</a><br />
 [3] <a href="http://igoro.com/archive/skip-lists-are-fascinating/">Skip lists are fascinating</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[快速排序复习笔记]]></title>
+    <link href="http://liuxuan.info/blog/2011/12/17/quicksort-note/"/>
+    <updated>2011-12-17T14:27:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2011/12/17/quicksort-note</id>
+    <content type="html"><![CDATA[<p>最近晚上躺在床上没事就拿着手机看了几节MIT的公开课《Introduction to Algorithms》，看着看着就觉得自己关于排序算法的原理基本上都忘光了。顿感非常失落，所以特意又对算法复习了一遍，特别是快速排序，这篇博客就是复习笔记，毕竟发表是最好的记忆嘛。</p>
+
+<p>这门课是由两位老师来上的的，一位是<a href="http://people.csail.mit.edu/cel/" title="Charles E.Leiserson">Charles E.Leiserson</a>教授，光听这个名字可能有点陌生，但是如果提到他参与编写的《算法导论》这本书，对于学计算机的人来说那是无人不知无人不晓的经典著作；另一位是80后的Erik Demaine<a href="http://www.csail.mit.edu/user/666" title="Erik Demaine">Erik Demaine</a>，据说此人在20岁时就当上了MIT的教授，真是牛人啊，而且大多数的课也都是由他来讲的。还有一点我比较在意的是一节课的时间大约是1个小时20分钟左右，这跟中国大学的45分钟一节课很不一样，个人觉得这样的时间安排可以使一节课更加连贯，学习效率也会更好。</p>
+
+<!-- more -->
+
+<p>好了，回到正题快速排序上。话说快速排序是被广泛实际应用的排序算法，究其原因就是优秀的时间复杂度，平均为O(n*log(n))和O(n)的空间负责度，但是快速排序不是稳定排序，因为不能保证相同的元素在排序后还是原来的顺序。</p>
+
+<p>快速排序有三个步骤：</p>
+
+<ol>
+  <li>从元素列表中选择一个元素，这个元素被称为pivot。</li>
+  <li>把所有小于pivot的元素都放到pivot的左边，所有大于pivot的元素都放到pivot的右边，这个过程称为partition。</li>
+  <li>在左右两个子列表中迭代步骤2。</li>
+</ol>
+
+<p>下面举个例子来说明快速排序的排序过程，假如我们有这样一组数：<code>6 10 13 5 8 3 2 11</code>，并且选取左端点元素<code>6</code>作为初始pivot，那么上面步骤2的过程应该是下面这个样子：</p>
+
+<pre><code>6  5  13  10  8   3   2  11  
+6  5   3  10  8  13   2  11  
+6  5   3   2  8  13  10  11  
+2  5   3   6  8  13  10  11
+</code></pre>
+
+<p>因为要把小于pivot的数都放到pivot的左边，而大于等于pivot的数都放到pivot的右边，所以在保证空间复杂度O(n)的前提下，采用一个变量<code>j</code>，初始为pivot的后一个位置，当循环这个数组发现有小于pivot的数时就和<code>j</code>这个位置上的数交换，然后<code>j + 1</code>，等到循环结束后再交换pivot和<code>j</code>位置上的数。当然如果空间够多的话，直接创建两个新数组往里塞更容易一点。到了上面最后一步后，pivot就变成了<code>6</code>，然后再在它的左右子数组中迭代步骤2。</p>
+
+<p>好了，现在我们可以来写代码了，根据上面的思想不难得出下面的代码：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Quicksort1.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">quickSort1</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">array</span><span class="o">,</span> <span class="kt">int</span> <span class="n">p</span><span class="o">,</span> <span class="kt">int</span> <span class="n">q</span><span class="o">)</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">q</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// 选取左端点为pivot</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">pivot</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="n">p</span><span class="o">];</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;=</span> <span class="n">q</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">array</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">pivot</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="c1">// 如果小于pivot则与j+1位置上数交换</span>
+</span><span class='line'>      <span class="n">swap</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="o">++</span><span class="n">j</span><span class="o">,</span> <span class="n">i</span><span class="o">);&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;}</span> <span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// 交换pivot与j位置上的数</span>
+</span><span class='line'>  <span class="n">swap</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">j</span><span class="o">);&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// 迭代左右子数组</span>
+</span><span class='line'>  <span class="n">quickSort1</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">quickSort1</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">q</span><span class="o">);</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">swap</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">array</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="kt">int</span> <span class="n">j</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+</span><span class='line'>  <span class="n">array</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="n">j</span><span class="o">];</span>
+</span><span class='line'>  <span class="n">array</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">=</span> <span class="n">temp</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>但是这个算法有个缺陷，在已经排序好的数组上性能非常差。所以人们就对原始快速排序算法进行了改进，改进的地方就是pivot的选取，用随机数或者中间位置的数取代最左端的数；还有就是初始化两个指针，分别从数组的两端向pivot扫描，小于pivot的数和大于等于pivot的数直接交换等，具体可以参看这篇文章：<a href="http://www.blogjava.net/killme2008/archive/2010/09/08/quicksort_optimized.html" title="快速排序及优化">快速排序及优化</a>。</p>
+
+<p>我们来看一下经过上述两个方法优化过的快速排序算法：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Quicksort2.java  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">quickSort2</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">array</span><span class="o">,</span> <span class="kt">int</span> <span class="n">p</span><span class="o">,</span> <span class="kt">int</span> <span class="n">q</span><span class="o">)</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">q</span><span class="o">;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// 选中间数为pivot</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">pivot</span> <span class="o">=</span> <span class="n">array</span><span class="o">[</span><span class="n">i</span> <span class="o">+</span> <span class="o">(</span><span class="n">q</span> <span class="o">-</span> <span class="n">p</span><span class="o">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">];&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;=</span> <span class="n">j</span><span class="o">)</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">while</span> <span class="o">(</span><span class="n">array</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">pivot</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">i</span><span class="o">++;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>		
+</span><span class='line'><span class="k">while</span> <span class="o">(</span><span class="n">array</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">pivot</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">j</span><span class="o">--;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 交换小于pivot的数和大于pivot的数</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;=</span> <span class="n">j</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">swap</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">j</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">i</span><span class="o">++;</span>
+</span><span class='line'>  <span class="n">j</span><span class="o">--;</span>
+</span><span class='line'> <span class="o">}</span>   <span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// 迭代</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">j</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">quickSort2</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">j</span><span class="o">);</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">q</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">quickSort2</span><span class="o">(</span><span class="n">array</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">q</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>就是这样，快速排序其实蛮简单的，它和冒泡排序的区别就是：在冒泡排序中，数组中的数需要和其他多个数比较，越前面的数比较的次数越多；而快速排序在一次排序中比较的是一个固定的pivot，所以效率要比冒泡排序高很多。</p>
+
+<p>下面是排序算法的比较：</p>
+
+<table class="datalist">
+  <thead>
+    <tr>
+      <th>Sort</th>
+      <th>Average</th>
+      <th>Best</th>
+      <th>Worst</th>
+      <th>Space</th>
+      <th>Stability</th>
+      <th>Remarks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Bubble sort</td>
+      <td>O(n^2)</td>
+      <td>O(n^2)</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>Always use a modified bubble sort</td>
+    </tr>
+    <tr>
+      <td>Modified Bubble sort</td>
+      <td>O(n^2)</td>
+      <td>O(n)</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>Stops after reaching a sorted array</td>
+    </tr>
+    <tr>
+      <td>Selection Sort</td>
+      <td>O(n^2)</td>
+      <td>O(n^2)</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>Even a perfectly sorted input requires scanning the entire array</td>
+    </tr>
+    <tr>
+      <td>Insertion Sort</td>
+      <td>O(n^2)</td>
+      <td>O(n)</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>In the best case (already sorted), every insert requires constant time</td>
+    </tr>
+    <tr>
+      <td>Heap Sort</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>Constant</td>
+      <td>Instable</td>
+      <td>By using input array as storage for the heap, it is possible to achieve constant space</td>
+    </tr>
+    <tr>
+      <td>Merge Sort</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>Depends</td>
+      <td>Stable</td>
+      <td>On arrays, merge sort requires O(n) space; on linked lists, merge sort requires constant space</td>
+    </tr>
+    <tr>
+      <td>Quicksort</td>
+      <td>O(nlog(n))</td>
+      <td>O(nlog(n))</td>
+      <td>O(n^2)</td>
+      <td>Constant</td>
+      <td>Stable</td>
+      <td>Randomly picking a pivot value (or shuffling the array prior to sorting) can help avoid worst case scenarios such as a perfectly sorted array</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>参考文章</p>
+
+<ol>
+  <li><a href="http://www.blogjava.net/killme2008/archive/2010/09/08/quicksort_optimized.html" title="快速排序及优化">快速排序及优化</a>  </li>
+  <li><a href="http://www.vogella.de/articles/JavaAlgorithmsQuicksort/article.html" title="Quicksort in Java">Quicksort in Java</a>  </li>
+  <li><a href="http://www.cprogramming.com/tutorial/computersciencetheory/sortcomp.html" title="Sorting Algorithm Comparison">Sorting Algorithm Comparison</a></li>
+</ol>
+
 ]]></content>
   </entry>
   

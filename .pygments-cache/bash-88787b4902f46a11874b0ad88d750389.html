@@ -1,0 +1,48 @@
+<div class="highlight"><pre>servive sendmail stop
+yum remove sendmail
+
+service httpd stop
+yum remove httpd
+
+service rsyslog stop
+yum remove rsyslog
+
+<span class="c"># 添加EPEL软件库</span>
+rpm -Uvh http:#dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
+
+<span class="c"># 安装syslog-ng代替rsyslog</span>
+yum install syslog-ng
+chkconfig syslog-ng on
+
+<span class="c"># 安装dropbear代替openssh</span>
+yum install dropbear
+chkconfig dropbear on
+
+<span class="c"># 等dropbear配置好后</span>
+service sshd stop
+yum remove openssh
+
+<span class="c"># 安装vsftpd作为ftp服务器</span>
+yum install vsftpd
+chkconfig vsftpd on
+
+<span class="c"># 添加用户</span>
+groupadd www
+useradd -g www username
+passwd username
+
+<span class="c"># 设定ftp登陆目录权限</span>
+chown -R usernmae /path/to/ftp/folder
+
+<span class="c"># 安装yum-utils</span>
+yum install yum-utils
+
+<span class="c"># 更新软件</span>
+yum upgrade
+
+<span class="c"># 安装ppp</span>
+rpm -ivh http:#poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm
+
+<span class="c"># 安装pptpd</span>
+rpm -ivh http:#poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
+</pre></div>

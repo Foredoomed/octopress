@@ -1,0 +1,18 @@
+<div class="highlight"><pre>  <span class="kd">public</span> <span class="n">Executor</span> <span class="nf">newExecutor</span><span class="o">(</span><span class="n">Transaction</span> <span class="n">transaction</span><span class="o">,</span> <span class="n">ExecutorType</span> <span class="n">executorType</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">executorType</span> <span class="o">=</span> <span class="n">executorType</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">defaultExecutorType</span> <span class="o">:</span> <span class="n">executorType</span><span class="o">;</span>
+    <span class="n">executorType</span> <span class="o">=</span> <span class="n">executorType</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">ExecutorType</span><span class="o">.</span><span class="na">SIMPLE</span> <span class="o">:</span> <span class="n">executorType</span><span class="o">;</span>
+    <span class="n">Executor</span> <span class="n">executor</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">ExecutorType</span><span class="o">.</span><span class="na">BATCH</span> <span class="o">==</span> <span class="n">executorType</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">executor</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BatchExecutor</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">transaction</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">ExecutorType</span><span class="o">.</span><span class="na">REUSE</span> <span class="o">==</span> <span class="n">executorType</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">executor</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ReuseExecutor</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">transaction</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="n">executor</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SimpleExecutor</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">transaction</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">cacheEnabled</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">executor</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CachingExecutor</span><span class="o">(</span><span class="n">executor</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="o">(</span><span class="n">Executor</span><span class="o">)</span> <span class="n">interceptorChain</span><span class="o">.</span><span class="na">pluginAll</span><span class="o">(</span><span class="n">executor</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">executor</span><span class="o">;</span>
+  <span class="o">}</span>
+</pre></div>

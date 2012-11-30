@@ -1,0 +1,36 @@
+<div class="highlight"><pre>tar zxvf libiconv-1.14.tar.gz
+<span class="nb">cd </span>libiconv-1.13.1/
+./configure –prefix<span class="o">=</span>/usr/local
+make &amp;amp;&amp;amp; make install&lt;/p&gt;
+
+&lt;p&gt;tar zxvf libmcrypt-2.5.8.tar.gz
+<span class="nb">cd </span>libmcrypt-2.5.8/
+./configure
+make &amp;amp;&amp;amp; make install
+/sbin/ldconfig
+<span class="nb">cd </span>libltdl
+./configure –enable-ltdl-install
+make &amp;amp;&amp;amp; make install&lt;/p&gt;
+
+&lt;p&gt;tar zxvf mhash-0.9.9.9.tar.gz
+<span class="nb">cd </span>mhash-0.9.9.9/
+./configure
+make &amp;amp;&amp;amp; make install&lt;/p&gt;
+
+&lt;p&gt;tar zxvf mcrypt-2.6.8.tar.gz
+<span class="nb">cd </span>mcrypt-2.6.8/
+/sbin/ldconfig
+./configure
+make &amp;amp;&amp;amp; make install&lt;/p&gt;
+
+&lt;p&gt;ln -s /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
+ln -s /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
+ln -s /usr/local/lib/libmcrypt.so.4 /usr/lib/libmcrypt.so.4
+ln -s /usr/local/lib/libmcrypt.so.4.4.8 /usr/lib/libmcrypt.so.4.4.8
+ln -s /usr/local/lib/libmhash.a /usr/lib/libmhash.a
+ln -s /usr/local/lib/libmhash.la /usr/lib/libmhash.la
+ln -s /usr/local/lib/libmhash.so /usr/lib/libmhash.so
+ln -s /usr/local/lib/libmhash.so.2 /usr/lib/libmhash.so.2
+ln -s /usr/local/lib/libmhash.so.2.0.1 /usr/lib/libmhash.so.2.0.1
+ln -s /usr/local/bin/libmcrypt-config /usr/bin/libmcrypt-config
+</pre></div>

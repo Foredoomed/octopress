@@ -1,0 +1,25 @@
+<div class="highlight"><pre><span class="c"># 配置vim</span>
+vim /etc/vimrc
+
+<span class="c"># 加入下面几行</span>
+syntax on
+<span class="nb">set </span>nu
+<span class="nb">set </span><span class="nv">mouse</span><span class="o">=</span>a
+<span class="nb">set </span><span class="nv">tabstop</span><span class="o">=</span>4
+
+<span class="c"># 禁用IPv6</span>
+vim /etc/sysconfig/network
+<span class="nv">NETWORKING_IPV6</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
+
+<span class="c"># 设置文件最大打开数</span>
+vim /etc/security/limits.conf
+<span class="c"># 加入下面两行</span>
+* soft nofile 65535
+* hard nofile 65535
+
+<span class="c"># 把服务器时间改为上海时间</span>
+cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+<span class="c"># 关闭不需要的服务</span>
+ntsysv  <span class="c">#按空格选择和取消，按F12退出</span>
+</pre></div>

@@ -1,0 +1,14 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="n">Sql</span> <span class="nf">getSql</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">state</span><span class="o">.</span><span class="na">getConfig</span><span class="o">().</span><span class="na">getErrorContext</span><span class="o">().</span><span class="na">setActivity</span><span class="o">(</span><span class="err">“</span><span class="n">processing</span> <span class="n">an</span> <span class="n">SQL</span> <span class="n">statement</span><span class="err">”</span><span class="o">);&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kt">boolean</span> <span class="n">isDynamic</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+<span class="n">StringBuffer</span> <span class="n">sqlBuffer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">();</span>
+<span class="n">DynamicSql</span> <span class="n">dynamic</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DynamicSql</span><span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="na">getConfig</span><span class="o">().</span><span class="na">getClient</span><span class="o">().</span><span class="na">getDelegate</span><span class="o">());</span>
+<span class="n">isDynamic</span> <span class="o">=</span> <span class="n">parseDynamicTags</span><span class="o">(</span><span class="n">parentNode</span><span class="o">,</span> <span class="n">dynamic</span><span class="o">,</span> <span class="n">sqlBuffer</span><span class="o">,</span> <span class="n">isDynamic</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+<span class="n">String</span> <span class="n">sqlStatement</span> <span class="o">=</span> <span class="n">sqlBuffer</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">isDynamic</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">return</span> <span class="n">dynamic</span><span class="o">;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nf">RawSql</span><span class="o">(</span><span class="n">sqlStatement</span><span class="o">);</span>
+<span class="o">}</span> <span class="o">}</span> 
+</pre></div>

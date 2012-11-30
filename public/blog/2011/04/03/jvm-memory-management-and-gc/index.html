@@ -9,7 +9,7 @@
   <meta name="author" content="Foredoomed">
 
   
-  <meta name="description" content="一.Java基本类型和类的大小 1.Java手册上的类型大小 byte : 8-bit short : 16-bit Int : 32-bit long : 64-bit char : 16 bit unsigned integer float : 32-bit double: 64-bit &hellip;">
+  <meta name="description" content="0.Java基本类型和类的大小 Java手册上的类型大小 byte : 8-bit short : 16-bit Int : 32-bit long : 64-bit char : 16-bit unsigned integer float : 32-bit double: 64-bit &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +28,8 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
+
 
   
   <script type="text/javascript">
@@ -106,20 +107,20 @@
   </header>
 
 
-<div class="entry-content"><p><strong>一.Java基本类型和类的大小</strong></p>
+<div class="entry-content"><p><strong>0.Java基本类型和类的大小</strong></p>
 
-<p>1.Java手册上的类型大小</p>
+<p>Java手册上的类型大小</p>
 
 <p>byte : 8-bit                           <br />
 short : 16-bit                           <br />
 Int : 32-bit                              <br />
 long : 64-bit                               <br />
-char : 16 bit unsigned integer         <br />
+char : 16-bit unsigned integer         <br />
 float : 32-bit                             <br />
 double: 64-bit                              <br />
 boolean: 1-bit                             </p>
 
-<p>2.实际存储大小(根据JVM实现而定)</p>
+<p>实际存储大小(根据JVM实现而定)</p>
 
 <p>Byte : 16 bytes<br />
 Short : 16 bytes<br />
@@ -133,23 +134,25 @@ Object ：8 bytes  </p>
 
 <!--more-->
 
-<p><strong>二.JVM的堆结构</strong></p>
+<p><strong>1.JVM的堆结构</strong></p>
 
-<p><a href="http://www.flickr.com/photos/60110479@N08/5504939947/" title="Flickr 上 Foredoomed 的 JVMHeapStructure"><img src="http://farm6.static.flickr.com/5136/5504939947_19ed9a8dbc.jpg" width="500" height="330" alt="JVMHeapStructure" /></a></p>
+<p><img src="http://farm6.static.flickr.com/5136/5504939947_19ed9a8dbc.jpg" title="JVMHeapStructure" alt="JVMHeapStructure" /></p>
 
 <p>运行时数据区域，所有类实例和数组的内存均从此处分配，由Java 虚拟机启动时创建。对象的堆内存由称为垃圾回收器的自动内存管理系统回收。</p>
 
 <p>堆由两部分组成:</p>
 
-<p><code>Eden</code>+<code>From Space</code>+<code>To Space</code>也叫做<code>Young Generation(年轻代)</code>,<code>Tenured Space</code>也叫做<code>Old Generation(老年代)</code>。</p>
+<p>Eden + From Space(S0) + To Space(S1): 也叫做Young Generation(年轻代)</p>
 
-<p><code>Survivor Space</code>包括<code>S0</code>和<code>S1</code>。</p>
+<p>Tenured Space: 也叫做Old Generation(老年代)</p>
 
-<p><code>Permanent Space(方法区)</code>： JVM具有一个由所有线程共享的方法区。它存储每个类结构，如运行时常数池、字段和方法数据，以及方法和构造方法的代码，它是在Java虚拟机启动时创建的，<strong>不包括在JVM堆内</strong>，默认为4M。 </p>
+<p>Survivor Space: 包括S0和S1</p>
+
+<p>permanent space(方法区)： JVM具有一个由所有线程共享的方法区。它存储每个类结构，如运行时常数池、字段和方法数据，以及方法和构造方法的代码，它是在Java虚拟机启动时创建的，<strong>不包括在JVM堆内</strong>，默认为4M。 </p>
 
 <p>这个区域主要存放：</p>
 
-<p>1.Class的信息</p>
+<p>类的信息</p>
 
 <ul>
   <li>包名</li>
@@ -159,7 +162,7 @@ Object ：8 bytes  </p>
   <li>父接口包名</li>
 </ul>
 
-<p>2.其它信息</p>
+<p>其它信息</p>
 
 <ul>
   <li>类型的常量池</li>
@@ -170,30 +173,24 @@ Object ：8 bytes  </p>
   <li>一个指向<code>Class</code>类的引用</li>
 </ul>
 
-<p><strong>三.GC的工作流程</strong></p>
+<p><strong>2.GC的工作流程</strong></p>
 
-<ol>
-  <li>绝大多数情况下对象初始化被分配在<code>Eden</code>中(一个非常大的对象会被分配在老年代中)。</li>
-  <li>如果<code>Eden</code>空间占满了， 会触发 minor GC。 Minor GC 后仍然存活的对象会被复制到<code>S0</code>中去。这样<code>Eden</code>就被清空可以分配给新的对象。</li>
-  <li>又触发了一次 Minor GC ， <code>S0</code>和<code>Eden</code>中存活的对象被复制到<code>S1</code>中， 并且<code>S0</code>和<code>Eden</code>被清空。 在同一时刻, 只有<code>Eden</code>和一个<code>Survivor Space</code>同时被操作。</li>
-  <li>当每次对象从<code>Eden</code>复制到<code>Survivor Space</code>或者从<code>Survivor Space</code>中的一个复制到另外一个，有一个计数器会自动增加值。 默认情况下如果复制发生超过16次， JVM 会停止复制并把他们移到老年代中去。</li>
-  <li>如果一个对象不能在<code>Eden</code>中被创建，它会直接被创建在老年代中。 如果老年代的空间被占满会触发老年代的 GC，也被称为 Full GC。full GC 是一个压缩处理过程，所以它比<code>Minor GC</code>要慢很多。</li>
-</ol>
+<p>(0) 绝大多数情况下对象初始化被分配在<code>Eden</code>中(一个非常大的对象会被分配在老年代中)。<br />
+(1) 如果<code>Eden</code>空间占满了， 会触发 minor GC。 Minor GC 后仍然存活的对象会被复制到<code>S0</code>中去。这样<code>Eden</code>就被清空可以分配给新的对象。<br />
+(2) 又触发了一次 Minor GC ， <code>S0</code>和<code>Eden</code>中存活的对象被复制到<code>S1</code>中， 并且<code>S0</code>和<code>Eden</code>被清空。 在同一时刻, 只有<code>Eden</code>和一个<code>Survivor Space</code>同时被操作。<br />
+(3) 当每次对象从<code>Eden</code>复制到<code>Survivor Space</code>或者从<code>Survivor Space</code>中的一个复制到另外一个，有一个计数器会自动增加值。 默认情况下如果复制发生超过16次， JVM 会停止复制并把他们移到老年代中去。<br />
+(4) 如果一个对象不能在<code>Eden</code>中被创建，它会直接被创建在老年代中。 如果老年代的空间被占满会触发老年代的 GC，也被称为 Full GC。full GC 是一个压缩处理过程，所以它比<code>Minor GC</code>要慢很多。  </p>
 
-<p><strong>四.GC算法</strong></p>
+<p><strong>3.GC算法</strong></p>
 
-<ol>
-  <li>Serial Collector</li>
-</ol>
+<p>Serial Collector</p>
 
 <p>大部分平台或者强制<code>java -client</code>默认会使用这种。
 Young Generation  = Serial
 Old Generation  = Serial (Mark-Sweep-Compact)
 这种方法的缺点很明显，Stop-the-world, 速度慢。服务器应用不推荐使用。</p>
 
-<ol>
-  <li>Parallel Collector</li>
-</ol>
+<p>Parallel Collector</p>
 
 <p>在Linux x64上默认是这种算法，其他平台要加<code>java -server</code>参数。
 Young Generation = parallel，多个thread同时copy
@@ -201,18 +198,14 @@ Old Generation = Mark-Sweep-Compact = 1
 优点：新生代回收更快。因为系统大部分时间做的GC都是新生代的，这样提高了Throughput(CPU用于非GC时间)。
 缺点：当运行在8G/16G Server 上 Old Generation 存活对象太多的时候暂停时间(Pause Time)过长。</p>
 
-<ol>
-  <li>Parallel Compacting Collector (ParallelOld)</li>
-</ol>
+<p>Parallel Compacting Collector (ParallelOld)</p>
 
 <p>Young Generation = parallel 
 Old Generation = parallel
 优点：Old Generation 上性能较 Parallel Collector 方式有提高。
 缺点：大部分Server系统Old Generation内存占用会达到60%-80%, Compact方面开销比起Parallel Collector并没明显减少。</p>
 
-<ol>
-  <li>Concurent Mark-Sweep(CMS) Collector (low-latency collector)</li>
-</ol>
+<p>Concurent Mark-Sweep(CMS) Collector (low-latency collector)</p>
 
 <p>Young Generation = parallel 
 Old Generation = CMS
@@ -220,9 +213,95 @@ Old Generation = CMS
 优点：Pause Time会降低, Pause Time敏感但CPU有空闲的场景需要建议使用策略4。
 缺点：CPU占用过多，CPU密集型服务器不适合。需要更大的堆空间，会造成很多碎片。</p>
 
-<p><strong>五.JVM的默认设置</strong></p>
+<table class="datalist">
+  <thead>
+    <tr>
+      <th>GC算法</th>
+      <th>年代区</th>
+      <th>特点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Serial</td>
+      <td>Young</td>
+      <td>Stop The World, Copying Collector, Single GC thread.</td>
+    </tr>
+    <tr>
+      <td>Serial Old (MSC)</td>
+      <td>Old</td>
+      <td>Stop the World, Mark Sweep Compact (MSC), Single GC thread</td>
+    </tr>
+    <tr>
+      <td>Parallel Scavenge</td>
+      <td>Young</td>
+      <td>Stop the World, copying collector, multiple GC threads. Provides higher throughput by executing GC tasks in parallel with each other (but not the app). Cannot run during concurrent phases of the CMS.</td>
+    </tr>
+    <tr>
+      <td>Parallel New</td>
+      <td>Young</td>
+      <td>As Parallel Scavenge, but can run during the concurrent phases of the CMS</td>
+    </tr>
+    <tr>
+      <td>Parallel Old/ Parallel Compacting</td>
+      <td>Old</td>
+      <td>Similar to Parallel Scavenge, but operates on the old generation. Uses multiple GC threads to speed up the work of Serial Old (MSC). STW collector, but higher throughput for old generation collections.</td>
+    </tr>
+    <tr>
+      <td>Concurrent Mark-Sweep (CMS)</td>
+      <td>Old</td>
+      <td>Breaks up its work into phases, and executes most of its phases concurrently with the application thread – resulting in low latency. However, it introduces substantial management overhead and results in a fragmented heap.</td>
+    </tr>
+  </tbody>
+</table>
 
-<p>1.堆（heap）即（New Generation 和Old Generaion 之和）的设置</p>
+<p><strong>垃圾收集器的选择</strong></p>
+
+<table class="datalist">
+  <thead>
+    <tr>
+      <th>JVM参数</th>
+      <th>年轻代</th>
+      <th>老年代</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>UseSerialGC</td>
+      <td>Serial</td>
+      <td>Serial Old (MSC)</td>
+    </tr>
+    <tr>
+      <td>UseParNewGC</td>
+      <td>ParNew</td>
+      <td>Serial Old (MSC)</td>
+    </tr>
+    <tr>
+      <td>UseConcMarkSweepGC</td>
+      <td>ParNew</td>
+      <td>CMS (mostly used)， Serial Old (used when concurrent mode failure occurs)</td>
+    </tr>
+    <tr>
+      <td>+UseParallelGC</td>
+      <td>Parallel Scavenge</td>
+      <td>Serial Old</td>
+    </tr>
+    <tr>
+      <td>UseParallelOldGC</td>
+      <td>Parallel Scavenge</td>
+      <td>Parallel Old</td>
+    </tr>
+    <tr>
+      <td>+UseConcMarkSweepGC/-UseParNewGC</td>
+      <td>Serial</td>
+      <td>CMS/Serial Old</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>4.JVM的默认设置</strong></p>
+
+<p>堆（heap）即（New Generation 和Old Generaion 之和）的设置</p>
 
 <ul>
   <li>
@@ -248,28 +327,27 @@ Old Generation = CMS
   </li>
 </ul>
 
-<p>2.非堆内存的设置</p>
+<p>非堆内存的设置</p>
 
 <p>默认分配为64M</p>
 
 <p><code>-XX:PermSize</code>设置最小分配空间，<code>-XX:MaxPermSize</code>设置最大分配空间。一般把这两个数值设为相同，以减少申请内存空间的时间。</p>
 
-<p><strong>六.GC调优</strong></p>
+<p><strong>5.GC调优</strong></p>
 
 <p>参考：<a href="http://java.sun.com/docs/hotspot/gc1.4.2/example.html" title="GC调优例子">GC调优例子</a></p>
 
-<ol>
-  <li>设置Xms=Xmx=3/4物理内存，-Xmn为1/4的-Xmx值</li>
-  <li>如果是CPU密集型服务器，使用–XX:+UseParallelOldGC, 否则–XX:+UseConcMarkSweepGC</li>
-  <li>新生代,Parallel/ParallelOld可设大于Xmx1/4，CMS可设小，小于Xmx1/4</li>
-  <li>经验之谈：通常情况下，JVM堆的大小应为物理内存的80%</li>
-</ol>
+<p>*设置Xms=Xmx=3/4物理内存(或50%-70%)，-Xmn为1/4的-Xmx值，新生代必须小于堆的一半大
+*如果是CPU密集型服务器，使用–XX:+UseParallelOldGC, 否则–XX:+UseConcMarkSweepGC
+*新生代,Parallel/ParallelOld可设大于Xmx1/4，CMS可设小，小于Xmx1/4
+*经验之谈：通常情况下，JVM堆的大小应为物理内存的80%
+*使用-verbose:gc和-XX:+PrintGCDetails观察GC性能</p>
 
-<p><strong>七.Dump heap</strong></p>
+<p><strong>6.Dump heap</strong></p>
 
-<p>1.Linux下：<code>jmap -dump:file=xxx.hprof pid</code>，其中<code>pid</code>通过<code>ps -aux</code>命令查看</p>
+<p>Linux下：<code>jmap -dump:file=xxx.hprof pid</code> (其中<code>pid</code>通过<code>ps -aux</code>命令查看)</p>
 
-<p>2.命令行:<code>jstat -gcutil pid p1 p2</code>，其中<code>p1</code>表示每多少毫秒打印一次；<code>p2</code>表示一共打印几次。</p>
+<p>命令行:<code>jstat -gcutil pid p1 p2</code> (其中<code>p1</code>表示每多少毫秒打印一次；<code>p2</code>表示一共打印几次)</p>
 
 <p>输出的参数含义：</p>
 
@@ -286,7 +364,7 @@ Old Generation = CMS
   <li>GCT：用于垃圾回收的总时间(单位秒)</li>
 </ul>
 
-<p>jstat 命令其他参数含义：</p>
+<p>jstat命令其他参数含义：</p>
 
 <ul>
   <li>jstat -class pid:显示加载class的数量，及所占空间等信息。 </li>
@@ -302,16 +380,16 @@ Old Generation = CMS
   <li>jstat -printcompilation pid:当前VM执行的信息。 </li>
 </ul>
 
-<p>3.GC Log  </p>
+<p>GC日志</p>
 
 <p>-Xloggc:d:\gc.log
 -XX:+PrintGC
 -XX:+PrintGCDetails
 -XX:+PrintGCTimeStamps – add time stamp </p>
 
-<p><strong>八.Out of Memory - java.lang.OutOfMemoryError</strong></p>
+<p><strong>7.内存泄漏-java.lang.OutOfMemoryError</strong></p>
 
-<p>1.Java heap space</p>
+<p>Java heap space</p>
 
 <ul>
   <li>Configuration issue: -Xmx</li>
@@ -327,9 +405,9 @@ Old Generation = CMS
   <li>Native Memory Allocation Issue </li>
 </ul>
 
-<p>2.Perm Memory Leak</p>
+<p>Perm Memory Leak</p>
 
-<p>(1)Too Many Interned String</p>
+<p>Too Many Interned String</p>
 
 <ul>
   <li>String.intern()</li>
@@ -338,14 +416,14 @@ Old Generation = CMS
   <li>If Perm Memory increased dynamically, be careful</li>
 </ul>
 
-<p>(2)Too Many Classes or Class Load Leak</p>
+<p>Too Many Classes or Class Load Leak</p>
 
 <ul>
   <li>Enlarge the perm generation</li>
   <li>Avoid duplicated class loader</li>
 </ul>
 
-<p>3.Out of Swap Space</p>
+<p>Out of Swap Space</p>
 
 <ul>
   <li>Enlarge the swap space</li>
@@ -413,6 +491,14 @@ Old Generation = CMS
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
       </li>
     
@@ -424,21 +510,12 @@ Old Generation = CMS
         <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
-<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+    <li class='category'><a href='/blog/categories/algorithms/'>algorithms (3)</a></li>
 <li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
 <li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
 <li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
@@ -448,7 +525,7 @@ Old Generation = CMS
 <li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
 <li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
 <li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
-<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (7)</a></li>
 <li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
 <li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
 
@@ -466,6 +543,22 @@ Old Generation = CMS
 Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
   Copyright &copy; 2012 - Foredoomed -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=8495631; 
+var sc_invisible=0; 
+var sc_security="5b0817e1"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost +
+"statcounter.com/counter/counter_xhtml.js'></"+"script>");</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="https://c.statcounter.com/8495631/0/5b0817e1/0/"
+alt="free hit counters" /></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
 
 </footer>
   

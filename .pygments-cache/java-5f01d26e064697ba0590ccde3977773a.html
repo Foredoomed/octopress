@@ -1,0 +1,18 @@
+<div class="highlight"><pre>  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">parseConfiguration</span><span class="o">(</span><span class="n">XNode</span> <span class="n">root</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">typeAliasesElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;typeAliases&quot;</span><span class="o">));</span>
+      <span class="n">pluginElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;plugins&quot;</span><span class="o">));</span>
+      <span class="n">objectFactoryElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;objectFactory&quot;</span><span class="o">));</span>
+      <span class="n">objectWrapperFactoryElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;objectWrapperFactory&quot;</span><span class="o">));</span>
+      <span class="n">propertiesElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;properties&quot;</span><span class="o">));</span>
+      <span class="n">settingsElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;settings&quot;</span><span class="o">));</span>
+      <span class="n">environmentsElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;environments&quot;</span><span class="o">));</span>
+      <span class="n">typeHandlerElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;typeHandlers&quot;</span><span class="o">));</span>
+      <span class="n">mapperElement</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">evalNode</span><span class="o">(</span><span class="s">&quot;mappers&quot;</span><span class="o">));</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nf">BuilderException</span><span class="o">(</span><span class="s">&quot;Error parsing SQL Mapper Configuration. Cause: &quot;</span> <span class="o">+</span> <span class="n">e</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+  
+  <span class="o">...</span>
+</pre></div>

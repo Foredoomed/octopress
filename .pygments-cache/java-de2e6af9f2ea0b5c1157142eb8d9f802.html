@@ -1,0 +1,28 @@
+<div class="highlight"><pre><span class="nd">@Controller</span><span class="o">()</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/users&quot;</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserController</span> <span class="o">{</span>
+
+  <span class="nd">@Autowired</span>
+  <span class="kd">private</span> <span class="n">MailManager</span> <span class="n">mailManager</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMailManager</span><span class="o">(</span><span class="n">MailManager</span>  <span class="n">mailManager</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">mailManager</span> <span class="o">=</span> <span class="n">mailManager</span><span class="o">;</span>
+  <span class="o">}</span>
+
+  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">)</span>
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">doingSignUp</span><span class="o">(</span><span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_email_address&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_email_address</span><span class="o">,</span> <span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_password&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_password</span><span class="o">,</span> <span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;user_name&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">user_name</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="c1">//用户注册代码省略</span>
+      <span class="k">new</span> <span class="nf">AbstractExecutionThreadService</span><span class="o">()</span> <span class="o">{</span>
+      <span class="nd">@Override</span>
+      <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+      <span class="n">mailManager</span><span class="o">.</span><span class="na">sendActivateMail</span><span class="o">(</span><span class="n">user</span><span class="o">);</span><span class="c1">//发送邮件</span>
+      <span class="o">}}.</span><span class="na">start</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+    <span class="o">}</span>
+      <span class="k">return</span> <span class="s">&quot;index&quot;</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>

@@ -1,0 +1,48 @@
+<div class="highlight"><pre>servive sendmail stop
+yum remove sendmail&lt;/p&gt;
+
+&lt;p&gt;service httpd stop
+yum remove httpd&lt;/p&gt;
+
+&lt;p&gt;service rsyslog stop
+yum remove rsyslog&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;epel&quot;</span>&gt;添加EPEL软件库&lt;/h1&gt;
+&lt;p&gt;rpm -Uvh http:#dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;syslog-ngrsyslog&quot;</span>&gt;安装syslog-ng代替rsyslog&lt;/h1&gt;
+&lt;p&gt;yum install syslog-ng
+chkconfig syslog-ng on&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;dropbearopenssh&quot;</span>&gt;安装dropbear代替openssh&lt;/h1&gt;
+&lt;p&gt;yum install dropbear
+chkconfig dropbear on&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;dropbear&quot;</span>&gt;等dropbear配置好后&lt;/h1&gt;
+&lt;p&gt;service sshd stop
+yum remove openssh&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;vsftpdftp&quot;</span>&gt;安装vsftpd作为ftp服务器&lt;/h1&gt;
+&lt;p&gt;yum install vsftpd
+chkconfig vsftpd on&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;section&quot;</span>&gt;添加用户&lt;/h1&gt;
+&lt;p&gt;groupadd www
+useradd -g www username
+passwd username&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;ftp&quot;</span>&gt;设定ftp登陆目录权限&lt;/h1&gt;
+&lt;p&gt;chown -R usernmae /path/to/ftp/folder&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;yum-utils&quot;</span>&gt;安装yum-utils&lt;/h1&gt;
+&lt;p&gt;yum install yum-utils&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;section-1&quot;</span>&gt;更新软件&lt;/h1&gt;
+&lt;p&gt;yum upgrade&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;ppp&quot;</span>&gt;安装ppp&lt;/h1&gt;
+&lt;p&gt;rpm -ivh http:#poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;pptpd&quot;</span>&gt;安装pptpd&lt;/h1&gt;
+&lt;p&gt;rpm -ivh http:#poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
+</pre></div>

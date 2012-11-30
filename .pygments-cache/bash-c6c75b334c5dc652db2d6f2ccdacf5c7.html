@@ -1,0 +1,6 @@
+<div class="highlight"><pre>groupadd www
+useradd -g www www
+mkdir -p /data/htdocs/blog  //blog目录是Wordpress的根目录
+chmod +w /data/htdocs/blog
+chown -R www:www /data/htdocs/blog
+</pre></div>

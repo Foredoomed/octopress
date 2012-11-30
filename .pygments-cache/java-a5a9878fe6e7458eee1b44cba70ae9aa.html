@@ -1,0 +1,29 @@
+<div class="highlight"><pre><span class="k">finally</span> <span class="o">{</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">in</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="n">in</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// There is nothing we can do if close fails</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">out</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="n">out</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// There is nothing we can do if close fails</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">//从5.0版本开始,你可以利用Closeable接口对代码进行重构:</span>
+<span class="k">finally</span> <span class="o">{</span>
+  <span class="n">closeIgnoringException</span><span class="o">(</span><span class="n">in</span><span class="o">);</span>
+  <span class="n">closeIgnoringEcception</span><span class="o">(</span><span class="n">out</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">closeIgnoringException</span><span class="o">(</span><span class="n">Closeable</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+    <span class="n">c</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// There is nothing we can do if close fails</span>
+<span class="o">}</span>
+</pre></div>

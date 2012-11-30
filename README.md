@@ -1,4 +1,0 @@
-octopress
-=========
-
-my blog

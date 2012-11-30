@@ -4,7 +4,7 @@
   <title><![CDATA[Zhixingheyi]]></title>
   <link href="http://liuxuan.info/atom.xml" rel="self"/>
   <link href="http://liuxuan.info/"/>
-  <updated>2012-09-22T18:41:50+08:00</updated>
+  <updated>2012-11-28T21:10:24+08:00</updated>
   <id>http://liuxuan.info/</id>
   <author>
     <name><![CDATA[Foredoomed]]></name>
@@ -12,6 +12,221 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Hashing神话]]></title>
+    <link href="http://liuxuan.info/blog/2012/10/21/hashing-myths/"/>
+    <updated>2012-10-21T20:33:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/10/21/hashing-myths</id>
+    <content type="html"><![CDATA[<p>最近许多网站的用户名和秘密都被泄露，这也引发了一场对密码的存储问题的大讨论。其中的核心就是hashing，所以就让我们来看看关于hashing的几个常见的误解吧。这篇博文是一篇英文帖子的翻译，原文请戳<a href="http://webdevrefinery.com/forums/topic/4850-hashing-myths/page_hl_hashing" title="Hashing Myths">Hashing Myths</a>。</p>
+
+<p><strong>神话#1：Hashing后的结果是独一无二的</strong></p>
+
+<p><strong>大错特错</strong>。让我们用简单的逻辑来解释。比如有一个32位长的hash，如果再对33位长的字符串hash的话，就有可能产生相同的hash(又叫“碰撞”)。道理很简单，33位长字符串的排列组合比32位长的字符串要多得多，因为可以在32位长字符串的尾部加上一个任意字符就是33位长的字符串。所以打个比方来说，如果有90000个33位长字符串和20000个32位长字符串，前者其中的某些字符串一定跟后者中的一些字符串的hash值相同。Hashing算法的目的是尽量减少碰撞，<strong>但是不可能完全消除碰撞</strong>。</p>
+
+<!-- more -->
+
+<p><strong>神话#2：MD5是不安全的</strong></p>
+
+<p><strong>大错特错</strong>。MD5是比SHA-256来说没那么负责(因此速度更快)的算法，但是这个算法是安全的。一个不安全的hash代表这个hash可以被逆向破解，或者可以仅凭hash值就可以用一个字符串产生相同的hash，而在MD5下不行。事实上最接近的是修改一个存在的大文件，但是并不改变它已有的hash值。人类历史上还没有一个人能够逆向破解MD5。产生这个误解是因为MD5是一个常见的秘密破解攻击对象，这就又产生了下一个误解。</p>
+
+<p><strong>神话#3：MD5没有其他hash算法(像SHA)安全</strong></p>
+
+<p><strong>大错特错</strong>。如果你有秘密的hash值的话，那么确定就有三种攻击手段来找出密码原文。<br />
+1. 查hash数据库。你可以到在线的hash数据库里查有没有你的hash。对于这种攻击的常见防范手段就是对秘密hash时加<a href="http://en.wikipedia.org/wiki/Salt_(cryptography)" title="salt">salt</a>。<br />
+2. Brute force算法。对字典中的所有单词hash，比较是否符合。如果没用的话就对5，6，7，8位长所有可能的字符串hash。这种攻击需要消耗大量时间，而且经常得不到想要的结果，而且很容易的用salt来防范。<br />
+3. Rainbow tables。这是hashing和rehashing方法，它可以找到不同单词的hash值的相似之处，并最终找到秘密原文。salt在这种攻击下作用不大。  </p>
+
+<p><strong>神话#4：复杂超常的hash值(像SHA-256)不容易被攻击</strong></p>
+
+<p><strong>大错特错</strong>。Hash破解的最大威胁是Rainbow table，它是时间和空间的折衷，经常在1分钟之内就能破解密码。但是Rainbow table并不神奇，大多数人更容易去相信，而不是理解它的原理。如果你有15分钟的话可以看下<a href="http://en.wikipedia.org/wiki/Rainbow_table" title="rainbow table">介绍</a>。</p>
+
+<p>如果你已经知道Rainbow table的原理的话，你就会知道它最大的弱点就是hash碰撞。所以安全密码的hash是一个折折衷：你希望的是一个算法产生的碰撞越少越好，这样两个秘密就不会产生相同的hash；但你又希望这个算法能产生足够的碰撞，这样的话rainbow table就会陷入死循环，密码被破解的可能性也就降低了。就这两点说，SHA-256是可怕的。因为它几乎不产生碰撞，不管有没有salt，所以更容易被攻击。SHA-256适用与hash大文件而不是密码。</p>
+
+<p><strong>神话#5：SHA-1仍然比MD5更好，因为MD5更容易被破解</strong></p>
+
+<p><strong>大错特错</strong>。再一次你搞错了。SHA-1有160位，碰撞比MD5少，而且hash数据库和rainbow table对与SHA-1和MD5是一样的。这个误解在程序员中被广泛传播的原因是他们没有花时间去研究事实的真相。事实上，SHA产生的较长的hash对hash数据库和rainbow table的攻击几乎无用。与MD5相比，SHA-1只是多了一些存储空间，因为SHA-1有160位，而MD5才128位长。长度的增加可以减少碰撞的产生，相对大文件来说这对于密码的hash根本没用。</p>
+
+<p><strong>神话#6：用多个算法hash就更安全</strong></p>
+
+<p><strong>大错特错</strong>。我看到过这样的hash：<code>sha1(md5("Password"))</code>，这样的计算方式是非常荒谬的。你在把128位转换成160位，这会非常容易被破解。你不能多次hash。你为了防止被破解会在hash时多加一个处理步骤，但是最终结果还是一样的。不要猜什么更安全，要去理解什么更安全。</p>
+
+<p><strong>神话#7：全局salt和用户salt的组合比单个用户salt更安全</strong></p>
+
+<p>最近在一篇文章里有人支持用全局salt加上用户salt的方法，但是我认为这是没用的。我的观点遭到了强烈的反对，他们说黑客窃取数据库而不是源代码更安全。我同意，但是这种方式提供的安全性可以忽略不计。下面就是原因：</p>
+
+<p>上面的三个hash攻击中，只有brute force法是用了全局salt比不用更难破解，但同时这个方法也是最难成功的方法。全局salt只是把几乎不可能变成非常不可能。我承认有点作用，但是黑客们的常用攻击手段是rainbow table而不是brute force，不然他们会发疯的。在rainbow table的攻击下，全局salt不比用户salt安全多少。如果有人可以窃取到你的数据库的拷贝，他们也可以轻易地窃取你源代码的拷贝。</p>
+
+<p>如果你在寻找保护你数据库被窃取的方法的话，一个非常非常非常有效的方法就是对称加密hash。选择一个速度快，简单的对称加密算法(RC4,Blowfish等)，创建ke并保存在配置文件中，用它加密数据库中所有加过salt的密码hash。当从数据库中读取他们时，只要用key解密出来就可以了。现在即使有人入侵了数据库或服务器，就连rainbow table的攻击也对你的hash无效，这对在公共软件仍然有效，而且比全局salt要有效的多的多。</p>
+
+<p><strong>那么密码hashing的最佳实践是什么呢？</strong></p>
+
+<p>对于密码来说只有两个hash算法是比较好的选择：MD5和SHA-1，而你应该让你的编程语言来决定选择哪个算法。对于PHP和大多数语言来说，MD5比SHA-1快，所以MD5是比较好的选择。保证密码安全的关键是用一个合适长度的salt。安全的保存密码，避免字典和brute force的攻击是相对rainbow table来说比较安全的折衷点是用生成一个2倍于原本hash长度的hash。比如MD5的话，可以hash两个MD5生成的hash。你可以为它生成一个128位的salt(对许多用户来说会占用非常多的存储空间)，或者你可以hash一个字符串来生成salt。我最喜欢的方法是：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$finalHash = md5(md5($salt) . md5($password))</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>这个方法的有点是：用两个MD5生成一个新的hash，它非常容易移植，因为任何一个语言(包括SQL)都支持上面的方法，3次MD5仍然是一个相对速度快的处理过程，而且如果是web的话，在密码发送到服务器之前，你可以用javascript来hash密码，而且仍然可以用它来生成最终的hash。</p>
+
+<p>是否在最终hash上做对称加密完全取决于你。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[字符串搜索算法]]></title>
+    <link href="http://liuxuan.info/blog/2012/10/20/string-searching-algorithms/"/>
+    <updated>2012-10-20T22:30:00+08:00</updated>
+    <id>http://liuxuan.info/blog/2012/10/20/string-searching-algorithms</id>
+    <content type="html"><![CDATA[<p>字符串搜索算法</p>
+
+<p><strong>0.Brute-force search (BFS)</strong></p>
+
+<p>BFS应该是字符串搜索算法中最简单的一个，维基百科上的描述是：</p>
+
+<blockquote>
+  <p>a trivial but very general problem-solving technique that consists of systematically enumerating all possible candidates for the solution and checking whether each candidate satisfies the problem’s statement.</p>
+</blockquote>
+
+<p>所以BFS算法就是用模式串去和搜索串逐一比较，直到找到模式串为止。</p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/bruteforcesearch_zps3f5d214f.png" title="BFS BFS" /></p>
+
+<p>BFS的特征有：</p>
+
+<ul>
+  <li>模式串不做预处理</li>
+  <li>从左边开始一个字符一个字符的匹配</li>
+  <li>最差情况下需要比较<code>mn</code>次</li>
+  <li>返回的是第一次匹配的字符串</li>
+</ul>
+
+<p>BSF的优点和缺点都很明显：优点就是简单；缺点速度慢，不稳定。</p>
+
+<!-- more -->
+
+<p><strong>1.Knuth-Morris-Pratt (KMP)</strong></p>
+
+<p>维基百科上的描述是：</p>
+
+<blockquote>
+  <p>searches for occurrences of a “word” W within a main “text string” S by employing the observation that when a mismatch occurs, the word itself embodies sufficient information to determine where the next match could begin, thus bypassing re-examination of previously matched characters.</p>
+</blockquote>
+
+<p>BFS算法最大的问题就是当匹配失败时，需要把模式串右移一位重新开始匹配。但是很有可能匹配失败，然后再右移一位匹配。这当中重复了很多不必要的匹配过程，这也是造成BFS算法效率差的原因(当搜索串不是很大时，BFS应该比其他算法更有优势)。</p>
+
+<p>KMP解决了不必要匹配过多的问题，大大提高了算法的效率。显然，匹配的核心问题就是当匹配失败出现时，模式串右移多少位再开始重新匹配。KMP算法是通过对模式串的预处理，建立一张前缀表来实现。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">i    0  1  2  3  4  5  6
+</span><span class="line">W[i] A  B  C  D  A  B  D   
+</span><span class="line">T[i] -1 0  0  0  0  1  2  </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>建立这张表的算法是：从左往右遍历模式串，观察前<code>i-1</code>长子串中，最长前缀子串和后缀子串匹配的长度。如上图所示，匹配串<code>W[i]=ABCDABD</code>的第一个字符是<code>a</code>，约定<code>T[0]=-1</code>；<code>W[1]</code>之前的字串是<code>A</code>，因为只有一个字符，它没有前缀子串和后缀子串，所以<code>T[1]=0</code>；同理<code>T[2]=0</code>，<code>T[3]=0</code>，<code>T[4]=0</code>；当<code>W[5]=ABCDA</code>时，有前缀和后缀字串<code>A</code>，所以<code>T[5]=1</code>；同理<code>T[6]=2</code>。</p>
+
+<p>我们来看下面的例子：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9
+</span><span class="line">a	b	c	a	b	c	a	b	d		
+</span><span class="line">a	b	c	a	b	d					
+</span><span class="line">        a	b	c	a	b	d</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>当<code>i=5</code>时匹配失败，又<code>T[5]=2</code>，所以模式串往右移<code>i-T[5]=5-2=3</code>位继续匹配。</p>
+
+<p>KMP算法的特点有：</p>
+
+<ul>
+  <li>从左往右匹配</li>
+  <li>预处理模式串，时间负责度<code>Θ(m)</code></li>
+  <li>搜索时间负责度<code>Θ(m+n)</code></li>
+  <li>最多比较<code>2n-1</code>次</li>
+</ul>
+
+<p>KMP算法的优点有：简单，速度快，对处理大文件有优势；缺点是随着字符种类增加，匹配失败的几率也随之增加。</p>
+
+<p><strong>2.Boyer-Moore (BM)</strong></p>
+
+<p>维基百科上的描述是：</p>
+
+<blockquote>
+  <p>is an efficient string searching algorithm that is the standard benchmark for practical string search literature. It was developed by Robert S. Boyer and J Strother Moore in 1977. The algorithm preprocesses the string being searched for (the pattern), but not the string being searched in (the text). It is thus well-suited for applications in which the text does not persist across multiple searches. The Boyer-Moore algorithm uses information gathered during the preprocess step to skip sections of the text, resulting in a lower constant factor than many other string algorithms. In general, the algorithm runs faster as the pattern length increases.</p>
+</blockquote>
+
+<p>简单来说，BM算法是从模式串的右边开始往左边匹配搜索串，如果搜索串中的字符与模式串最右的字符不匹配，并且模式串里不包含这个字符的话，那么模式串可以右移m(模式串的长度)位。</p>
+
+<p>例子：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9	
+</span><span class="line">a	b	b	a	d	a	b	a	c	b	a
+</span><span class="line">b	a	b	a	c						
+</span><span class="line">                b	a	b	a	c</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>2.1 Bad character 搜索法</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9  
+</span><span class="line">a	b	b	a	b	a	b	a	c	b	a
+</span><span class="line">b	a	b	a	c						
+</span><span class="line">        b	a	b	a	c  </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>首先匹配<code>i=4</code>位置上的<code>b</code>和<code>c</code>，显然不相等，然后我们发觉<code>b</code>在模式串中出现在了<code>0</code>和<code>2</code>的位置上，所以我们可以把搜索串<code>i=4</code>位置上的<code>b</code>和模式串<code>i=2</code>位置上的<code>b</code>对齐。</p>
+
+<p><strong>2.2 Good suffix 搜索法</strong>	</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9   
+</span><span class="line">a	b	a	a	b	a	b	a	c	b	a  
+</span><span class="line">c	a	b	a	b						
+</span><span class="line">        c	a	b	a	b  </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>从右开始匹配到<code>i=2</code>时匹配失败，这时后缀<code>ab</code>匹配成功，我们可以把模式串中的下一个<code>ab</code>(如果有的话)与搜索串的<code>ab</code>对齐。但是如果碰到下面这种情况：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9  
+</span><span class="line">a	a	b	a	b	a	b	a	c	b	a
+</span><span class="line">a	b	b	a	b						
+</span><span class="line">        a	b	b	a	b		</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>我们可以看到后缀<code>bab</code>匹配成功，但是模式串中没有第二个<code>bab</code>，所以我们可以在模式串中寻找<code>bab</code>的字串，就像上面的<code>ab</code>，然后把它与搜索串对齐。</p>
+
+<p>BM算法的特点：</p>
+
+<ul>
+  <li>从右往左匹配</li>
+  <li>预处理模式串，时间负责度<code>Θ(m+σ)</code></li>
+  <li>搜索时间负责度<code>Θ(m*n)</code></li>
+  <li>最多比较<code>3n</code>次</li>
+</ul>
+
+<p>BM算法是字符串搜索算法里效率最高的算法，但是缺点是比较复杂(需要考虑的情况很多)，对<code>good suffix</code>的预处理比较难理解和实现。</p>
+
+<p>参考资料</p>
+
+<p>[1] <a href="http://en.wikipedia.org/wiki/Brute-force_search" title="Wikipedia，Brute-force searching algorithm">Wikipedia-Brute-force searching algorithm</a><br />
+[2] <a href="http://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm" title="Wikipedia，Knuth–Morris–Pratt algorithm">Wikipedia-Knuth–Morris–Pratt algorithm</a><br />
+[3] <a href="http://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string_search_algorithm" title="Wikipedia，Boyer–Moore string search algorithm">Wikipedia-Boyer–Moore string search algorithm</a><br />
+[4] <a href="http://www.inf.fh-flensburg.de/lang/algorithmen/pattern/" title="algorithms">algorithms</a></p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Skip List原理简述]]></title>
@@ -525,6 +740,9 @@
 <span class="line-number">42</span>
 <span class="line-number">43</span>
 <span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
 </pre></td><td class="code"><pre><code class="bash"><span class="line">servive sendmail stop
 </span><span class="line">yum remove sendmail
 </span><span class="line">
@@ -534,41 +752,44 @@
 </span><span class="line">service rsyslog stop
 </span><span class="line">yum remove rsyslog
 </span><span class="line">
-</span><span class="line">// 添加EPEL软件库
-</span><span class="line">rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
+</span><span class="line"><span class="c"># 添加EPEL软件库</span>
+</span><span class="line">rpm -Uvh http:#dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
 </span><span class="line">
-</span><span class="line">// 安装syslog-ng代替rsyslog
+</span><span class="line"><span class="c"># 安装syslog-ng代替rsyslog</span>
 </span><span class="line">yum install syslog-ng
 </span><span class="line">chkconfig syslog-ng on
 </span><span class="line">
-</span><span class="line">// 安装dropbear代替openssh
+</span><span class="line"><span class="c"># 安装dropbear代替openssh</span>
 </span><span class="line">yum install dropbear
 </span><span class="line">chkconfig dropbear on
-</span><span class="line">// 等dropbear配置好后
+</span><span class="line">
+</span><span class="line"><span class="c"># 等dropbear配置好后</span>
 </span><span class="line">service sshd stop
 </span><span class="line">yum remove openssh
 </span><span class="line">
-</span><span class="line">// 安装vsftpd作为ftp服务器
+</span><span class="line"><span class="c"># 安装vsftpd作为ftp服务器</span>
 </span><span class="line">yum install vsftpd
 </span><span class="line">chkconfig vsftpd on
 </span><span class="line">
-</span><span class="line">// 添加用户
+</span><span class="line"><span class="c"># 添加用户</span>
 </span><span class="line">groupadd www
 </span><span class="line">useradd -g www username
 </span><span class="line">passwd username
 </span><span class="line">
-</span><span class="line">// 设定ftp登陆目录权限
+</span><span class="line"><span class="c"># 设定ftp登陆目录权限</span>
 </span><span class="line">chown -R usernmae /path/to/ftp/folder
 </span><span class="line">
-</span><span class="line">// 更新软件
-</span><span class="line">yum update
+</span><span class="line"><span class="c"># 安装yum-utils</span>
+</span><span class="line">yum install yum-utils
+</span><span class="line">
+</span><span class="line"><span class="c"># 更新软件</span>
 </span><span class="line">yum upgrade
 </span><span class="line">
-</span><span class="line">// 安装ppp
-</span><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm
+</span><span class="line"><span class="c"># 安装ppp</span>
+</span><span class="line">rpm -ivh http:#poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm
 </span><span class="line">
-</span><span class="line">// 安装pptpd
-</span><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
+</span><span class="line"><span class="c"># 安装pptpd</span>
+</span><span class="line">rpm -ivh http:#poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <!-- more -->
@@ -608,34 +829,34 @@
 <span class="line-number">31</span>
 <span class="line-number">32</span>
 <span class="line-number">33</span>
-</pre></td><td class="code"><pre><code class="bash"><span class="line">// 安装git
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="c"># 安装git</span>
 </span><span class="line">yum install git
 </span><span class="line">
-</span><span class="line">// 安装RVM
+</span><span class="line"><span class="c"># 安装RVM</span>
 </span><span class="line">curl -L get.rvm.io | bash -s stable
 </span><span class="line">
-</span><span class="line">// 安装ruby的依赖包
+</span><span class="line"><span class="c"># 安装ruby的依赖包</span>
 </span><span class="line">yum install -y gcc-c++ patch readline readline-devel zlib zlib-devel libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison
 </span><span class="line">
-</span><span class="line">// 添加nginx软件库
-</span><span class="line">rpm -Uvh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+</span><span class="line"><span class="c"># 添加nginx软件库</span>
+</span><span class="line">rpm -Uvh http:#nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 </span><span class="line">
-</span><span class="line">// 安装nginx
+</span><span class="line"><span class="c"># 安装nginx</span>
 </span><span class="line">yum install nginx
 </span><span class="line">
-</span><span class="line">// 安装ruby
+</span><span class="line"><span class="c"># 安装ruby</span>
 </span><span class="line">rvm install 1.9.2
 </span><span class="line">
-</span><span class="line">// 安装Octopress的依赖包
+</span><span class="line"><span class="c"># 安装Octopress的依赖包</span>
 </span><span class="line">yum install python-devel
 </span><span class="line">
-</span><span class="line">// 安装Octopress
+</span><span class="line"><span class="c"># 安装Octopress</span>
 </span><span class="line">mkdir /data
 </span><span class="line"><span class="nb">cd</span> /data
-</span><span class="line">git clone git://github.com/imathis/octopress.git octopress
+</span><span class="line">git clone git:#github.com/imathis/octopress.git octopress
 </span><span class="line">
 </span><span class="line">gem install bundler
-</span><span class="line">rbenv rehash //If you use rbenv, rehash to be able to run the bundle <span class="nb">command</span>
+</span><span class="line">rbenv rehash <span class="c">#If you use rbenv, rehash to be able to run the bundle command</span>
 </span><span class="line">bundle install
 </span><span class="line">rake install
 </span><span class="line">
@@ -668,29 +889,31 @@
 <span class="line-number">21</span>
 <span class="line-number">22</span>
 <span class="line-number">23</span>
-</pre></td><td class="code"><pre><code class="bash"><span class="line">// 配置vim
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="c"># 配置vim</span>
 </span><span class="line">vim /etc/vimrc
-</span><span class="line">// 加入下面几行
+</span><span class="line">
+</span><span class="line"><span class="c"># 加入下面几行</span>
 </span><span class="line">syntax on
 </span><span class="line"><span class="nb">set </span>nu
 </span><span class="line"><span class="nb">set </span><span class="nv">mouse</span><span class="o">=</span>a
 </span><span class="line"><span class="nb">set </span><span class="nv">tabstop</span><span class="o">=</span>4
 </span><span class="line">
-</span><span class="line">// 禁用IPv6
+</span><span class="line"><span class="c"># 禁用IPv6</span>
 </span><span class="line">vim /etc/sysconfig/network
 </span><span class="line"><span class="nv">NETWORKING_IPV6</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
 </span><span class="line">
-</span><span class="line">// 设置文件最大打开数
+</span><span class="line"><span class="c"># 设置文件最大打开数</span>
 </span><span class="line">vim /etc/security/limits.conf
-</span><span class="line">// 加入下面两行
+</span><span class="line"><span class="c"># 加入下面两行</span>
 </span><span class="line">* soft nofile 65535
 </span><span class="line">* hard nofile 65535
 </span><span class="line">
-</span><span class="line">// 把服务器时间改为上海时间
+</span><span class="line"><span class="c"># 把服务器时间改为上海时间</span>
 </span><span class="line">cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 </span><span class="line">
-</span><span class="line">// 关闭不需要的服务
-</span><span class="line">ntsysv  //按空格选择和取消，按F12退出
+</span><span class="line"><span class="c"># 关闭不需要的服务</span>
+</span><span class="line">ntsysv  <span class="c">#按空格选择和取消，按F12退出</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p><strong>4.其他设置</strong></p>
@@ -2452,133 +2675,6 @@ Webkit的RenderObject类是renderer的基本类，它的定义如下：</p>
 <p>在Gecko里，把已经经过视觉格式化过的元素树称为框架树(frame tree)。每个元素是一个框架。Webkit则用了另外一个术语：由渲染对象(render object)组成的渲染树(render tree)。</p>
 
 <p>Webkit把元素的放置称为布局(layout)，而Gecko则称之为回流(reflow)。附件(attachment)是Webkit用来表示连接DOM节点和视觉信息来创建渲染树的过程。一个细小的，非语意上的区别是，Gecko在HTML和DOM之间又另外多出来一层。它被称为内容下沉层(content sink)，并且它是制造DOM元素的工厂。下面将会说明整个流程的各个部分。</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[浏览器是如何工作的(一)]]></title>
-    <link href="http://liuxuan.info/blog/2011/12/05/how-browsers-work-one/"/>
-    <updated>2011-12-05T23:03:00+08:00</updated>
-    <id>http://liuxuan.info/blog/2011/12/05/how-browsers-work-one</id>
-    <content type="html"><![CDATA[<p>浏览器可能是目前使用的人最多的软件，对于软件开发人员来说更是如此。我对浏览器的认识差不多是这样的：</p>
-
-<ul>
-  <li>发送请求到服务器(get/post)</li>
-  <li>解析从服务器返回的response(HTML,CSS)</li>
-  <li>执行JavaScript代码</li>
-</ul>
-
-<p>基本上就是上面这些，但是至于细节就不了解了。直到我看到了这篇长长的文章：<a href="http://www.html5rocks.com/en/tutorials/internals/howbrowserswork/" title="How Browsers Work:Behind the Scenes of Modern Web Browsers">How Browsers Work:Behind the Scenes of Modern Web Browsers</a>,才第一次窥探到了浏览器的处理细节。这个主题一共分成了10章来讲，对于学习和参考浏览器的工作原理都非常有用。所以，我就决定把它翻译成中文，供以后参考用。值得一提的是，这篇文章的作者是一个有着10年以上经验的女程序员，让我们像她致敬！</p>
-
-<p>由于原文较长，所以我也会分成几篇博客来翻，而这篇博客是这个系列的第一篇翻译。</p>
-
-<!-- more -->
-
-<p>=================正文开始====================</p>
-
-<p>1 引子</p>
-
-<p>浏览器可能是目前使用最广的软件。在这个系列的文章中，我将解释浏览器是如何工作的。我们将会看到在浏览器的地址栏中敲入google.com到你看到google的页面这段时间内到底发生了什么。</p>
-
-<p>1.1 我们将会讨论的浏览器</p>
-
-<p>现在有5个主流的浏览器，他们是：IE,Firefox,Safari, Chrome和Opera。我会从开源浏览器Firefox,Chrome以及部分开源的Safari中举例。根据<a href="http://gs.statcounter.com/" title="StatCounter browser statistics">StatCounter browser statistics</a>上的统计，到2011年8月为止，Firefox,Chrome和Safari三者加起来的占有率已经到达将近60%。所以开源浏览器是浏览器领域的重要组成部分。</p>
-
-<p>1.2 浏览器的主要功能</p>
-
-<p>浏览器的主要功能是展现用户选择的网络资源，这是通过发送请求给服务器并且在浏览器中显示返回结果。而这个网络资源一般是一个HTML文档，但也有可能是PDF，图片或者其他类型的资源。资源的地址是通过URI来描述的。</p>
-
-<p>浏览器解释和显示HTML文件的方式是在HTML和CSS规范里面规定的。这些规范是由<a href="http://www.w3.org/" title="W3C">W3C</a>维护的。</p>
-
-<p>多年以来，那些浏览器只遵守了一部分的规范，并且开发他们自己的扩展。但是这就给开发人员带来了严重的兼容性问题。目前大多数浏览器或多或少遵守着规范。</p>
-
-<p>浏览器的用户接口基本上差不多，他们有：</p>
-
-<ul>
-  <li>地址栏</li>
-  <li>后退和前进按钮</li>
-  <li>书签选项</li>
-  <li>刷新和停止按钮</li>
-  <li>主页按钮</li>
-</ul>
-
-<p>奇怪的是，浏览器的用户接口并有在任何正式的规范里规定过，而是来自于多年经验形成的最佳实践，还有浏览器之间的相互模仿。HTML5规范并没有规定浏览器必须具有的UI元素，但是它列出了一些共有的元素。在他们之中有地址栏，状态栏和工具栏。当然，浏览器也可以有自己独特的特性，比如Firefox的Download Manager。</p>
-
-<p>1.3 浏览器的结构概览</p>
-
-<ol>
-  <li>用户接口 - 前面已经提到过</li>
-  <li>浏览器引擎 - 处理UI和渲染引擎之间的行为</li>
-  <li>渲染引擎 - 负责显示请求的内容。比如解析HTML和CSS后显示出来。</li>
-  <li>网络 - 用来网络调用，比如HTTP请求。它是不依赖于平台并且实现隐藏于平台之下。</li>
-  <li>UI后端 - 用来画基本的组合框和窗口。它暴露一个不依赖平台的通用接口，在它之下使用的是操作系统的用户接口方法。</li>
-  <li>JavaScript解释器 - 解析和执行JavaScript代码</li>
-  <li>数据存储 - 这是一个持久层，浏览器需要保存所有类型的数据到硬盘上，比如cookie。而HTML5规定了浏览器的数据库web database。</li>
-</ol>
-
-<p><img src="http://farm8.staticflickr.com/7172/6459942245_401c8ce2ac.jpg&quot; width=&quot;500&quot; height=&quot;339&quot;" alt="layers" /></p>
-
-<p>需要注意的是，Chrome跟大多数浏览器不一样的是，它会有多个渲染引擎的实例，每个标签页都有一个渲染引擎，每个标签页是个独立的进程。</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[JIT到底做了些什么事]]></title>
-    <link href="http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot/"/>
-    <updated>2011-12-03T15:15:00+08:00</updated>
-    <id>http://liuxuan.info/blog/2011/12/03/what-does-jit-do-in-hotspot</id>
-    <content type="html"><![CDATA[<p>最近在网上看到一篇关JIT(Just in Time)的文章<a href="http://java.dzone.com/articles/just-time-compiler-jit-hotspot?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+javalobby%2Ffrontpage+%28Javalobby+%2F+Java+Zone%29&amp;utm_content=Google+Reader" title="Just in Time Compiler (JIT) in Hotspot">Just in Time Compiler (JIT) in Hotspot</a>,这篇文章很短，但是对JIT的作用基本上说的比较清楚的，可以作为JIT的学习参考，所以我就决定把这篇文章翻译成中文，供以后复习参考用。</p>
-
-<!--more-->
-
-<p>================正文开始==================</p>
-
-<p>什么是JIT编译器</p>
-
-<p>JIT和更普便的自适应优化概念是在包括Java在内的许多编程语言，例如.Net, Lua, JRuby中所为人熟知的概念。</p>
-
-<p>为了解释什么是JIT编译器，我想从编译器的定义开始。根据维基百科上对于编译器的定义：
-&gt; 一个计算机程序是把源程序语言转换成目标语言。</p>
-
-<p>我们对静态Java编译器(javac)都很熟悉，它的作用是将人类能够阅读的.java文件编译成为能够被JVM解释的.class文件。现在问题来了，那么JIT用来编译什么东西呢？答案将在解释完什么是Just in Time后给出。</p>
-
-<p>根据许多研究得出的结果，20%的代码的执行时间要占到全部时间的80%。如果这时候有一种方法决定那些20%的代码并且优化他们，那将是令人兴奋的事。这就是JIT做的事：在运行时收集统计数据，找出那些经常执行的代码，把他们从字节码转换成操作系统能够直接执行的本地代码，并且重度优化他们。最小的编译单元是单个方法。编译和统计数据收集是靠特殊线程并行处理的。在统计数据收集期间，编译器会推测代码功能，并且通过时间的推移来验证这个推测。如果这个推测是错误的话，优化过的代码会被还原并且重新编译。</p>
-
-<p>Hotspot JVM这个名字的由来就是因为这个JVM的作用就是找到代码中的“hot spot(热点)”。</p>
-
-<p>JIT会做哪些优化？</p>
-
-<ul>
-  <li>内敛方法 - 方法不是直接在对象的实例上调用，而是拷贝到调用代码里去。为了防止产生任何开销，热门方法应该尽可能靠近调用着</li>
-  <li>如果监视器从别的线程是不可到达的，那就消除锁</li>
-  <li>用直接的方法调用代替接口以消除调用虚函数的开销</li>
-  <li>合并临近的在同一对象上的锁</li>
-  <li>消除不会被执行的代码(dead code)</li>
-  <li>对非volatile变量，忽略内存写</li>
-  <li>删除预先检查的NullPointerException和IndexOutOfBoundsException</li>
-  <li>等等</li>
-</ul>
-
-<p>当JVM调用一个Java方法，它会使用在已经加载类的方法块中的定义的调用方法。虚拟机有好几个调用方法，比如，如果方法是同步的，或者是本地方法的话，不同的调用者会被使用。JIT编译器使用的是它自己的调用者。虚拟机会检查ACC_MACHINE_COMPILED这个值，来通知解释器这个值对应的方法已经编译并且保持在已加载的类中。JIT编译器把方法块编译成本地代码，并且把它保存在那个方法的代码块中。一旦ACC_MACHINE_COMPILED位被设置，那么这个代码就被编译完成了。那我们怎么知道JIT在我们的程序中正在做什么，怎么样才能控制它？</p>
-
-<p>首先就是取消JIT的功能：Djava.compiler=NONE</p>
-
-<p>Hotspot中有2种JI编译器，一种是为客户端程序使用，另一种是服务器端程序。运行在服务器上的程序通常来说需要更多的资源，并且程序的吞吐量是非常重要的。因此，服务器版的JIT会消耗更多的资源，并且为了统计数据的准确，要花更多的时间来收集统计数据。而客户端版的JIT为一个方法收集统计数据会持续1500次方法调用，服务器版JIT则是15000次。这些默认值可以通过JVM参数:-XX:CompileThreshold=XXX来修改。</p>
-
-<p>JIT的不足</p>
-
-<p>JIT增加了Java程序的不可预测性和复杂性。它增加了一层程序员不是正真理解的另外一层。</p>
-
-<p>一个可能bug的例子：并发中的”happens before relations”。JIT会简单的记录在单线程中代码的改变是否安全。解决这个问题的方法是加上<strong>synchronized</strong>或着显式的加锁。</p>
-
-<p>JIT的优势</p>
-
-<ul>
-  <li>对于GC来说，程序必须到达安全点。为了这个目的，JIT通过在本地代码的相同间隔内注入<strong>yieldpoints</strong>。</li>
-  <li>除了扫描堆栈来找出根引用，寄存器也必须被扫描，因为他们可能会持有JIT创建的对象。</li>
-</ul>
 
 ]]></content>
   </entry>

@@ -1,0 +1,29 @@
+<div class="highlight"><pre>tar zxvf memcache-3.0.6.tgz
+<span class="nb">cd </span>memcache-3.0.6
+/usr/local/webserver/php/bin/phpize
+./configure –with-php-config<span class="o">=</span>/usr/local/webserver/php/bin/php-config
+make &amp;amp;&amp;amp; make install&lt;/p&gt;
+
+&lt;p&gt;tar jxvf APC-3.1.9.tgz
+<span class="nb">cd </span>APC-3.1.9
+/usr/local/webserver/php/bin/phpize
+./configure –with-php-config<span class="o">=</span>/usr/local/webserver/php/bin/php-config –prefix<span class="o">=</span>/usr/local/webserver/ –enable-apc –enable-apc-mmap –enable-apc-spinlocks
+make &amp;amp;&amp;amp; make install&lt;/p&gt;
+
+&lt;p&gt;tar zxvf PDO_MYSQL-1.0.2.tgz
+<span class="nb">cd </span>PDO_MYSQL-1.0.2
+/usr/local/webserver/php/bin/phpize
+./configure –with-php-config<span class="o">=</span>/usr/local/webserver/php/bin/php-config –with-pdo-mysql<span class="o">=</span>/usr/local/webserver/mysql
+make &amp;amp;&amp;amp; make install&lt;/p&gt;
+
+&lt;p&gt;tar zxvf ImageMagick.tar.gz
+<span class="nb">cd </span>ImageMagick-6.7.1-7
+./configure
+make &amp;amp;&amp;amp; make install&lt;/p&gt;
+
+&lt;p&gt;tar zxvf imagick-3.0.1.tgz
+<span class="nb">cd </span>imagick-3.0.1
+/usr/local/webserver/php/bin/phpize
+./configure –with-php-config<span class="o">=</span>/usr/local/webserver/php/bin/php-config
+make &amp;amp;&amp;amp; make install
+</pre></div>

@@ -1,0 +1,58 @@
+<div class="highlight"><pre><span class="o">[</span>client<span class="o">]</span>
+character-set-server <span class="o">=</span> utf8
+<span class="nv">port</span>		<span class="o">=</span> 3306
+<span class="nv">socket</span>		<span class="o">=</span> /tmp/mysql.sock
+
+<span class="o">[</span>mysqld<span class="o">]</span>
+character-set-server <span class="o">=</span> utf8
+<span class="nv">port</span>		<span class="o">=</span> 3306
+<span class="nv">socket</span>		<span class="o">=</span> /tmp/mysql.sock
+skip-locking
+<span class="nv">key_buffer_size</span> <span class="o">=</span> 16M
+<span class="nv">max_allowed_packet</span> <span class="o">=</span> 16M
+<span class="nv">table_open_cache</span> <span class="o">=</span> 64
+<span class="nv">sort_buffer_size</span> <span class="o">=</span> 128K
+<span class="nv">net_buffer_length</span> <span class="o">=</span> 8K
+<span class="nv">read_buffer_size</span> <span class="o">=</span> 256K
+<span class="nv">read_rnd_buffer_size</span> <span class="o">=</span> 512K
+<span class="nv">myisam_sort_buffer_size</span> <span class="o">=</span> 8M
+
+<span class="nv">basedir</span> <span class="o">=</span> /usr/local/webserver/mysql
+<span class="nv">datadir</span> <span class="o">=</span> /usr/local/webserver/mysql/data
+<span class="nv">open_files_limit</span> <span class="o">=</span> 600
+<span class="nv">back_log</span> <span class="o">=</span> 20
+<span class="nv">max_connections</span> <span class="o">=</span> 100
+<span class="nv">max_connect_errors</span> <span class="o">=</span> 200
+<span class="nv">table_cache</span> <span class="o">=</span> 60
+external-locking <span class="o">=</span> FALSE
+<span class="nv">join_buffer_size</span> <span class="o">=</span> 128K
+<span class="nv">thread_cache_size</span> <span class="o">=</span> 10
+<span class="nv">thread_concurrency</span> <span class="o">=</span> 8
+<span class="nv">query_cache_size</span> <span class="o">=</span> 0M
+<span class="nv">query_cache_limit</span> <span class="o">=</span> 2M
+<span class="nv">query_cache_min_res_unit</span> <span class="o">=</span> 2k
+<span class="nv">default_table_type</span> <span class="o">=</span> MyISAM
+<span class="nv">thread_stack</span> <span class="o">=</span> 192K
+<span class="nv">tmp_table_size</span> <span class="o">=</span> 512K
+<span class="nv">max_heap_table_size</span> <span class="o">=</span> 32M
+<span class="nv">long_query_time</span> <span class="o">=</span> 1
+log_long_format
+<span class="nv">binlog_cache_size</span> <span class="o">=</span> 2M
+<span class="nv">max_binlog_cache_size</span> <span class="o">=</span> 4M
+<span class="nv">max_binlog_size</span> <span class="o">=</span> 512M
+<span class="nv">expire_logs_days</span> <span class="o">=</span> 7
+
+<span class="o">[</span>myisamchk<span class="o">]</span>
+<span class="nv">key_buffer_size</span> <span class="o">=</span> 4M
+<span class="nv">sort_buffer_size</span> <span class="o">=</span> 1M
+<span class="nv">read_buffer</span> <span class="o">=</span> 2M
+<span class="nv">write_buffer</span> <span class="o">=</span> 2M
+
+<span class="nv">read_rnd_buffer_size</span> <span class="o">=</span> 2M
+<span class="nv">bulk_insert_buffer_size</span> <span class="o">=</span> 2M
+<span class="nv">myisam_sort_buffer_size</span> <span class="o">=</span> 4M
+<span class="nv">myisam_max_sort_file_size</span> <span class="o">=</span> 10G
+<span class="nv">myisam_max_extra_sort_file_size</span> <span class="o">=</span> 10G
+<span class="nv">myisam_repair_threads</span> <span class="o">=</span> 1
+myisam_recover
+</pre></div>

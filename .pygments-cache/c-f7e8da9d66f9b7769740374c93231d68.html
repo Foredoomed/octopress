@@ -1,0 +1,5 @@
+<div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">isCloseTag</span><span class="p">(</span><span class="n">brTag</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">m_document</span><span class="o">-&gt;</span><span class="n">inCompatMode</span><span class="p">())</span> <span class="p">{</span>
+     <span class="n">reportError</span><span class="p">(</span><span class="n">MalformedBRError</span><span class="p">);</span>
+     <span class="n">t</span><span class="o">-&gt;</span><span class="n">beginTag</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

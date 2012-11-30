@@ -28,7 +28,8 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
+
 
   
   <script type="text/javascript">
@@ -110,12 +111,27 @@
 
 <p>我们都知道在Ubuntu下如果直接在终端中用命令安装Vim，那么安装的都不是最新版本。如果要想安装最新版本只有下载最新版源代码包，然后再编译安装。</p>
 
-<p>首先，Vim最新版源代码包可以在 <a href="http://www.vim.org/" title="官网">官网</a> 下载，下载源代码包到本地Ubuntu主机后，解压缩，进入该目录，进行配置，编译和安装：
-Liquid error: ClassNotFound: no lexer for alias ‘shell’ found
-<!--more--></p>
+<p>首先，Vim最新版源代码包可以在 <a href="http://www.vim.org/" title="官网">官网</a> 下载，下载源代码包到本地Ubuntu主机后，解压缩，进入该目录，进行配置，编译和安装：</p>
 
-<p>如果安装出现错误则有可能是目录的权限问题，试试下面的命令吧：
-Liquid error: ClassNotFound: no lexer for alias ‘shell’ found</p>
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="shell"><span class="line">tar xzvf vim-7.3.tar.bz2
+</span><span class="line"><span class="nb">cd </span>vim73
+</span><span class="line">./configure --prefix<span class="o">=</span>/usr/local/vim --enable-rubyinterp --enable-multibyte --enable-gui<span class="o">=</span>gnome2 --enable-xim --enable-fontset --with-features<span class="o">=</span>huge
+</span><span class="line">make <span class="o">&amp;&amp;</span> make install
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<!--more-->
+
+<p>如果安装出现错误则有可能是目录的权限问题，试试下面的命令吧：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="shell"><span class="line">sudo chmod 777 /usr/bin
+</span><span class="line">sudo chmod 777 /usr/local/
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>好了，如果不出什么意外的话，Vim应该已经安装好了，接下来就是要安装和配置插件了。首先，要在主目录里新建<strong>.vimrc</strong>文件，然后在这个文件里配置Vim。
 配置可以参考<a href="https://github.com/panweizeng/env" title="这里">这里</a></p>
@@ -229,6 +245,14 @@ Liquid error: ClassNotFound: no lexer for alias ‘shell’ found</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
       </li>
     
@@ -240,21 +264,12 @@ Liquid error: ClassNotFound: no lexer for alias ‘shell’ found</p>
         <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
-<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+    <li class='category'><a href='/blog/categories/algorithms/'>algorithms (3)</a></li>
 <li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
 <li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
 <li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
@@ -264,7 +279,7 @@ Liquid error: ClassNotFound: no lexer for alias ‘shell’ found</p>
 <li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
 <li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
 <li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
-<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (7)</a></li>
 <li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
 <li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
 
@@ -282,6 +297,22 @@ Liquid error: ClassNotFound: no lexer for alias ‘shell’ found</p>
 Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
   Copyright &copy; 2012 - Foredoomed -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=8495631; 
+var sc_invisible=0; 
+var sc_security="5b0817e1"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost +
+"statcounter.com/counter/counter_xhtml.js'></"+"script>");</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="https://c.statcounter.com/8495631/0/5b0817e1/0/"
+alt="free hit counters" /></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
 
 </footer>
   

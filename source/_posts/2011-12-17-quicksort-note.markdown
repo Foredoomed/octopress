@@ -3,7 +3,7 @@ layout: post
 title: "快速排序复习笔记"
 date: 2011-12-17 14:27
 comments: true
-categories: algorithm
+categories: algorithms
 ---
 最近晚上躺在床上没事就拿着手机看了几节MIT的公开课《Introduction to Algorithms》，看着看着就觉得自己关于排序算法的原理基本上都忘光了。顿感非常失落，所以特意又对算法复习了一遍，特别是快速排序，这篇博客就是复习笔记，毕竟发表是最好的记忆嘛。
 

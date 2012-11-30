@@ -1,0 +1,15 @@
+<div class="highlight"><pre>  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">parsePendingStatements</span><span class="o">()</span> <span class="o">{</span>
+	  <span class="n">Collection</span><span class="o">&lt;</span><span class="n">xmlstatementbuilder</span><span class="o">&gt;</span> <span class="n">incompleteStatements</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="na">getIncompleteStatements</span><span class="o">();</span>
+	  <span class="kd">synchronized</span> <span class="o">(</span><span class="n">incompleteStatements</span><span class="o">)</span> <span class="o">{</span>
+		  <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">xmlstatementbuilder</span><span class="o">&gt;</span> <span class="n">iter</span> <span class="o">=</span> <span class="n">incompleteStatements</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+		  <span class="k">while</span> <span class="o">(</span><span class="n">iter</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+			  <span class="k">try</span> <span class="o">{</span>
+				  <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">().</span><span class="na">parseStatementNode</span><span class="o">();</span>
+				  <span class="n">iter</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+			  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IncompleteStatementException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+				  <span class="c1">// Statement is still missing a resource...</span>
+			  <span class="o">}</span>
+		  <span class="o">}</span>
+	  <span class="o">}</span>
+  <span class="o">}</span>
+</pre></div>

@@ -1,0 +1,89 @@
+<div class="highlight"><pre><span class="cm">/**</span>
+<span class="cm"> * FIFO (first in, first out) cache controller implementation</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FifoCacheController</span> <span class="kd">implements</span> <span class="n">CacheController</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kt">int</span> <span class="n">cacheSize</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="n">Map</span> <span class="n">cache</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="n">List</span> <span class="n">keyList</span><span class="o">;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="cm">/**</span>
+<span class="cm">   * Default constructor</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="nf">FifoCacheController</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">cacheSize</span> <span class="o">=</span> <span class="mi">100</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">cache</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">synchronizedMap</span><span class="o">(</span><span class="k">new</span> <span class="n">HashMap</span><span class="o">());</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">keyList</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="k">new</span> <span class="n">LinkedList</span><span class="o">());</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kt">int</span> <span class="n">getCacheSize</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">cacheSize</span><span class="o">;</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kt">void</span> <span class="n">setCacheSize</span><span class="o">(</span><span class="kt">int</span> <span class="n">cacheSize</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">cacheSize</span> <span class="o">=</span> <span class="n">cacheSize</span><span class="o">;</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="cm">/**</span>
+<span class="cm">   * Configures the cache</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param props Optionally can contain properties [reference-type=WEAK|SOFT|STRONG]</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setProperties</span><span class="o">(</span><span class="n">Properties</span> <span class="n">props</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">size</span> <span class="o">=</span> <span class="n">props</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="err">“</span><span class="n">cache</span><span class="o">-</span><span class="n">size</span><span class="err">”</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">size</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">size</span> <span class="o">=</span> <span class="n">props</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="err">“</span><span class="n">size</span><span class="err">”</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">size</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">cacheSize</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">size</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="cm">/**</span>
+<span class="cm">   * Add an object to the cache</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param cacheModel The cacheModel</span>
+<span class="cm">   * @param key        The key of the object to be cached</span>
+<span class="cm">   * @param value      The object to be cached</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">putObject</span><span class="o">(</span><span class="n">CacheModel</span> <span class="n">cacheModel</span><span class="o">,</span> <span class="n">Object</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+    <span class="n">keyList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">keyList</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">cacheSize</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="n">Object</span> <span class="n">oldestKey</span> <span class="o">=</span> <span class="n">keyList</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+        <span class="n">cache</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">oldestKey</span><span class="o">);</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IndexOutOfBoundsException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//ignore</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="cm">/**</span>
+<span class="cm">   * Get an object out of the cache.</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param cacheModel The cache model</span>
+<span class="cm">   * @param key        The key of the object to be returned</span>
+<span class="cm">   * @return The cached object (or null)</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="n">Object</span> <span class="nf">getObject</span><span class="o">(</span><span class="n">CacheModel</span> <span class="n">cacheModel</span><span class="o">,</span> <span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">cache</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="n">Object</span> <span class="n">removeObject</span><span class="o">(</span><span class="n">CacheModel</span> <span class="n">cacheModel</span><span class="o">,</span> <span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">keyList</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">cache</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="cm">/**</span>
+<span class="cm">   * Flushes the cache.</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param cacheModel The cache model</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">flush</span><span class="o">(</span><span class="n">CacheModel</span> <span class="n">cacheModel</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">cache</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+    <span class="n">keyList</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</pre></div>

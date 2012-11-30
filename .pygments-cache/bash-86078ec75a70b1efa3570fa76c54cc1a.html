@@ -1,0 +1,40 @@
+<div class="highlight"><pre><span class="c">#!/bin/sh&lt;/p&gt;</span>
+
+&lt;p&gt;function_start_mysql<span class="o">()</span>
+<span class="o">{</span>
+   <span class="nb">printf</span> “Starting MySQL…<span class="se">\n</span>”
+   /bin/sh /usr/local/webserver/mysql/bin/mysqld_safe –defaults-file<span class="o">=</span>/usr/local/webserver/mysql/my.cnf &amp;amp;
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;function_stop_mysql<span class="o">()</span>
+<span class="o">{</span>
+   <span class="nb">printf</span> “Stopping MySQL…<span class="se">\n</span>”
+   /usr/local/webserver/mysql/bin/mysqladmin -u mysql -pmysql shutdown
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;function_restart_mysql<span class="o">()</span>
+<span class="o">{</span>
+   <span class="nb">printf</span> “Restarting MySQL…<span class="se">\n</span>”
+   function_stop_mysql
+   sleep 5
+   function_start_mysql
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;function_kill_mysql<span class="o">()</span>
+<span class="o">{</span>
+   <span class="nb">kill</span> -9 <span class="k">$(</span>ps -ef | grep ‘bin/mysqld_safe’ | grep 3306 | awk ‘<span class="o">{</span><span class="nb">printf</span> <span class="nv">$2</span><span class="o">}</span>’<span class="k">)</span>
+   <span class="nb">kill</span> -9 <span class="k">$(</span>ps -ef | grep ‘libexec/mysqld’ | grep 3306 | awk ‘<span class="o">{</span><span class="nb">printf</span> <span class="nv">$2</span><span class="o">}</span>’<span class="k">)</span>
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;if <span class="o">[</span> “<span class="nv">$1</span>” <span class="o">=</span> “start” <span class="o">]</span>; <span class="k">then</span>
+function_start_mysql
+<span class="k">elif</span> <span class="o">[</span> “<span class="nv">$1</span>” <span class="o">=</span> “stop” <span class="o">]</span>; <span class="k">then</span>
+function_stop_mysql
+<span class="k">elif</span> <span class="o">[</span> “<span class="nv">$1</span>” <span class="o">=</span> “restart” <span class="o">]</span>; <span class="k">then</span>
+function_restart_mysql
+<span class="k">elif</span> <span class="o">[</span> “<span class="nv">$1</span>” <span class="o">=</span> “kill” <span class="o">]</span>; <span class="k">then</span>
+function_kill_mysql
+<span class="k">else</span>
+<span class="nb">printf</span> “Usage: /usr/local/webserver/mysql <span class="o">{</span>start|stop|restart|kill<span class="o">}</span><span class="se">\n</span>”
+<span class="k">fi</span>
+</pre></div>

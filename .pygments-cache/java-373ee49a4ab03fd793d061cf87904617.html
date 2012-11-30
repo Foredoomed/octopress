@@ -1,0 +1,20 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="n">SqlSessionFactory</span> <span class="nf">build</span><span class="o">(</span><span class="n">Reader</span> <span class="n">reader</span><span class="o">,</span> <span class="n">String</span> <span class="n">environment</span><span class="o">,</span> <span class="n">Properties</span> <span class="n">properties</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">XMLConfigBuilder</span> <span class="n">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="n">XMLConfigBuilder</span><span class="o">(</span><span class="n">reader</span><span class="o">,</span> <span class="n">environment</span><span class="o">,</span> <span class="n">properties</span><span class="o">);</span>
+      <span class="k">return</span> <span class="nf">build</span><span class="o">(</span><span class="n">parser</span><span class="o">.</span><span class="na">parse</span><span class="o">());</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="n">ExceptionFactory</span><span class="o">.</span><span class="na">wrapException</span><span class="o">(</span><span class="s">&quot;Error building SqlSession.&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="n">ErrorContext</span><span class="o">.</span><span class="na">instance</span><span class="o">().</span><span class="na">reset</span><span class="o">();</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="n">reader</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Intentionally ignore. Prefer previous error.</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="n">SqlSessionFactory</span> <span class="nf">build</span><span class="o">(</span><span class="n">Configuration</span> <span class="n">config</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">DefaultSqlSessionFactory</span><span class="o">(</span><span class="n">config</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>

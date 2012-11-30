@@ -1,0 +1,6 @@
+<div class="highlight"><pre>tar zxvf mysql-5.1.58.tar.gz
+<span class="nb">cd </span>mysql-5.1.58
+./configure --prefix<span class="o">=</span>/usr/local/webserver/mysql/ --localstatedir<span class="o">=</span>/usr/webserver/local/mysql/data --with-unix-socket-path<span class="o">=</span>/tmp/mysql.sock --with-charset<span class="o">=</span>utf8 --with-collation<span class="o">=</span>utf8_general_ci --enable-assembler --with-extra-charsets<span class="o">=</span>complex --enable-thread-safe-client --with-big-tables --with-readline --with-ssl --with-embedded-server --enable-local-infile --with-client-ldflags<span class="o">=</span>-all-static --with-mysqld-ldflags<span class="o">=</span>-all-static --with-plugins<span class="o">=</span>partition,innobase,myisammrg
+make <span class="o">&amp;&amp;</span> make install
+cp support-files/my-medium.cnf /usr/local/webserver/mysql/my.cnf
+</pre></div>

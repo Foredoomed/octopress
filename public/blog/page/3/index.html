@@ -9,7 +9,7 @@
   <meta name="author" content="Foredoomed">
 
   
-  <meta name="description" content="最近一直感觉现在用的笔记本有点慢，特别是打开eclipse的话要等上最起码半分钟时间，这对于我来说是不能忍受的。所以我决定鸟枪换炮，把从大学时期开始就陪伴着我到现在的IBM R60给我爸用，我自己就再去买台笔记本电脑。 目标其实早就决定了， &hellip;">
+  <meta name="description" content="浏览器可能是目前使用的人最多的软件，对于软件开发人员来说更是如此。我对浏览器的认识差不多是这样的： 发送请求到服务器(get/post) 解析从服务器返回的response(HTML,CSS) 执行JavaScript代码 基本上就是上面这些，但是至于细节就不了解了。直到我看到了这篇长长的文章： &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +28,8 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
+
 
   
   <script type="text/javascript">
@@ -78,6 +79,102 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/05/how-browsers-work-one/">浏览器是如何工作的(一)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-05T23:03:00+08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/05/how-browsers-work-one/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>浏览器可能是目前使用的人最多的软件，对于软件开发人员来说更是如此。我对浏览器的认识差不多是这样的：</p>
+
+<ul>
+  <li>发送请求到服务器(get/post)</li>
+  <li>解析从服务器返回的response(HTML,CSS)</li>
+  <li>执行JavaScript代码</li>
+</ul>
+
+<p>基本上就是上面这些，但是至于细节就不了解了。直到我看到了这篇长长的文章：<a href="http://www.html5rocks.com/en/tutorials/internals/howbrowserswork/" title="How Browsers Work:Behind the Scenes of Modern Web Browsers">How Browsers Work:Behind the Scenes of Modern Web Browsers</a>,才第一次窥探到了浏览器的处理细节。这个主题一共分成了10章来讲，对于学习和参考浏览器的工作原理都非常有用。所以，我就决定把它翻译成中文，供以后参考用。值得一提的是，这篇文章的作者是一个有着10年以上经验的女程序员，让我们像她致敬！</p>
+
+<p>由于原文较长，所以我也会分成几篇博客来翻，而这篇博客是这个系列的第一篇翻译。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/05/how-browsers-work-one/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/03/what-does-jit-do-in-hotspot/">JIT到底做了些什么事</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-03T15:15:00+08:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/03/what-does-jit-do-in-hotspot/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近在网上看到一篇关JIT(Just in Time)的文章<a href="http://java.dzone.com/articles/just-time-compiler-jit-hotspot?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+javalobby%2Ffrontpage+%28Javalobby+%2F+Java+Zone%29&amp;utm_content=Google+Reader" title="Just in Time Compiler (JIT) in Hotspot">Just in Time Compiler (JIT) in Hotspot</a>,这篇文章很短，但是对JIT的作用基本上说的比较清楚的，可以作为JIT的学习参考，所以我就决定把这篇文章翻译成中文，供以后复习参考用。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/03/what-does-jit-do-in-hotspot/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1286,119 +1383,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/26/ibatis-and-mybatis-source-code-analysis-logging/">iBatis和myBatis源码分析之日志</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-08-26T18:20:00+08:00" pubdate data-updated="true">Aug 26<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/08/26/ibatis-and-mybatis-source-code-analysis-logging/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>一.包结构分析</strong></p>
-
-<p>1.iBatis的logging包结构：</p>
-
-<table border="1" width="100%" cellpadding="3" cellspacing="0" summary=""><tbody><tr>
-<th align="left" colspan="2" style="background-color:#CCCCFF">
-<b>Packages</b></th></tr>
-<tr bgcolor="white">
-<td width="20%"><b>com.ibatis.common.logging</b></td>
-<td>&nbsp;</td>
-</tr>
-<tr bgcolor="white">
-<td width="20%"><b>com.ibatis.common.logging.jakarta</b></td>
-<td>&nbsp;</td>
-</tr>
-<tr bgcolor="white">
-<td width="20%"><b>com.ibatis.common.logging.jdk14</b></td>
-<td>&nbsp;</td>
-</tr>
-<tr bgcolor="white">
-<td width="20%"><b>com.ibatis.common.logging.log4j</b></td>
-<td>&nbsp;</td>
-</tr>
-<tr bgcolor="white">
-<td width="20%"><b>com.ibatis.common.logging.nologging</b></td>
-<td>&nbsp;</td>
-</tr>
-</tbody></table>
-
-<p>iBatis把对logging支持的类全部放在了common包的子包下，并且又根据不同的logging实现又分成了commons-logging，jdk1.4自带的logging，log4j和nologging四个子包。个人感觉整个包的划分还是非常清晰的，但是nologging包的存在感觉有点鸡肋，因为日志是一个系统必备的功能之一，很难想象一个系统缺少了日志怎么做数据分析，性能调优等。难道作者认为有些时候或有一天就不需要日志了？ </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/08/26/ibatis-and-mybatis-source-code-analysis-logging/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/24/ibatis-and-mybatis-source-code-analysis-overview/">iBatis和myBatis源码分析之概览</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-08-24T18:08:00+08:00" pubdate data-updated="true">Aug 24<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/08/24/ibatis-and-mybatis-source-code-analysis-overview/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>一.写在最前</strong></p>
-
-<p>记得第一次知道<a href="http://ibatis.apache.org/" title="iBatis">iBatis</a>这个框架还是在2、3年前，那段时间Hibernate风头正劲，Java EE开发已经被概括为SSH，各个软件公司把Hibernate作为Java程序员一种标配的技能而来考核。正是在这样一种情况下，iBatis作为与Hibernate不同的ORM思想的实现，仍然被一部分开发者喜爱和支持，当然我也是其中之一。而且在一个偶然的机会让我知道原来淘宝的ORM工具也是用的iBatis后，就更加坚定了我对iBatis的信心(可能是因为Rails的关系，现在我觉得<a href="http://www.springsource.org/roo" title="Spring Roo">Spring Roo</a>会更有前途)。 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/08/24/ibatis-and-mybatis-source-code-analysis-overview/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -1424,6 +1408,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
       </li>
     
@@ -1435,21 +1427,12 @@
         <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
-<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+    <li class='category'><a href='/blog/categories/algorithms/'>algorithms (3)</a></li>
 <li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
 <li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
 <li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
@@ -1459,7 +1442,7 @@
 <li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
 <li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
 <li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
-<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (7)</a></li>
 <li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
 <li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
 
@@ -1476,6 +1459,22 @@
 Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
   Copyright &copy; 2012 - Foredoomed -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=8495631; 
+var sc_invisible=0; 
+var sc_security="5b0817e1"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost +
+"statcounter.com/counter/counter_xhtml.js'></"+"script>");</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="https://c.statcounter.com/8495631/0/5b0817e1/0/"
+alt="free hit counters" /></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
 
 </footer>
   

@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>字符串搜索算法 - Zhixingheyi</title>
+  <meta name="author" content="Foredoomed">
+
+  
+  <meta name="description" content="字符串搜索算法 0.Brute-force search (BFS) BFS应该是字符串搜索算法中最简单的一个，维基百科上的描述是： a trivial but very general problem-solving technique that consists of &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://liuxuan.info/blog/2012/10/20/string-searching-algorithms/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/zhixingheyi" rel="alternate" title="Zhixingheyi" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17293168-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Zhixingheyi</a></h1>
+  
+    <h2>Just for fun!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/zhixingheyi" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:liuxuan.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">字符串搜索算法</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-20T22:30:00+08:00" pubdate data-updated="true">Oct 20<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>字符串搜索算法</p>
+
+<p><strong>0.Brute-force search (BFS)</strong></p>
+
+<p>BFS应该是字符串搜索算法中最简单的一个，维基百科上的描述是：</p>
+
+<blockquote>
+  <p>a trivial but very general problem-solving technique that consists of systematically enumerating all possible candidates for the solution and checking whether each candidate satisfies the problem’s statement.</p>
+</blockquote>
+
+<p>所以BFS算法就是用模式串去和搜索串逐一比较，直到找到模式串为止。</p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/bruteforcesearch_zps3f5d214f.png" title="BFS BFS" /></p>
+
+<p>BFS的特征有：</p>
+
+<ul>
+  <li>模式串不做预处理</li>
+  <li>从左边开始一个字符一个字符的匹配</li>
+  <li>最差情况下需要比较<code>mn</code>次</li>
+  <li>返回的是第一次匹配的字符串</li>
+</ul>
+
+<p>BSF的优点和缺点都很明显：优点就是简单；缺点速度慢，不稳定。</p>
+
+<!-- more -->
+
+<p><strong>1.Knuth-Morris-Pratt (KMP)</strong></p>
+
+<p>维基百科上的描述是：</p>
+
+<blockquote>
+  <p>searches for occurrences of a “word” W within a main “text string” S by employing the observation that when a mismatch occurs, the word itself embodies sufficient information to determine where the next match could begin, thus bypassing re-examination of previously matched characters.</p>
+</blockquote>
+
+<p>BFS算法最大的问题就是当匹配失败时，需要把模式串右移一位重新开始匹配。但是很有可能匹配失败，然后再右移一位匹配。这当中重复了很多不必要的匹配过程，这也是造成BFS算法效率差的原因(当搜索串不是很大时，BFS应该比其他算法更有优势)。</p>
+
+<p>KMP解决了不必要匹配过多的问题，大大提高了算法的效率。显然，匹配的核心问题就是当匹配失败出现时，模式串右移多少位再开始重新匹配。KMP算法是通过对模式串的预处理，建立一张前缀表来实现。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">i    0  1  2  3  4  5  6
+</span><span class="line">W[i] A  B  C  D  A  B  D   
+</span><span class="line">T[i] -1 0  0  0  0  1  2  </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>建立这张表的算法是：从左往右遍历模式串，观察前<code>i-1</code>长子串中，最长前缀子串和后缀子串匹配的长度。如上图所示，匹配串<code>W[i]=ABCDABD</code>的第一个字符是<code>a</code>，约定<code>T[0]=-1</code>；<code>W[1]</code>之前的字串是<code>A</code>，因为只有一个字符，它没有前缀子串和后缀子串，所以<code>T[1]=0</code>；同理<code>T[2]=0</code>，<code>T[3]=0</code>，<code>T[4]=0</code>；当<code>W[5]=ABCDA</code>时，有前缀和后缀字串<code>A</code>，所以<code>T[5]=1</code>；同理<code>T[6]=2</code>。</p>
+
+<p>我们来看下面的例子：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9
+</span><span class="line">a	b	c	a	b	c	a	b	d		
+</span><span class="line">a	b	c	a	b	d					
+</span><span class="line">        a	b	c	a	b	d</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>当<code>i=5</code>时匹配失败，又<code>T[5]=2</code>，所以模式串往右移<code>i-T[5]=5-2=3</code>位继续匹配。</p>
+
+<p>KMP算法的特点有：</p>
+
+<ul>
+  <li>从左往右匹配</li>
+  <li>预处理模式串，时间负责度<code>Θ(m)</code></li>
+  <li>搜索时间负责度<code>Θ(m+n)</code></li>
+  <li>最多比较<code>2n-1</code>次</li>
+</ul>
+
+<p>KMP算法的优点有：简单，速度快，对处理大文件有优势；缺点是随着字符种类增加，匹配失败的几率也随之增加。</p>
+
+<p><strong>2.Boyer-Moore (BM)</strong></p>
+
+<p>维基百科上的描述是：</p>
+
+<blockquote>
+  <p>is an efficient string searching algorithm that is the standard benchmark for practical string search literature. It was developed by Robert S. Boyer and J Strother Moore in 1977. The algorithm preprocesses the string being searched for (the pattern), but not the string being searched in (the text). It is thus well-suited for applications in which the text does not persist across multiple searches. The Boyer-Moore algorithm uses information gathered during the preprocess step to skip sections of the text, resulting in a lower constant factor than many other string algorithms. In general, the algorithm runs faster as the pattern length increases.</p>
+</blockquote>
+
+<p>简单来说，BM算法是从模式串的右边开始往左边匹配搜索串，如果搜索串中的字符与模式串最右的字符不匹配，并且模式串里不包含这个字符的话，那么模式串可以右移m(模式串的长度)位。</p>
+
+<p>例子：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9	
+</span><span class="line">a	b	b	a	d	a	b	a	c	b	a
+</span><span class="line">b	a	b	a	c						
+</span><span class="line">                b	a	b	a	c</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>2.1 Bad character 搜索法</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9  
+</span><span class="line">a	b	b	a	b	a	b	a	c	b	a
+</span><span class="line">b	a	b	a	c						
+</span><span class="line">        b	a	b	a	c  </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>首先匹配<code>i=4</code>位置上的<code>b</code>和<code>c</code>，显然不相等，然后我们发觉<code>b</code>在模式串中出现在了<code>0</code>和<code>2</code>的位置上，所以我们可以把搜索串<code>i=4</code>位置上的<code>b</code>和模式串<code>i=2</code>位置上的<code>b</code>对齐。</p>
+
+<p><strong>2.2 Good suffix 搜索法</strong>	</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9   
+</span><span class="line">a	b	a	a	b	a	b	a	c	b	a  
+</span><span class="line">c	a	b	a	b						
+</span><span class="line">        c	a	b	a	b  </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>从右开始匹配到<code>i=2</code>时匹配失败，这时后缀<code>ab</code>匹配成功，我们可以把模式串中的下一个<code>ab</code>(如果有的话)与搜索串的<code>ab</code>对齐。但是如果碰到下面这种情况：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">0	1	2	3	4	5	6	7	8	9  
+</span><span class="line">a	a	b	a	b	a	b	a	c	b	a
+</span><span class="line">a	b	b	a	b						
+</span><span class="line">        a	b	b	a	b		</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>我们可以看到后缀<code>bab</code>匹配成功，但是模式串中没有第二个<code>bab</code>，所以我们可以在模式串中寻找<code>bab</code>的字串，就像上面的<code>ab</code>，然后把它与搜索串对齐。</p>
+
+<p>BM算法的特点：</p>
+
+<ul>
+  <li>从右往左匹配</li>
+  <li>预处理模式串，时间负责度<code>Θ(m+σ)</code></li>
+  <li>搜索时间负责度<code>Θ(m*n)</code></li>
+  <li>最多比较<code>3n</code>次</li>
+</ul>
+
+<p>BM算法是字符串搜索算法里效率最高的算法，但是缺点是比较复杂(需要考虑的情况很多)，对<code>good suffix</code>的预处理比较难理解和实现。</p>
+
+<p>参考资料</p>
+
+<p>[1] <a href="http://en.wikipedia.org/wiki/Brute-force_search" title="Wikipedia，Brute-force searching algorithm">Wikipedia-Brute-force searching algorithm</a><br />
+[2] <a href="http://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm" title="Wikipedia，Knuth–Morris–Pratt algorithm">Wikipedia-Knuth–Morris–Pratt algorithm</a><br />
+[3] <a href="http://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string_search_algorithm" title="Wikipedia，Boyer–Moore string search algorithm">Wikipedia-Boyer–Moore string search algorithm</a><br />
+[4] <a href="http://www.inf.fh-flensburg.de/lang/algorithmen/pattern/" title="algorithms">algorithms</a></p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Foredoomed</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-20T22:30:00+08:00" pubdate data-updated="true">Oct 20<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/algorithms/'>algorithms</a>
+  
+</span>
+
+
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+<h1>Twitter</h1>
+<ul>
+<li>
+<a href="http://twitter.com/comomt">Follow me on twitter</a>
+</li>
+</ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/18/head-first-coroutine/">深入浅出Coroutine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/algorithms/'>algorithms (3)</a></li>
+<li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
+<li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
+<li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
+<li class='category'><a href='/blog/categories/life/'>life (8)</a></li>
+<li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>nosql (1)</a></li>
+<li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
+<li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
+<li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (7)</a></li>
+<li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
+<li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+<img alt="Creative Commons License" style="border-width:0;" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br/>
+Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
+  Copyright &copy; 2012 - Foredoomed -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=8495631; 
+var sc_invisible=0; 
+var sc_security="5b0817e1"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost +
+"statcounter.com/counter/counter_xhtml.js'></"+"script>");</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="https://c.statcounter.com/8495631/0/5b0817e1/0/"
+alt="free hit counters" /></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'zhixingheyi';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://liuxuan.info/blog/2012/10/20/string-searching-algorithms/';
+        var disqus_url = 'http://liuxuan.info/blog/2012/10/20/string-searching-algorithms/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

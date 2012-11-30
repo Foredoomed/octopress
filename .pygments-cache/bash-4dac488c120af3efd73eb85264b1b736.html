@@ -1,0 +1,118 @@
+<div class="highlight"><pre>user  www www;&lt;/p&gt;
+
+&lt;p&gt;worker_processes 1;&lt;/p&gt;
+
+&lt;p&gt;error_log  /data/log/nginx_error.log  crit;&lt;/p&gt;
+
+&lt;p&gt;pid        /usr/local/webserver/nginx/nginx.pid;&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;specifies-the-value-for-maximum-file-descriptors-that-can-be-opened-by-this-process&quot;</span>&gt;Specifies the value <span class="k">for </span>maximum file descriptors that can be opened by this process.&lt;/h1&gt;
+&lt;p&gt;worker_rlimit_nofile 65535;&lt;/p&gt;
+
+&lt;p&gt;events
+<span class="o">{</span>
+  use epoll;
+  worker_connections 65535;
+<span class="o">}</span>&lt;/p&gt;
+
+&lt;p&gt;http
+<span class="o">{</span>
+  include       mime.types;
+  default_type  application/octet-stream;&lt;/p&gt;
+
+&lt;p&gt;#charset  gb2312;&lt;/p&gt;
+
+&lt;p&gt;server_names_hash_bucket_size 128;
+  large_client_header_buffers 4 32k;
+  client_header_buffer_size 32k; 
+  client_max_body_size 8m;&lt;/p&gt;
+
+&lt;p&gt;sendfile on;
+  keepalive_timeout 10 10;
+  tcp_nopush on;
+  tcp_nodelay on;&lt;/p&gt;
+
+&lt;p&gt;fastcgi_connect_timeout 300;
+  fastcgi_send_timeout 300;
+  fastcgi_read_timeout 300;
+  fastcgi_buffer_size 32k;
+  fastcgi_buffers 4 32k;
+  fastcgi_busy_buffers_size 32k;
+  fastcgi_temp_file_write_size 32k;
+  fastcgi_intercept_errors on;&lt;/p&gt;
+
+&lt;p&gt;gzip on;
+  gzip_min_length  1k;
+  gzip_buffers     4 16k;
+  gzip_http_version 1.0;
+  gzip_comp_level 1;
+  gzip_types       text/plain application/x-javascript text/css application/xml;
+  gzip_vary on;&lt;/p&gt;
+
+&lt;p&gt;#limit_zone  crawler  <span class="nv">$binary_remote_addr</span>  10m;&lt;/p&gt;
+
+&lt;p&gt;server
+  <span class="o">{</span>
+    listen       80;
+    server_name  liuxuan.info www.liuxuan.info;
+    index index.html index.htm index.php;
+    root  /data/htdocs/blog;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#limit_conn   crawler  20;
+
+location / <span class="o">{</span>          
+   try_files <span class="nv">$uri</span> <span class="nv">$uri</span>/ /index.php?q<span class="o">=</span><span class="nv">$uri</span>&amp;amp;<span class="nv">$args</span>;    
+<span class="o">}</span>
+
+<span class="c"># if file exists return it right away</span>
+<span class="k">if</span> <span class="o">(</span>-f <span class="nv">$request_filename</span><span class="o">)</span> <span class="o">{</span>      
+   <span class="nb">break</span>;
+<span class="o">}</span>
+ 
+<span class="c"># otherwise rewrite the request</span>
+<span class="k">if</span> <span class="o">(</span>!-e <span class="nv">$request_filename</span><span class="o">)</span> <span class="o">{</span>
+   rewrite ^<span class="o">(</span>.+<span class="o">)</span><span class="nv">$ </span>/index.php<span class="nv">$1</span> last;
+   <span class="nb">break</span>;
+<span class="o">}</span>    
+
+ 
+location ~ .*<span class="se">\.</span><span class="o">(</span>php|php5<span class="o">)</span>?<span class="err">$</span>
+<span class="o">{</span>      
+  fastcgi_pass  unix:/tmp/php-cgi.sock;
+  <span class="c">#fastcgi_pass  127.0.0.1:9000;</span>
+  fastcgi_index index.php;
+  include fastcgi.conf;
+
+<span class="o">}</span>
+
+location ~ .*<span class="se">\.</span><span class="o">(</span>gif|jpg|jpeg|png|bmp|swf<span class="o">)</span><span class="err">$</span>
+<span class="o">{</span>
+  access_log off;
+  expires      30d;
+<span class="o">}</span>
+
+location ~ .*<span class="se">\.</span><span class="o">(</span>js|css<span class="o">)</span>?<span class="err">$</span>
+<span class="o">{</span>
+  access_log off;
+  expires      1d;
+<span class="o">}</span>    
+
+<span class="c"># Only allow search engine to access pics</span>
+location ~ .*<span class="se">\.</span><span class="o">(</span>gif|jpg|jpeg|png|bmp|swf|flv<span class="o">)</span><span class="err">$</span>
+<span class="o">{</span>
+valid_referers none blocked *.liuxuan.info *.google.com *.baidu.com;
+<span class="k">if</span> <span class="o">(</span><span class="nv">$invalid_referer</span><span class="o">)</span>
+<span class="o">{</span>
+   <span class="k">return </span>403;
+<span class="o">}</span>
+<span class="o">}</span>
+  
+
+log_format  access  <span class="s1">&#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;</span>
+          <span class="s1">&#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;</span>
+          <span class="s1">&#39;&quot;$http_user_agent&quot; $http_x_forwarded_for&#39;</span>;
+access_log  /data/log/access.log  access;   <span class="o">}</span>
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;<span class="o">}</span>
+</pre></div>

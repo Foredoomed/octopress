@@ -1,0 +1,10 @@
+<div class="highlight"><pre><span class="k">function</span> <span class="nf">foo</span><span class="p">()</span>
+	<span class="nb">print</span><span class="p">(</span><span class="err">“</span><span class="n">hello</span><span class="err">”</span><span class="p">)</span>
+	<span class="nb">coroutine.yield</span><span class="p">()</span> <span class="err">–</span> <span class="err">在这里挂起</span><span class="n">coroutine</span>
+	<span class="nb">print</span><span class="p">(</span><span class="err">“</span><span class="n">world</span><span class="err">”</span><span class="p">)</span> 
+<span class="k">end</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">local</span> <span class="n">co</span> <span class="o">=</span> <span class="nb">coroutine.create</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span> <span class="err">–</span> <span class="n">co</span><span class="err">保存的是上下文变量</span>
+<span class="nb">coroutine.resume</span><span class="p">(</span><span class="n">co</span><span class="p">)</span>         <span class="err">–</span> <span class="err">只打印出</span> <span class="n">hello</span>
+<span class="nb">coroutine.resume</span><span class="p">(</span><span class="n">co</span><span class="p">)</span>         <span class="err">–</span> <span class="err">只打印出</span> <span class="n">world</span>
+</pre></div>

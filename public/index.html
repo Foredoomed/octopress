@@ -9,7 +9,7 @@
   <meta name="author" content="Foredoomed">
 
   
-  <meta name="description" content="Skip List(以下简称SL)是由William Pugh在1989年提出的，从字面上解释的话差不多就是“跳跃链表”，它是普通有序链表的一种改进，目的是为了提高搜索，插入和删除的速度。我们知道，普通List的搜索，插入和删除的时间复杂度都是O(n)，而SL则可以提高到O(log n)， &hellip;">
+  <meta name="description" content="最近许多网站的用户名和秘密都被泄露，这也引发了一场对密码的存储问题的大讨论。其中的核心就是hashing，所以就让我们来看看关于hashing的几个常见的误解吧。这篇博文是一篇英文帖子的翻译，原文请戳Hashing Myths。 神话#1：Hashing后的结果是独一无二的 大错特错。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,7 +28,8 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
+
 
   
   <script type="text/javascript">
@@ -78,6 +79,119 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-21T20:33:00+08:00" pubdate data-updated="true">Oct 21<span>st</span>, 2012</time>
+        
+         | <a href="/blog/2012/10/21/hashing-myths/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近许多网站的用户名和秘密都被泄露，这也引发了一场对密码的存储问题的大讨论。其中的核心就是hashing，所以就让我们来看看关于hashing的几个常见的误解吧。这篇博文是一篇英文帖子的翻译，原文请戳<a href="http://webdevrefinery.com/forums/topic/4850-hashing-myths/page_hl_hashing" title="Hashing Myths">Hashing Myths</a>。</p>
+
+<p><strong>神话#1：Hashing后的结果是独一无二的</strong></p>
+
+<p><strong>大错特错</strong>。让我们用简单的逻辑来解释。比如有一个32位长的hash，如果再对33位长的字符串hash的话，就有可能产生相同的hash(又叫“碰撞”)。道理很简单，33位长字符串的排列组合比32位长的字符串要多得多，因为可以在32位长字符串的尾部加上一个任意字符就是33位长的字符串。所以打个比方来说，如果有90000个33位长字符串和20000个32位长字符串，前者其中的某些字符串一定跟后者中的一些字符串的hash值相同。Hashing算法的目的是尽量减少碰撞，<strong>但是不可能完全消除碰撞</strong>。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/21/hashing-myths/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-20T22:30:00+08:00" pubdate data-updated="true">Oct 20<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/10/20/string-searching-algorithms/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>字符串搜索算法</p>
+
+<p><strong>0.Brute-force search (BFS)</strong></p>
+
+<p>BFS应该是字符串搜索算法中最简单的一个，维基百科上的描述是：</p>
+
+<blockquote>
+  <p>a trivial but very general problem-solving technique that consists of systematically enumerating all possible candidates for the solution and checking whether each candidate satisfies the problem’s statement.</p>
+</blockquote>
+
+<p>所以BFS算法就是用模式串去和搜索串逐一比较，直到找到模式串为止。</p>
+
+<p><img src="http://i1256.photobucket.com/albums/ii494/Foredoomed/bruteforcesearch_zps3f5d214f.png" title="BFS BFS" /></p>
+
+<p>BFS的特征有：</p>
+
+<ul>
+  <li>模式串不做预处理</li>
+  <li>从左边开始一个字符一个字符的匹配</li>
+  <li>最差情况下需要比较<code>mn</code>次</li>
+  <li>返回的是第一次匹配的字符串</li>
+</ul>
+
+<p>BSF的优点和缺点都很明显：优点就是简单；缺点速度慢，不稳定。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/20/string-searching-algorithms/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -349,6 +463,9 @@
 <span class="line-number">42</span>
 <span class="line-number">43</span>
 <span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
 </pre></td><td class="code"><pre><code class="bash"><span class="line">servive sendmail stop
 </span><span class="line">yum remove sendmail
 </span><span class="line">
@@ -358,41 +475,44 @@
 </span><span class="line">service rsyslog stop
 </span><span class="line">yum remove rsyslog
 </span><span class="line">
-</span><span class="line">// 添加EPEL软件库
-</span><span class="line">rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
+</span><span class="line"><span class="c"># 添加EPEL软件库</span>
+</span><span class="line">rpm -Uvh http:#dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
 </span><span class="line">
-</span><span class="line">// 安装syslog-ng代替rsyslog
+</span><span class="line"><span class="c"># 安装syslog-ng代替rsyslog</span>
 </span><span class="line">yum install syslog-ng
 </span><span class="line">chkconfig syslog-ng on
 </span><span class="line">
-</span><span class="line">// 安装dropbear代替openssh
+</span><span class="line"><span class="c"># 安装dropbear代替openssh</span>
 </span><span class="line">yum install dropbear
 </span><span class="line">chkconfig dropbear on
-</span><span class="line">// 等dropbear配置好后
+</span><span class="line">
+</span><span class="line"><span class="c"># 等dropbear配置好后</span>
 </span><span class="line">service sshd stop
 </span><span class="line">yum remove openssh
 </span><span class="line">
-</span><span class="line">// 安装vsftpd作为ftp服务器
+</span><span class="line"><span class="c"># 安装vsftpd作为ftp服务器</span>
 </span><span class="line">yum install vsftpd
 </span><span class="line">chkconfig vsftpd on
 </span><span class="line">
-</span><span class="line">// 添加用户
+</span><span class="line"><span class="c"># 添加用户</span>
 </span><span class="line">groupadd www
 </span><span class="line">useradd -g www username
 </span><span class="line">passwd username
 </span><span class="line">
-</span><span class="line">// 设定ftp登陆目录权限
+</span><span class="line"><span class="c"># 设定ftp登陆目录权限</span>
 </span><span class="line">chown -R usernmae /path/to/ftp/folder
 </span><span class="line">
-</span><span class="line">// 更新软件
-</span><span class="line">yum update
+</span><span class="line"><span class="c"># 安装yum-utils</span>
+</span><span class="line">yum install yum-utils
+</span><span class="line">
+</span><span class="line"><span class="c"># 更新软件</span>
 </span><span class="line">yum upgrade
 </span><span class="line">
-</span><span class="line">// 安装ppp
-</span><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm
+</span><span class="line"><span class="c"># 安装ppp</span>
+</span><span class="line">rpm -ivh http:#poptop.sourceforge.net/yum/stable/rhel6/i386/ppp-2.4.5-17.0.rhel6.i686.rpm
 </span><span class="line">
-</span><span class="line">// 安装pptpd
-</span><span class="line">rpm -ivh http://poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
+</span><span class="line"><span class="c"># 安装pptpd</span>
+</span><span class="line">rpm -ivh http:#poptop.sourceforge.net/yum/stable/rhel6/i386/pptpd-1.3.4-2.el6.i686.rpm
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 </div>
@@ -537,130 +657,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/12/14/how-browsers-work-ten/">浏览器是如何工作的(十)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-12-14T00:26:00+08:00" pubdate data-updated="true">Dec 14<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/12/14/how-browsers-work-ten/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>6 绘制</strong></p>
-
-<p>在绘制阶段会遍历渲染树和调用renderer的<code>paint</code>方法来把他们的内容显示在屏幕上。绘制使用的是UI基础组件。</p>
-
-<p><strong>6.1 全局和增量</strong></p>
-
-<p>像布局一样，可以全局绘(绘制整个渲染树)，也可以是增量绘制。在增量绘制中，一部分renderer的变化不会影响这棵渲染树。变化过的renderer会使它在屏幕上的矩形区域无效，这就会造成OS把它当作“脏区域”(dirty region)并且生成<code>paint</code>事件。OS会聪明地把多个脏区域合并成一个。在Chrome中则更复杂一点，因为renderer不是在主进程中，而是在其他进程中。Chrome模拟OS行为并且扩展它们，表现层监听这些事件而且把消息代理给渲染树的根元素。遍历渲染树直到遇见相关的renderer，渲染树重新绘制自己(经常连同它的孩子节点)。</p>
-
-<p><strong>6.2 绘制顺序</strong></p>
-
-<p>CSS2的规范中规定了绘制的顺序。这个顺序实际上就是元素在上下文中堆积的顺序。因为是从后往前绘制的，所以这个顺序会影响绘制。renderer的堆积顺序是：</p>
-
-<ol>
-  <li>background color</li>
-  <li>background image</li>
-  <li>border</li>
-  <li>children</li>
-  <li>outline</li>
-</ol>
-
-<p><strong>6.3 Firefox的显示列表</strong></p>
-
-<p>Firefox会再次遍历渲染树，然后构造一个已经绘制的矩形区域的显示列表。其中包含矩形区域相关的renderer，从右往左的绘制顺序(背景，边框等)。这种方式只需要遍历一次渲染树就可以重新绘制(所有背景，再所有图片，再所有边框等)。</p>
-
-<p>Firefox通过不把hidden的元素加入到列表中来优化这个过程。</p>
-
-<p><strong>6.4 Webkit的矩形存储</strong></p>
-
-<p>在重新绘制之前，webkit把旧的矩形保存为一个<code>bitmap</code>，然后只重新绘制新旧矩形的不同之处。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/12/14/how-browsers-work-ten/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/12/12/how-browsers-work-nine/">浏览器是如何工作的(九)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-12-12T22:19:00+08:00" pubdate data-updated="true">Dec 12<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/12/12/how-browsers-work-nine/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>5 布局</strong></p>
-
-<p>当renderer被创建和加入到树中时，它是没有位置和大小的，计算这两个值称为布局或回流(reflow)。</p>
-
-<p>HTML使用的是基于布局模型的流，这意味着大多数时间内，单一路径下计算几何值是可能的。后进入流的元素不会影响比它先进入流的元素的几何属性值，所以布局文档可以被从左到右，从上到下处理。但是也有例外：比如，HTML的table元素可能需要多条路径。</p>
-
-<p>坐标系统是和根框架相关的，而且使用的是上坐标和左坐标。</p>
-
-<p>布局是一个迭代的过程，它从根renderer(对应于HTML文档的<code>&lt;html&gt;</code>元素)开始。布局迭代部分或整个框架，计算每个renderer的几何信息。</p>
-
-<p>根renderer的位置是<code>0,0</code>，它的范围是viewport(浏览器窗口的可视区域)。所有的renderer都有<code>layout</code>或<code>reflow</code>方法，每个renderer调用需要生成布局的孩子的<code>layout</code>方法。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/12/12/how-browsers-work-nine/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -684,6 +680,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/21/hashing-myths/">Hashing神话</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/20/string-searching-algorithms/">字符串搜索算法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/26/skip-list-in-a-netshell/">Skip List原理简述</a>
       </li>
     
@@ -695,21 +699,12 @@
         <a href="/blog/2012/06/17/install-munin-on-vps/">用Munin监控VPS的运行情况</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2012/06/16/linux-frequently-used-commands/">Linux常用命令</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/14/setup-octopress-on-vps/">快速搭建Octopress博客环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/algorithm/'>algorithm (1)</a></li>
-<li class='category'><a href='/blog/categories/algorithms/'>algorithms (1)</a></li>
+    <li class='category'><a href='/blog/categories/algorithms/'>algorithms (3)</a></li>
 <li class='category'><a href='/blog/categories/architecture/'>architecture (4)</a></li>
 <li class='category'><a href='/blog/categories/browsers/'>browsers (10)</a></li>
 <li class='category'><a href='/blog/categories/java/'>java (10)</a></li>
@@ -719,7 +714,7 @@
 <li class='category'><a href='/blog/categories/notes/'>notes (4)</a></li>
 <li class='category'><a href='/blog/categories/octopress/'>octopress (2)</a></li>
 <li class='category'><a href='/blog/categories/opensource/'>opensource (7)</a></li>
-<li class='category'><a href='/blog/categories/programming/'>programming (6)</a></li>
+<li class='category'><a href='/blog/categories/programming/'>programming (7)</a></li>
 <li class='category'><a href='/blog/categories/vim/'>vim (1)</a></li>
 <li class='category'><a href='/blog/categories/vps/'>vps (4)</a></li>
 
@@ -736,6 +731,22 @@
 Blog content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.<br/>
   Copyright &copy; 2012 - Foredoomed -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=8495631; 
+var sc_invisible=0; 
+var sc_security="5b0817e1"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost +
+"statcounter.com/counter/counter_xhtml.js'></"+"script>");</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="https://c.statcounter.com/8495631/0/5b0817e1/0/"
+alt="free hit counters" /></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
 
 </footer>
   
